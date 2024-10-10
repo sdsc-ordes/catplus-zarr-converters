@@ -1,5 +1,9 @@
 # Cat+ Zarr Converters 
 
+> [!WARNING]
+> This is a WIP repository, it is not yet stable.
+
+
 ## Summary
 
 This repository contains all the Zarr converters for the different data types in the Cat+ project (Agilent, UV, IR, etc.)
