@@ -1,0 +1,9 @@
+[package]
+name = "synth-converter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jsonschema = "0.22.3"
+sophia_jsonld = "0.8.0"
+sophia = "0.8.0"
