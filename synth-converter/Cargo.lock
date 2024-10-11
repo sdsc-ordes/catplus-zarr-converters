@@ -1474,6 +1474,7 @@ dependencies = [
  "sophia_inmem",
  "sophia_iri",
  "sophia_isomorphism",
+ "sophia_jsonld",
  "sophia_resource",
  "sophia_rio",
  "sophia_term",
@@ -1565,8 +1566,10 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "807253d3a4144e1f3eacf6976849dab04cbd493ff568414df07c33fd10886ce2"
 dependencies = [
+ "futures-util",
  "sophia_api",
  "sophia_iri",
+ "sophia_jsonld",
  "sophia_turtle",
  "thiserror",
 ]
@@ -1675,8 +1678,8 @@ name = "synth-converter"
 version = "0.1.0"
 dependencies = [
  "jsonschema",
+ "serde_json",
  "sophia",
- "sophia_jsonld",
 ]
 
 [[package]]

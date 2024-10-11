@@ -22,3 +22,6 @@ target/
 
 #OS specific
 .DS_Store
+
+#Folders
+data/**
