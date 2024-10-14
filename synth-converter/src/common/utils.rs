@@ -1,1 +1,1 @@
-pub fn utils(){}
+pub fn foo() {}
