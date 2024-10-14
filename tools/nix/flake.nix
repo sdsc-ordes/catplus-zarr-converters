@@ -1,5 +1,5 @@
 {
-  description = "tripsu";
+  description = "cat-plus-zarr-converters";
 
   nixConfig = {
     extra-substituters = [
@@ -39,13 +39,8 @@
       ...
     }:
     let
-      # This is string (without toString it would be a `path` which is put into the store)
-      rootDir = toString ./. + "../../..";
-    in
-    flake-utils.lib.eachDefaultSystem
-      # Creates an attribute map `{ devShells.<system>.default = ...}`
-      # by calling this function:
-      (
+      # The function which builds the flake output attrMap.
+      defineOutput =
         system:
         let
           overlays = [ (import rust-overlay) ];
@@ -80,14 +75,13 @@
             dasel
           ];
         in
-        with pkgs;
-        rec {
+        {
           devShells = {
-            default = mkShell {
+            default = pkgs.mkShell {
               packages = packagesBasic ++ packagesDev;
             };
 
-            ci = mkShell {
+            ci = pkgs.mkShell {
               packages = packagesBasic ++ packagesDev;
 
               # Due to some weird handling of TMPDIR inside containers:
@@ -98,6 +92,10 @@
               shellHook = "unset TMPDIR";
             };
           };
-        }
-      );
+        };
+    in
+    # Creates an attribute map `{ <key>.<system>.default = ...}`
+    # by calling function `defineOutput`.
+    # Key sofar is only `devShells` but can be any output `key` for a flake.
+    flake-utils.lib.eachDefaultSystem defineOutput;
 }
