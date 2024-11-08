@@ -11,6 +11,7 @@ path = "synth-converter/src/main.rs"
 [dependencies]
 jsonschema = "0.22.3"
 sophia = { version = "0.8.0-alpha.3", features = ["jsonld"] }
+oxigraph = "0.4.3"
 oxrdf = "0.2.1"
 oxttl = "0.1.1"
 serde = { version = "1.0", features = ["derive"] }
