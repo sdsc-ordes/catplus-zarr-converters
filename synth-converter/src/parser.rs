@@ -1,10 +1,19 @@
-use serde_json::{Result, Value};
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
 
-pub fn untyped_example(json_data: &str) -> Result<()> {
-	let v: Value = serde_json::from_str(json_data)?;
+#[derive(Serialize, Deserialize)]
+struct Person {
+    name: String,
+    age: u8,
+    phones: Vec<String>,
+}
 
-    // Access parts of the data by indexing with square brackets.
-    println!("Please call {} at the number {}", v["name"], v["phones"][0]);
+pub fn typed_example(json_data: &str) -> Result<()> {
+    // Some JSON input data as a &str. Maybe this comes from the user.
+    let p: Person = serde_json::from_str(json_data)?;
+
+    // Do things just like with any other Rust data structure.
+    println!("Please call {} at the number {}", p.name, p.phones[0]);
 
     Ok(())
 }
