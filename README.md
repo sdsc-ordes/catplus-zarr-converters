@@ -12,11 +12,16 @@ The data types are all in different formats, their data and metadata colluded to
 
 ## Installation guidelines
 
-To be defined.
+The project can be started in VS Code via a dev container
 
 ## How to Use
 
-To be defined.
+```
+cargo build 
+cargo run
+```
+
+This should print "Hello world"
 
 ## Contribute
 
