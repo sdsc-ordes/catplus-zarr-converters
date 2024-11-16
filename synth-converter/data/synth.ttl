@@ -1,0 +1,2 @@
+<http://example.org/23> <http://purl.allotrope.org/ontologies/resultAFR_0001120> "23"
+<http://example.org/23> <http://purl.allotrope.org/ontologies/realizable#AFRE_0000001> 

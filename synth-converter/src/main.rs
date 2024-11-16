@@ -30,6 +30,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 b.batch_id.as_str(),
             )?;
 
+            for item in &b.actions {
+                println!("action: {:?}", item);
+                let item_uri = ex.get(&item.name)?;
+
+                // Add triples for each item
+                g.insert(
+                    batch_uri.clone(),
+                    allores.get("AFRE_0000001")?,
+                    item_uri.clone(),
+                )?;                                
+            }            
+
             // Uncomment and fix serialization if needed
             let mut nt_stringifier = TurtleSerializer::new_stringifier();
             let example2 = nt_stringifier.serialize_graph(&g)?.as_str().to_string();
