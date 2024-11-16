@@ -1,6 +1,7 @@
 use std::fs;
+mod parser;
 
-pub mod parser;
+use parser::parser::typed_example;
 
 fn main() {
     println!("Hello, world!");
@@ -9,5 +10,5 @@ fn main() {
     let file_path = "data/test.json".to_owned();
     let contents = fs::read_to_string(file_path).expect("Couldn't find or load that file.");
 
-    let _ = parser::typed_example(&contents);
+    let _ = typed_example(&contents);
 }
