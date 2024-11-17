@@ -10,13 +10,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let file_path = "data/synth.json".to_owned();
     let contents = fs::read_to_string(file_path).expect("Couldn't find or load the file.");
     
-    // Parse JSON into Batch
+    // Parse json into Struct Batch
     match parse_json(&contents) {
+
+        // json was parses successfully
         Ok(batch) => {
             // Initialize the graph builder
             let mut graph_builder = GraphBuilder::new()?;
             
-            // Add batch to the graph
+            // Add Batch to the graph
             graph_builder.add_batch(&batch)?;
 
             // Serialize and print the graph

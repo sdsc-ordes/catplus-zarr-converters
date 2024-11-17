@@ -1,1 +1,1 @@
-pub mod graph_builder; // Exposes `parser.rs`
+pub mod graph_builder;
