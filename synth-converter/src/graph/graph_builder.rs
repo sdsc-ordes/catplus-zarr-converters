@@ -3,6 +3,7 @@ use sophia::api::graph::MutableGraph;
 use sophia::api::ns::Namespace;
 use sophia::api::serializer::TripleSerializer;
 use sophia::inmem::graph::LightGraph;
+use sophia_api::term::bnode_id::BnodeId;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 
@@ -63,13 +64,13 @@ impl GraphBuilder {
             println!("Processing action: {:?}", action.name);
 
             // Generate a unique action URI
-            let unique_action_name = self.get_action_uri(&action.name);
-            let action_uri = self.ex.get(&unique_action_name)?.clone(); // Use `?` to unwrap, then clone
+            let unique_action_name = self.get_action_uri(&action.name).clone();
 
+            let action_bnode = BnodeId::new_unchecked(&*unique_action_name);
             self.graph.insert(
                 &batch_uri,
                 &self.allores.get("AFRE_0000001")?,
-                &action_uri,
+                &action_bnode,
             )?;
 
             self.map_action_to_rdfs_class(&action.name);
@@ -96,10 +97,10 @@ impl GraphBuilder {
                     self.cat.get("dispenseType")?,
                 ),
             ];
-    
+
             for (field, predicate) in action_predicates {
                 if let Some(value) = field {
-                    self.graph.insert(&action_uri, &predicate, value)?;
+                    self.graph.insert(&action_bnode, &predicate, value)?;
                 }
             }
         }
@@ -109,10 +110,10 @@ impl GraphBuilder {
 
     pub fn serialize_to_turtle(&self) -> Result<String, Box<dyn std::error::Error>> {
         use sophia::api::serializer::Stringifier; // Import the required trait
-    
+
         let mut serializer = TurtleSerializer::new_stringifier();
         serializer.serialize_graph(&self.graph)?;
         Ok(serializer.as_str().to_string())
     }
-    
+
 }
