@@ -76,10 +76,8 @@ impl GraphBuilder {
                     self.cat.get("dispenseType")?,
                 ),
             ];
-            println!("{:?}", self.cat.get("dispenseType"));
     
             for (field, predicate) in action_predicates {
-                println!("Field: {:?}, Predicate: {:?}", field, predicate);
                 if let Some(value) = field {
                     self.graph.insert(&action_uri, &predicate, value)?;
                 }
