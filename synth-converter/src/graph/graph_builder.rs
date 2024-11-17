@@ -2,19 +2,16 @@ use std::collections::HashMap;
 use sophia::api::graph::MutableGraph;
 use sophia::api::ns::Namespace;
 use sophia::api::serializer::TripleSerializer;
-use sophia::inmem::graph::FastGraph;
-use sophia_term::RcTerm;
-use sophia_api::term::SimpleTerm;
+use sophia::inmem::graph::LightGraph;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 
 pub struct GraphBuilder {
-    graph: FastGraph,
+    graph: LightGraph,
     ex: Namespace<String>,
     allores: Namespace<String>,
     schema: Namespace<String>,
     cat: Namespace<String>,
-    rdf: Namespace<String>,
     action_counter: HashMap<String, usize>,
 }
 
@@ -22,16 +19,15 @@ impl GraphBuilder {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
             action_counter: HashMap::new(), 
-            graph: FastGraph::new(),
+            graph: LightGraph::new(),
             ex: Namespace::<String>::new("http://example.org/".to_string())?,
             allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
             schema: Namespace::<String>::new("https://schema.org/".to_string())?,
-            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,
-            rdf: Namespace::<String>::new("http://www.w3.org/1999/02/22-rdf-syntax-ns#".to_string())?,         
+            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,        
         })
     }
 
-    fn get_action_uri(&mut self, action_name: &str) -> String {
+    fn get_action_uri(&mut self, action_name: &str)  -> String {
         // Increment the counter for the given action name
         let count = self.action_counter.entry(action_name.to_string()).or_insert(0);
         *count += 1;
@@ -40,7 +36,7 @@ impl GraphBuilder {
         format!("{}_{}", action_name, *count)
     }
     
-    fn map_action_to_rdfs_class(&self, action_name: &str) -> SimpleTerm {{
+    fn map_action_to_rdfs_class(&self, action_name: &str) {
         // Match the action name and fetch the corresponding class from either `self.cat` or `self.allores`.
         let mapped_class = match action_name {
             "add" => self.cat.get("AddAction"),           // Get "AddAction" from `self.cat`
@@ -50,9 +46,6 @@ impl GraphBuilder {
         println!("{:?}", mapped_class);
     }
     
-    
-    
-
     pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
         // Fully resolve the batch URI before the loop
         let ex_namespace = self.ex.clone();
