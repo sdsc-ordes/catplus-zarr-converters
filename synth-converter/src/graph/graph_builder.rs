@@ -18,12 +18,12 @@ pub struct GraphBuilder {
 impl GraphBuilder {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
-            action_counter: HashMap::new(), 
+            action_counter: HashMap::new(),
             graph: LightGraph::new(),
             ex: Namespace::<String>::new("http://example.org/".to_string())?,
             allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
             schema: Namespace::<String>::new("https://schema.org/".to_string())?,
-            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,        
+            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,
         })
     }
 
@@ -35,7 +35,7 @@ impl GraphBuilder {
         // Generate a unique URI
         format!("{}_{}", action_name, *count)
     }
-    
+
     fn map_action_to_rdfs_class(&self, action_name: &str) {
         // Match the action name and fetch the corresponding class from either `self.cat` or `self.allores`.
         let mapped_class = match action_name {
@@ -45,14 +45,14 @@ impl GraphBuilder {
         };
         println!("{:?}", mapped_class);
     }
-    
+
     pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
         // Fully resolve the batch URI before the loop
         let ex_namespace = self.ex.clone();
 
         // Resolve the batch URI
         let batch_uri = ex_namespace.get(&batch.batch_id)?.clone();
-    
+
         self.graph.insert(
             &batch_uri,
             &self.allores.get("AFR_0001120")?,
@@ -61,11 +61,11 @@ impl GraphBuilder {
 
         for action in &batch.actions {
             println!("Processing action: {:?}", action.name);
-    
+
             // Generate a unique action URI
             let unique_action_name = self.get_action_uri(&action.name);
             let action_uri = self.ex.get(&unique_action_name)?.clone(); // Use `?` to unwrap, then clone
-    
+
             self.graph.insert(
                 &batch_uri,
                 &self.allores.get("AFRE_0000001")?,
