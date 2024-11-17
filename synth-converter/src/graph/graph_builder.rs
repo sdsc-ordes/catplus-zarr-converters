@@ -39,6 +39,15 @@ impl GraphBuilder {
         format!("{}_{}", action_name, *count)
     }
 
+    fn get_action_iri_name(&self, action_name: &str) -> String {
+        let mapped_class = match action_name {
+            "add" => "AddAction",
+            "set_temperature" => "setTemperatureAction",
+            _ => "AFRE_0000001",
+        };
+        mapped_class.to_string()
+    }
+
     pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
         // Fully resolve the batch URI before the loop
         let ex_namespace = self.ex.clone();
@@ -53,8 +62,6 @@ impl GraphBuilder {
         )?;
 
         for action in &batch.actions {
-            println!("Processing action: {:?}", action.name);
-
             // Generate a unique action URI
             let unique_action_name = self.get_action_uri(&action.name).clone();
 
@@ -64,16 +71,18 @@ impl GraphBuilder {
                 &self.allores.get("AFRE_0000001")?,
                 &action_bnode,
             )?;
-
-            if let (Ok(rdf_type), Ok(add_action)) = (
+            let action_iri_name = self.get_action_iri_name(&action.name);
+            if let (Ok(rdf_type), Ok(mapped_action)) = (
                 self.rdf.get("type"),
-                self.cat.get("AddAction")
+                self.cat.get(&action_iri_name),
             ) {
-                self.graph.insert(
-                    &action_bnode,
-                    &rdf_type,
-                    &add_action,
-                ).unwrap(); // Or handle the error appropriately
+                self.graph
+                    .insert(
+                        &action_bnode,
+                        &rdf_type,
+                        &mapped_action,
+                    )
+                    .unwrap(); // Or handle the error appropriately
             } else {
                 eprintln!("Error resolving RDF terms");
             }
