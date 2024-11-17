@@ -10,6 +10,7 @@ pub struct GraphBuilder {
     ex: Namespace<String>,
     allores: Namespace<String>,
     schema: Namespace<String>,
+    cat: Namespace<String>,
 }
 
 impl GraphBuilder {
@@ -19,6 +20,7 @@ impl GraphBuilder {
             ex: Namespace::<String>::new("http://example.org/".to_string())?,
             allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
             schema: Namespace::<String>::new("https://schema.org/".to_string())?,
+            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,
         })
     }
 
@@ -41,6 +43,14 @@ impl GraphBuilder {
 
             let action_predicates = vec![
                 (Some(action.name.as_str()), self.schema.get("name")?),
+                (
+                    action.equipment_local_name.as_ref().map(|x| x.as_str()),
+                    self.cat.get("localEquipmentName")?,
+                ),
+                (
+                    action.container_barcode.as_ref().map(|x| x.as_str()),
+                    self.cat.get("containerBarcode")?,
+                ),
             ];
     
             for (field, predicate) in action_predicates {
