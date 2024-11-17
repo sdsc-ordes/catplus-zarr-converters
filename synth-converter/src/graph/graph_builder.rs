@@ -8,12 +8,13 @@ use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 
 pub struct GraphBuilder {
+    action_counter: HashMap<String, usize>,
     graph: LightGraph,
     ex: Namespace<String>,
     allores: Namespace<String>,
     schema: Namespace<String>,
     cat: Namespace<String>,
-    action_counter: HashMap<String, usize>,
+    rdf: Namespace<String>,
 }
 
 impl GraphBuilder {
@@ -25,6 +26,7 @@ impl GraphBuilder {
             allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
             schema: Namespace::<String>::new("https://schema.org/".to_string())?,
             cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,
+            rdf: Namespace::<String>::new("http://www.w3.org/1999/02/22-rdf-syntax-ns#".to_string())?,
         })
     }
 
@@ -35,16 +37,6 @@ impl GraphBuilder {
 
         // Generate a unique URI
         format!("{}_{}", action_name, *count)
-    }
-
-    fn map_action_to_rdfs_class(&self, action_name: &str) {
-        // Match the action name and fetch the corresponding class from either `self.cat` or `self.allores`.
-        let mapped_class = match action_name {
-            "add" => self.cat.get("AddAction"),           // Get "AddAction" from `self.cat`
-            "set_temperature" => self.cat.get("setTemperatureAction"), // Get "setTemperatureAction" from `self.cat`
-            _ => self.allores.get("AFRE_0000001"),       // Default to "AFRE_0000001" from `self.allores`
-        };
-        println!("{:?}", mapped_class);
     }
 
     pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
@@ -73,14 +65,18 @@ impl GraphBuilder {
                 &action_bnode,
             )?;
 
-            self.map_action_to_rdfs_class(&action.name);
-
-            // Insert the RDF type triple (action_uri rdf:type action_rdfs_class)
-            /*self.graph.insert(
-                &action_uri,
-                &self.rdf.get("type")?, // RDF type predicate
-                &action_rdfs_class,
-            )?;*/
+            if let (Ok(rdf_type), Ok(add_action)) = (
+                self.rdf.get("type"),
+                self.cat.get("AddAction")
+            ) {
+                self.graph.insert(
+                    &action_bnode,
+                    &rdf_type,
+                    &add_action,
+                ).unwrap(); // Or handle the error appropriately
+            } else {
+                eprintln!("Error resolving RDF terms");
+            }
 
             let action_predicates = vec![
                 (Some(action.name.as_str()), self.schema.get("name")?),
