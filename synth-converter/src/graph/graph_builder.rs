@@ -9,6 +9,7 @@ pub struct GraphBuilder {
     graph: FastGraph,
     ex: Namespace<String>,
     allores: Namespace<String>,
+    schema: Namespace<String>,
 }
 
 impl GraphBuilder {
@@ -17,6 +18,7 @@ impl GraphBuilder {
             graph: FastGraph::new(),
             ex: Namespace::<String>::new("http://example.org/".to_string())?,
             allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
+            schema: Namespace::<String>::new("https://schema.org/".to_string())?,
         })
     }
 
@@ -36,6 +38,16 @@ impl GraphBuilder {
                 &self.allores.get("AFRE_0000001")?,
                 &action_uri,
             )?;
+
+            let action_predicates = vec![
+                (Some(action.name.as_str()), self.schema.get("name")?),
+            ];
+    
+            for (field, predicate) in action_predicates {
+                if let Some(value) = field {
+                    self.graph.insert(&action_uri, &predicate, value)?;
+                }
+            } 
         }
 
         Ok(())
