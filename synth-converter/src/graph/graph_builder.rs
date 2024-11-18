@@ -6,15 +6,19 @@ use sophia::inmem::graph::LightGraph;
 use sophia_api::term::bnode_id::BnodeId;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref RDF: Namespace<&'static str> = Namespace::new("http://www.w3.org/1999/02/22-rdf-syntax-ns#").unwrap();
+    pub static ref CAT: Namespace<&'static str> = Namespace::new("http://example.org/cat#").unwrap();
+    pub static ref SCHEMA: Namespace<&'static str> = Namespace::new("https://schema.org/").unwrap();
+    pub static ref ALLORES: Namespace<&'static str> = Namespace::new("http://purl.allotrope.org/ontologies/result#").unwrap();
+    pub static ref EX: Namespace<&'static str> = Namespace::new("http://example.org/").unwrap();
+}
 
 pub struct GraphBuilder {
     action_counter: HashMap<String, usize>,
     graph: LightGraph,
-    ex: Namespace<String>,
-    allores: Namespace<String>,
-    schema: Namespace<String>,
-    cat: Namespace<String>,
-    rdf: Namespace<String>,
 }
 
 impl GraphBuilder {
@@ -22,11 +26,6 @@ impl GraphBuilder {
         Ok(Self {
             action_counter: HashMap::new(),
             graph: LightGraph::new(),
-            ex: Namespace::<String>::new("http://example.org/".to_string())?,
-            allores: Namespace::<String>::new("http://purl.allotrope.org/ontologies/result#".to_string())?,
-            schema: Namespace::<String>::new("https://schema.org/".to_string())?,
-            cat: Namespace::<String>::new("http://example.org/cat#".to_string())?,
-            rdf: Namespace::<String>::new("http://www.w3.org/1999/02/22-rdf-syntax-ns#".to_string())?,
         })
     }
 
@@ -49,36 +48,33 @@ impl GraphBuilder {
     }
 
     pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
-        // Fully resolve the batch URI before the loop
-        let ex_namespace = self.ex.clone();
-
-        // Resolve the batch URI
-        let batch_uri = ex_namespace.get(&batch.batch_id)?.clone();
+        let batch_uri = EX.get(&batch.batch_id)?.clone();
+        let rdf_type = RDF.get("type")?;
 
         self.graph.insert(
             &batch_uri,
-            &self.allores.get("AFR_0001120")?,
+            &ALLORES.get("AFR_0001120")?,
             batch.batch_id.as_str(),
         )?;
+
         self.graph.insert(
             &batch_uri,
-            self.rdf.get("type").unwrap(),
-            self.cat.get("Batch").unwrap(),
+            &rdf_type,
+            &CAT.get("Batch")?,
         )?;
 
         for action in &batch.actions {
-            // Generate a unique action URI
             let unique_action_name = self.get_action_uri(&action.name).clone();
 
             let action_bnode = BnodeId::new_unchecked(&*unique_action_name);
             self.graph.insert(
                 &batch_uri,
-                &self.allores.get("AFRE_0000001")?,
+                &ALLORES.get("AFRE_0000001")?,
                 &action_bnode,
             )?;
+
             let action_iri_name = self.get_action_iri_name(&action.name);
-            let rdf_type = self.rdf.get("type").unwrap();
-            let mapped_action = self.cat.get(&action_iri_name).unwrap();
+            let mapped_action = CAT.get(&action_iri_name)?.clone();
             self.graph
                 .insert(
                     &action_bnode,
@@ -86,28 +82,31 @@ impl GraphBuilder {
                     &mapped_action,
                 )
                 .unwrap();
-
-            let action_predicates = vec![
-                (Some(action.name.as_str()), self.schema.get("name")?),
-                (
-                    action.equipment_local_name.as_ref().map(|x| x.as_str()),
-                    self.cat.get("localEquipmentName")?,
-                ),
-                (
-                    action.container_barcode.as_ref().map(|x| x.as_str()),
-                    self.cat.get("containerBarcode")?,
-                ),
-                (
-                    action.dispense_type.as_ref().map(|x| x.as_str()),
-                    self.cat.get("dispenseType")?,
-                ),
-            ];
-
-            for (field, predicate) in action_predicates {
-                if let Some(value) = field {
-                    self.graph.insert(&action_bnode, &predicate, value)?;
+                let schema_name = SCHEMA.get("name")?;
+                let cat_local_name = CAT.get("localEquipmentName")?;
+                let cat_barcode = CAT.get("containerBarcode")?;
+                let cat_dispense_type = CAT.get("dispenseType")?;
+                let action_predicates = vec![
+                    (Some(action.name.as_str()), &schema_name),
+                    (
+                        action.equipment_local_name.as_ref().map(|x| x.as_str()),
+                        &cat_local_name,
+                    ),
+                    (
+                        action.container_barcode.as_ref().map(|x| x.as_str()),
+                        &cat_barcode,
+                    ),
+                    (
+                        action.dispense_type.as_ref().map(|x| x.as_str()),
+                        &cat_dispense_type,
+                    ),
+                ];
+                for (field, predicate) in action_predicates {
+                    if let Some(value) = field {
+                        // Use `&*predicate` to convert `&NsTerm<'_>` to `&&NsTerm<'_>`
+                        self.graph.insert(&action_bnode, &*predicate, value)?;
+                    }
                 }
-            }
         }
 
         Ok(())
