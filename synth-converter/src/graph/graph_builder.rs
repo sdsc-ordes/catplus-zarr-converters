@@ -60,6 +60,11 @@ impl GraphBuilder {
             &self.allores.get("AFR_0001120")?,
             batch.batch_id.as_str(),
         )?;
+        self.graph.insert(
+            &batch_uri,
+            self.rdf.get("type").unwrap(),
+            self.cat.get("Batch").unwrap(),
+        )?;
 
         for action in &batch.actions {
             // Generate a unique action URI
