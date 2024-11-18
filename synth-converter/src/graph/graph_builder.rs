@@ -72,20 +72,15 @@ impl GraphBuilder {
                 &action_bnode,
             )?;
             let action_iri_name = self.get_action_iri_name(&action.name);
-            if let (Ok(rdf_type), Ok(mapped_action)) = (
-                self.rdf.get("type"),
-                self.cat.get(&action_iri_name),
-            ) {
-                self.graph
-                    .insert(
-                        &action_bnode,
-                        &rdf_type,
-                        &mapped_action,
-                    )
-                    .unwrap(); // Or handle the error appropriately
-            } else {
-                eprintln!("Error resolving RDF terms");
-            }
+            let rdf_type = self.rdf.get("type").unwrap();
+            let mapped_action = self.cat.get(&action_iri_name).unwrap();
+            self.graph
+                .insert(
+                    &action_bnode,
+                    &rdf_type,
+                    &mapped_action,
+                )
+                .unwrap();
 
             let action_predicates = vec![
                 (Some(action.name.as_str()), self.schema.get("name")?),
