@@ -17,11 +17,11 @@ The project can be started in VS Code via a dev container
 ## How to Use
 
 ```
-cargo build 
+cargo build
 cargo run
 ```
 
-This should print "Hello world"
+This will use the `data/synth.json` as input and build a turtle graph from it, mapping it to the cat-plus ontology (see link above).
 
 ## Contribute
 
