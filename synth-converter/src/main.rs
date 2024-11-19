@@ -7,7 +7,7 @@ use parser::parser::parse_json;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Read JSON file
-    let file_path = "data/synth.json".to_owned();
+    let file_path = "data/filtrate.json".to_owned();
     let contents = fs::read_to_string(file_path).expect("Couldn't find or load the file.");
 
     // Parse json into Struct Batch
