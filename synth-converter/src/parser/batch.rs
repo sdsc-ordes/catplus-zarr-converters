@@ -44,6 +44,6 @@ pub struct SetTemperatureAction {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Measurement {
-    value: f64,
-    unit: String,
+    pub value: f64,
+    pub unit: String,
 }

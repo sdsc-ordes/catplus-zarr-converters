@@ -5,8 +5,9 @@ use sophia::inmem::graph::LightGraph;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 use crate::parser::batch::Action;
-use crate::parser::batch::BaseAction;
 use sophia_api::ns::NsTerm;
+use crate::parser::batch::BaseAction;
+use crate::parser::batch::Measurement;
 use crate::graph::utils::generate_unique_identifier;
 use lazy_static::lazy_static;
 
@@ -16,6 +17,7 @@ lazy_static! {
     pub static ref SCHEMA: Namespace<&'static str> = Namespace::new("https://schema.org/").unwrap();
     pub static ref ALLORES: Namespace<&'static str> = Namespace::new("http://purl.allotrope.org/ontologies/result#").unwrap();
     pub static ref EX: Namespace<&'static str> = Namespace::new("http://example.org/").unwrap();
+    pub static ref QUDT: Namespace<&'static str> = Namespace::new("http://qudt.org/schema/qudt/").unwrap();
 }
 
 pub struct GraphBuilder {
@@ -43,6 +45,19 @@ impl GraphBuilder {
         Ok(())
     }
 
+    fn insert_measurement_to_graph(
+        &mut self,
+        property_uri: &NsTerm<'_>, // Property URI (e.g., "TemperatureTumbleStirrer")
+        measurement: &Measurement,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let measurement_id = generate_unique_identifier();
+        let measurement_uri = EX.get(&measurement_id)?;
+        self.graph.insert(measurement_uri, &RDF.get("type")?, property_uri)?;
+        self.graph.insert(measurement_uri, &QUDT.get("unit")?, measurement.unit.as_str())?;
+        self.graph.insert(measurement_uri, &QUDT.get("value")?, measurement.value)?;
+        Ok(())
+    }
+
     fn add_action_to_graph(
         &mut self,
         batch_uri: &NsTerm<'_>,
@@ -55,9 +70,14 @@ impl GraphBuilder {
             Action::setTemperatureAction(action) => {
                 self.graph.insert(&action_uri, &RDF.get("type")?, &CAT.get("setTemperatureAction")?)?;
                 self.add_base_action_to_graph(&action_uri, &action.base)?;
-                // Add specific fields for setTemperatureAction
-                //self.graph.insert(&action_uri, &ALLORES.get("AFX_0000721")?, action.TemperatureTumbleStirrer.value.to_string().as_str())?;
-                //self.graph.insert(&action_uri, &ALLORES.get("AFX_0000722")?, action.TemperatureShaker.value.to_string().as_str())?;
+                self.insert_measurement_to_graph(
+                    &CAT.get("temperatureShakerShape")?,
+                    &action.TemperatureTumbleStirrer,
+                )?;
+                self.insert_measurement_to_graph(
+                    &CAT.get("temperatureTumbleStirrerShape")?,
+                    &action.TemperatureShaker,
+                )?;
             }
             Action::filtrateAction(action) => {
                 self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
