@@ -5,6 +5,7 @@ use sophia::inmem::graph::LightGraph;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 use crate::parser::batch::Action;
+use sophia_api::term::bnode_id::BnodeId;
 use sophia_api::ns::NsTerm;
 use crate::parser::batch::BaseAction;
 use crate::parser::batch::Measurement;
@@ -47,14 +48,15 @@ impl GraphBuilder {
 
     fn insert_measurement_to_graph(
         &mut self,
+        action_uri: &NsTerm<'_>,
         property_uri: &NsTerm<'_>, // Property URI (e.g., "TemperatureTumbleStirrer")
         measurement: &Measurement,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let measurement_id = generate_unique_identifier();
-        let measurement_uri = EX.get(&measurement_id)?;
-        self.graph.insert(measurement_uri, &RDF.get("type")?, property_uri)?;
-        self.graph.insert(measurement_uri, &QUDT.get("unit")?, measurement.unit.as_str())?;
-        self.graph.insert(measurement_uri, &QUDT.get("value")?, measurement.value)?;
+        let bnode_id = generate_unique_identifier().clone();
+        let action_bnode = BnodeId::new_unchecked(bnode_id);
+        self.graph.insert(action_uri, property_uri, &action_bnode)?;
+        self.graph.insert(&action_bnode, &QUDT.get("unit")?, measurement.unit.as_str())?;
+        self.graph.insert(&action_bnode, &QUDT.get("value")?, measurement.value)?;
         Ok(())
     }
 
@@ -71,10 +73,12 @@ impl GraphBuilder {
                 self.graph.insert(&action_uri, &RDF.get("type")?, &CAT.get("setTemperatureAction")?)?;
                 self.add_base_action_to_graph(&action_uri, &action.base)?;
                 self.insert_measurement_to_graph(
+                    &action_uri,
                     &CAT.get("temperatureShakerShape")?,
                     &action.TemperatureTumbleStirrer,
                 )?;
                 self.insert_measurement_to_graph(
+                    &action_uri,
                     &CAT.get("temperatureTumbleStirrerShape")?,
                     &action.TemperatureShaker,
                 )?;
