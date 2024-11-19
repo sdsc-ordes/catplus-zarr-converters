@@ -5,6 +5,7 @@ use sophia::inmem::graph::LightGraph;
 use sophia_turtle::serializer::turtle::TurtleSerializer;
 use crate::parser::batch::Batch;
 use crate::parser::batch::Action;
+use crate::parser::batch::BaseAction;
 use sophia_api::ns::NsTerm;
 use crate::graph::utils::generate_unique_identifier;
 use lazy_static::lazy_static;
@@ -28,24 +29,39 @@ impl GraphBuilder {
         })
     }
 
+    fn add_base_action_to_graph(
+        &mut self,
+        action_uri: &NsTerm<'_>,
+        base: &BaseAction,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        self.graph.insert(action_uri, &ALLORES.get("AFX_0000622")?, base.startTime.as_str())?;
+        self.graph.insert(action_uri, &ALLORES.get("AFR_0001606")?, base.method_name.as_str())?;
+        self.graph.insert(action_uri, &ALLORES.get("AFR_0001723")?, base.equipment_name.as_str())?;
+        self.graph.insert(action_uri, &CAT.get("localEquipmentName")?, base.sub_equipment_name.as_str())?;
+        self.graph.insert(action_uri, &CAT.get("containerID")?, base.containerID.as_str())?;
+        self.graph.insert(action_uri, &CAT.get("containerBarcode")?, base.containerBarcode.as_str())?;
+        Ok(())
+    }
+
     fn add_action_to_graph(
         &mut self,
         batch_uri: &NsTerm<'_>,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        let action_id = generate_unique_identifier();
+        let action_uri = EX.get(&action_id)?;
+        self.graph.insert(&action_uri, &CAT.get("hasBatch")?, batch_uri)?;
         match action {
-            Action::filtrateAction(filtrate_action) => {
-                let action_id = generate_unique_identifier();
-                let action_uri = EX.get(&action_id)?;
-
-                self.graph.insert(&action_uri, &CAT.get("hasBatch")?, batch_uri)?;
-                self.graph.insert(&action_uri, &RDF.get("type")?, &CAT.get("FiltrateAction")?)?;
-                self.graph.insert(&action_uri, &ALLORES.get("AFX_0000622")?, filtrate_action.startTime.as_str())?;
-                self.graph.insert(&action_uri, &ALLORES.get("AFR_0001606")?, filtrate_action.method_name.as_str())?;
-                self.graph.insert(&action_uri, &ALLORES.get("AFR_0001723")?, filtrate_action.equipment_name.as_str())?;
-                self.graph.insert(&action_uri, &CAT.get("localEquipmentName")?, filtrate_action.sub_equipment_name.as_str())?;
-                self.graph.insert(&action_uri, &CAT.get("containerID")?, filtrate_action.containerID.as_str())?;
-                self.graph.insert(&action_uri, &CAT.get("containerBarcode")?, filtrate_action.containerBarcode.as_str())?;
+            Action::setTemperatureAction(action) => {
+                self.graph.insert(&action_uri, &RDF.get("type")?, &CAT.get("setTemperatureAction")?)?;
+                self.add_base_action_to_graph(&action_uri, &action.base)?;
+                // Add specific fields for setTemperatureAction
+                //self.graph.insert(&action_uri, &ALLORES.get("AFX_0000721")?, action.TemperatureTumbleStirrer.value.to_string().as_str())?;
+                //self.graph.insert(&action_uri, &ALLORES.get("AFX_0000722")?, action.TemperatureShaker.value.to_string().as_str())?;
+            }
+            Action::filtrateAction(action) => {
+                self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
+                self.add_base_action_to_graph(&action_uri, &action.base)?;
             }
         }
         Ok(())
