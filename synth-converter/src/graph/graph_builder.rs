@@ -38,7 +38,13 @@ impl GraphBuilder {
         base: &BaseAction,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.graph.insert(action_uri, &ALLORES.get("AFX_0000622")?, base.startTime.as_str())?;
-        self.graph.insert(action_uri, &ALLORES.get("AFR_0001606")?, base.method_name.as_str())?;
+        if let Some(method_name) = &base.method_name {
+            self.graph.insert(
+                action_uri,
+                &ALLORES.get("AFR_0001606")?,
+                method_name.as_str(),
+            )?;
+        }
         self.graph.insert(action_uri, &ALLORES.get("AFR_0001723")?, base.equipment_name.as_str())?;
         self.graph.insert(action_uri, &CAT.get("localEquipmentName")?, base.sub_equipment_name.as_str())?;
         self.graph.insert(action_uri, &CAT.get("containerID")?, base.containerID.as_str())?;
@@ -82,6 +88,25 @@ impl GraphBuilder {
                     &CAT.get("temperatureTumbleStirrerShape")?,
                     &action.TemperatureShaker,
                 )?;
+                if let Some(speed) = &action.speed {
+                    self.insert_measurement_to_graph(
+                        &action_uri,
+                        &CAT.get("speedInRPM")?,
+                        speed,
+                    )?;
+                }
+            }
+            Action::shakeAction(action) => {
+                self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
+                self.add_base_action_to_graph(&action_uri, &action.base)?;
+            }
+            Action::setVacuumAction(action) => {
+                self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
+                self.add_base_action_to_graph(&action_uri, &action.base)?;
+            }
+            Action::setPressureAction(action) => {
+                self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
+                self.add_base_action_to_graph(&action_uri, &action.base)?;
             }
             Action::filtrateAction(action) => {
                 self.graph.insert(&action_uri, &ALLORES.get("type")?, &CAT.get("AFRE_0000001")?)?;
