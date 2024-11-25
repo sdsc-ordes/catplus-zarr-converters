@@ -1,11 +1,11 @@
 {
-    "name": "Rust Development Environment",
-    "image": "mcr.microsoft.com/devcontainers/rust:latest",
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "rust-lang.rust-analyzer"
-            ]
-        }
-    }
+  "image": "mcr.microsoft.com/devcontainers/rust:latest",
+
+  "features": {
+    "ghcr.io/guiyomh/features/just:0": "latest"
+  },
+  "remoteUser": "root",
+
+  "capAdd": ["SYS_PTRACE"],
+  "securityOpt": ["seccomp=unconfined"]
 }
