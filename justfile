@@ -1,5 +1,6 @@
 set positional-arguments
 set shell := ["bash", "-cue"]
+
 root_dir := `git rev-parse --show-toplevel`
 
 # Default recipe to list all recipes.
