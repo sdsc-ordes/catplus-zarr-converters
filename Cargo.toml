@@ -1,0 +1,12 @@
+[package]
+name = "synth-converter"
+version = "0.1.0"
+edition = "2021"
+
+
+[[bin]]
+name = "synth-converter"
+path = "synth-converter/src/main.rs"
+
+[dependencies]
+
