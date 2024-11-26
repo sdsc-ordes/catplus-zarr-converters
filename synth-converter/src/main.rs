@@ -1,6 +1,7 @@
 mod parser;
+mod graph;
 use parser::parser::parse_json;
-use serde_json;
+use graph::graph_builder::GraphBuilder;
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -19,9 +20,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match parse_json(&input_content) {
         Ok(batch) => {
+            let mut graph_builder = GraphBuilder::new()?;
+            graph_builder.add_batch(&batch)?;
+            let serialized_graph = graph_builder.serialize_to_turtle()?;
+            println!("The resulting graph in Turtle format:\n{}", serialized_graph);
             let mut output = File::create(output_file)?;
-            let serialized_batch = serde_json::to_string(&batch)?;
-            output.write_all(serialized_batch.as_bytes())?;
+            output.write_all(serialized_graph.as_bytes())?;
             println!("Processed content written to {}", output_file);
             Ok(())
         }
@@ -31,5 +35,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 }
-
 
