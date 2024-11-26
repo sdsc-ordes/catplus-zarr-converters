@@ -1,0 +1,415 @@
+{
+    "batchID": "23",
+    "Actions": [
+        {
+            "actionName": "setTemperatureAction",
+            "speedShaker": {
+                "value": 152,
+                "unit": "rpm"
+            },
+            "temperatureTumbleStirrer": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "temperatureShaker": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "startTime": "2024-07-25T12:00:00",
+            "endingTime": "2024-07-25T12:00:02",
+            "methodName": "set_temperature",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "heater",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "AddAction",
+            "speedShaker": {
+                "value": 152,
+                "unit": "rpm"
+            },
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "GDU-V",
+            "hasContainerPositionAndQuantity": [
+                {
+                    "position": "1A1",
+                    "quantity": {
+                        "value": 1,
+                        "unit": "mg"
+                    }
+                },
+                {
+                    "position": "1B1",
+                    "quantity": {
+                        "value": 4,
+                        "unit": "mg"
+                    }
+                }
+            ],
+            "startTime": "2024-07-25T12:00:13",
+            "endingTime": "2024-07-25T12:00:17",
+            "methodName": "addition",
+            "dispenseState": "Liquid",
+            "dispenseType": "volume",
+            "hasSample": {
+                "expectedDatum": {
+                    "value": 2,
+                    "unit": "mg"
+                },
+                "containerID": "17",
+                "containerBarcode": "17",
+                "vialID": "15",
+                "vialType": "storage vial",
+                "role": "solvent",
+                "hasSample": [
+                    {
+                        "sampleID": "123",
+                        "role": "solvent",
+                        "internalBarCode": "1",
+                        "measuredQuantity": {
+                            "value": "",
+                            "unit": "mg"
+                        },
+                        "physicalState": "Liquid",
+                        "concentration": {
+                            "value": "",
+                            "unit": "mol/L"
+                        },
+                        "purity": "",
+                        "hasChemical": {
+                            "chemicalID": "134",
+                            "chemicalName": "Toluène",
+                            "CASNumber": "108-88-3",
+                            "molecularMass": {
+                                "value": 92.14,
+                                "unit": "g/mol"
+                            },
+                            "smiles": "CC1=CC=CC=C1"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "actionName": "AddAction",
+            "speedShaker": {
+                "value": 152,
+                "unit": "rpm"
+            },
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "GDU-V",
+            "hasContainerPositionAndQuantity": [
+                {
+                    "position": "1A1",
+                    "quantity": {
+                        "value": 0.024,
+                        "unit": "mg"
+                    }
+                },
+                {
+                    "position": "1B1",
+                    "quantity": {
+                        "value": 0.034,
+                        "unit": "mg"
+                    }
+                }
+            ],
+            "startTime": "2024-07-25T12:01:29",
+            "endingTime": "2024-07-25T12:01:35",
+            "methodName": "addition",
+            "dispenseState": "Liquid",
+            "dispenseType": "volume",
+            "hasSample": {
+                "expectedDatum": {
+                    "value": 2,
+                    "unit": "mg"
+                },
+                "containerID": "18",
+                "containerBarcode": "18",
+                "vialID": "17",
+                "vialType": "storage vial",
+                "role": "reagent",
+                "hasSample": [
+                    {
+                        "sampleID": "124",
+                        "role": "reagent",
+                        "internalBarCode": "2",
+                        "expectedDatum": {
+                            "value": 5,
+                            "unit": "mg"
+                        },
+                        "measuredQuantity": {
+                            "value": "",
+                            "unit": "mg"
+                        },
+                        "physicalState": "Liquid",
+                        "concentration": {
+                            "value": "",
+                            "unit": "mol/L"
+                        },
+                        "purity": "",
+                        "hasChemical": {
+                            "chemicalID": "134",
+                            "chemicalName": "4-methoxybenzaldehyde",
+                            "CASNumber": "123-11-5",
+                            "molecularMass": {
+                                "value": 136.15,
+                                "unit": "g/mol"
+                            },
+                            "smiles": "COC1=CC=C(C=C1)C=O"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "actionName": "AddAction",
+            "speedShaker": {
+                "value": 152,
+                "unit": "rpm"
+            },
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "GDU-V",
+            "hasContainerPositionAndQuantity": [
+                {
+                    "position": "1A1",
+                    "quantity": {
+                        "value": 0.035,
+                        "unit": "mg"
+                    }
+                },
+                {
+                    "position": "1B1",
+                    "quantity": {
+                        "value": 0.034,
+                        "unit": "mg"
+                    }
+                }
+            ],
+            "startTime": "2024-07-25T12:02:01",
+            "endingTime": "2024-07-25T12:02:03",
+            "methodName": "addition",
+            "dispenseState": "Solid",
+            "dispenseType": "mass",
+            "hasSample": {
+                "expectedDatum": {
+                    "value": 5,
+                    "unit": "mg"
+                },
+                "containerID": "20",
+                "containerBarcode": "20",
+                "vialID": "19",
+                "vialType": "storage vial",
+                "role": "reagent",
+                "hasSample": [
+                    {
+                        "sampleID": "147",
+                        "role": "reagent",
+                        "internalBarCode": "3",
+                        "expectedDatum": {
+                            "value": 20,
+                            "unit": "mg"
+                        },
+                        "measuredQuantity": {
+                            "value": "",
+                            "unit": "mg"
+                        },
+                        "physicalState": "Liquid",
+                        "concentration": {
+                            "value": "",
+                            "unit": "mol/L"
+                        },
+                        "purity": "",
+                        "hasChemical": {
+                            "chemicalID": "135",
+                            "chemicalName": "Styrene",
+                            "CASNumber": "100-42-5",
+                            "molecularMass": {
+                                "value": 104.15,
+                                "unit": "g/mol"
+                            },
+                            "smiles": "C=CC1=CC=CC=C1"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "actionName": "AddAction",
+            "speedShaker": {
+                "value": 152,
+                "unit": "rpm"
+            },
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "GDU-V",
+            "hasContainerPositionAndQuantity": [
+                {
+                    "position": "1A1",
+                    "quantity": {
+                        "value": 0.052,
+                        "unit": "mg"
+                    }
+                },
+                {
+                    "position": "1B1",
+                    "quantity": {
+                        "value": 0.054,
+                        "unit": "mg"
+                    }
+                }
+            ],
+            "startTime": "2024-07-25T12:02:39",
+            "endingTime": "2024-07-25T12:02:41",
+            "methodName": "addition",
+            "dispenseState": "Liquid",
+            "dispenseType": "volume",
+            "hasSample": {
+                "expectedDatum": {
+                    "value": 10,
+                    "unit": "mg"
+                },
+                "containerID": "24",
+                "containerBarcode": "24",
+                "vialID": "20",
+                "vialType": "storage vial",
+                "role": "reagent",
+                "hasSample": [
+                    {
+                        "sampleID": "147",
+                        "role": "reagent",
+                        "internalBarCode": "5",
+                        "expectedDatum": {
+                            "value": 5,
+                            "unit": "mg"
+                        },
+                        "measuredQuantity": {
+                            "value": "",
+                            "unit": "mg"
+                        },
+                        "physicalState": "Liquid",
+                        "concentration": {
+                            "value": "",
+                            "unit": "mol/L"
+                        },
+                        "purity": "",
+                        "hasChemical": {
+                            "chemicalID": "137",
+                            "chemicalName": "4-(Difluoromethyl)benzyl bromide",
+                            "CASNumber": "873373-34-3",
+                            "molecularMass": {
+                                "value": 221.042,
+                                "unit": "g/mol"
+                            },
+                            "smiles": "BrCc1ccc(cc1)C(F)(F)F"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "actionName": "shakeAction",
+            "speedTumbleStirrer": {
+                "value": 600,
+                "unit": "rpm"
+            },
+            "startTime": "2024-07-25T12:03:31",
+            "endingTime": "2024-07-25T12:15:20",
+            "methodName": "shake",
+            "temperatureTumbleStirrer": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "temperatureShaker": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "Tumble Stirrer",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "setTemperatureAction",
+            "speedShaker": {
+                "value": 1000,
+                "unit": "rpm"
+            },
+            "temperatureTumbleStirrer": {
+                "value": 59.99,
+                "unit": "°C"
+            },
+            "temperatureShaker": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "startTime": "2024-07-25T12:03:31",
+            "endingTime": "2024-07-25T12:03:41",
+            "methodName": "set_temperature",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "heater",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "setVacuumAction",
+            "vacuum": {
+                "value": 20,
+                "unit": "bar"
+            },
+            "startTime": "2024-07-25T12:03:41",
+            "endingTime": "2024-07-25T12:03:50",
+            "methodName": "set_vacuum",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "vacuum",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "setPressureAction",
+            "pressureMeasurement": {
+                "value": 5,
+                "unit": "bar"
+            },
+            "startTime": "2024-07-25T12:03:50",
+            "endingTime": "2024-07-25T12:04:057",
+            "methodName": "set_pressure",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "MTP_Pressure",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "setTemperatureAction",
+            "speedShaker": {
+                "value": 1000,
+                "unit": "rpm"
+            },
+            "temperatureTumbleStirrer": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "temperatureShaker": {
+                "value": 25,
+                "unit": "°C"
+            },
+            "startTime": "2024-07-25T12:04:57",
+            "endingTime": "2024-07-25T12:05:20",
+            "methodName": "set_temperature",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "heater",
+            "containerID": "1",
+            "containerBarcode": "1"
+        },
+        {
+            "actionName": "filtrateAction",
+            "startTime": "2024-07-25T12:15:23",
+            "endingTime":"2024-07-25T12:16:50",
+            "methodName": "filtrate",
+            "equipmentName": "Chemspeed SWING XL",
+            "subEquipmentName": "Filtration station",
+            "containerID": "1",
+            "containerBarcode": "1"
+        }
+    ]
+}
