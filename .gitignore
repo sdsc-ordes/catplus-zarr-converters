@@ -9,3 +9,4 @@ target
 
 #Folders
 data/**
+*.ttl
