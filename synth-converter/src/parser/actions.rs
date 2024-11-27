@@ -1,32 +1,46 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct Batch {
-    pub batchID: String,
-    pub Actions: Vec<Action>,
+    #[serde(rename = "batchID")]
+    pub batch_id: String,
+    #[serde(rename = "Actions")]
+    pub actions: Vec<Action>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct Action {
-    pub actionName: ActionName,
-    pub startTime: String,
-    pub endingTime: String,
-    pub methodName: String,
-    pub equipmentName: String,
-    pub subEquipmentName: String,
+    #[serde(rename = "actionName")]
+    pub action_name: ActionName,
+    #[serde(rename = "startTime")]
+    pub start_time: String,
+    #[serde(rename = "endingTime")]
+    pub ending_time: String,
+    #[serde(rename = "methodName")]
+    pub method_name: String,
+    #[serde(rename = "equipmentName")]
+    pub equipment_name: String,
+    #[serde(rename = "subEquipmentName")]
+    pub sub_equipment_name: String,
     #[serde(flatten)]
-    pub containerInfo: Option<ContainerInfo>,
-    pub speedShaker: Option<Observation>,
+    pub container_info: Option<ContainerInfo>,
+    #[serde(rename = "speedShaker")]
+    pub speed_shaker: Option<Observation>,
     #[serde(flatten)]
-    pub hasContainerPositionAndQuantity: Option<Vec<ContainerPosition>>,
-    pub dispenseState: Option<String>,
-    pub dispenseType: Option<String>,
-    pub hasSample: Option<Sample>,
-    pub speedTumbleStirrer: Option<Observation>,
-    pub temperatureTumbleStirrer: Option<Observation>,
-    pub temperatureShaker: Option<Observation>,
+    #[serde(rename = "hasContainerPositionAndQuantity")]
+    pub has_container_position_and_quantity: Option<Vec<ContainerPosition>>,
+    #[serde(rename = "dispenseState")]
+    pub dispense_state: Option<String>,
+    #[serde(rename = "dispenseType")]
+    pub dispense_type: Option<String>,
+    #[serde(rename = "hasSample")]
+    pub has_sample: Option<Sample>,
+    #[serde(rename = "speedTumbleStirrer")]
+    pub speed_tumble_stirrer: Option<Observation>,
+    #[serde(rename = "temperatureTumbleStirrer")]
+    pub temperature_tumble_stirrer: Option<Observation>,
+    #[serde(rename = "temperatureShaker")]
+    pub temperature_shaker: Option<Observation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -41,10 +55,11 @@ pub enum ActionName {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct ContainerInfo {
-    pub containerID: String,
-    pub containerBarcode: String,
+    #[serde(rename = "containerID")]
+    pub container_id: String,
+    #[serde(rename = "containerBarcode")]
+    pub container_barcode: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,35 +69,45 @@ pub struct Observation {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct Sample {
     #[serde(flatten)]
     pub container: ContainerInfo,
-    pub vialID: String,
-    pub vialType: String,
+    #[serde(rename = "vialID")]
+    pub vial_id: String,
+    #[serde(rename = "vialType")]
+    pub vial_type: String,
     pub role: String,
-    pub expectedDatum: Observation,
-    pub hasSample: Vec<SampleItem>,
+    #[serde(rename = "expectedDatum")]
+    pub expected_datum: Observation,
+    #[serde(rename = "hasSample")]
+    pub has_sample: Vec<SampleItem>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct SampleItem {
-    pub sampleID: String,
+    #[serde(rename = "sampleID")]
+    pub sample_id: String,
     pub role: String,
-    pub internalBarCode: String,
-    pub expectedDatum: Option<Observation>,
-    pub physicalState: String,
-    pub hasChemical: Chemical,
+    #[serde(rename = "internalBarCode")]
+    pub internal_bar_code: String,
+    #[serde(rename = "expectedDatum")]
+    pub expected_datum: Option<Observation>,
+    #[serde(rename = "physicalState")]
+    pub physical_state: String,
+    #[serde(rename = "hasChemical")]
+    pub has_chemical: Chemical,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case)]
 pub struct Chemical {
-    pub chemicalID: String,
-    pub chemicalName: String,
-    pub CASNumber: String,
-    pub molecularMass: Observation,
+    #[serde(rename = "chemicalID")]
+    pub chemical_id: String,
+    #[serde(rename = "chemicalName")]
+    pub chemical_name: String,
+    #[serde(rename = "CASNumber")]
+    pub cas_number: String,
+    #[serde(rename = "molecularMass")]
+    pub molecular_mass: Observation,
     pub smiles: String,
 }
 

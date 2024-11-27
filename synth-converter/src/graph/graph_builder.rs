@@ -49,12 +49,12 @@ impl GraphBuilder {
         self.graph.insert(
             subject,
             &CAT.get("containerID")?,
-            container_info.containerID.as_str(),
+            container_info.container_id.as_str(),
         )?;
         self.graph.insert(
             subject,
             &CAT.get("containerBarcode")?,
-            container_info.containerBarcode.as_str(),
+            container_info.container_barcode.as_str(),
         )?;
         Ok(())
     }
@@ -114,30 +114,30 @@ impl GraphBuilder {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let chemical_term: SimpleTerm = generate_uri_term()?;
         self.graph
-            .insert(subject, &CAT.get("hasChemical")?, &chemical_term)?;
+            .insert(subject, &CAT.get("has_chemical")?, &chemical_term)?;
         self.graph
             .insert(&chemical_term, &RDF.get("type")?, &OBO.get("CHEBI_25367")?)?;
         self.graph.insert(
             &chemical_term,
             &PURL.get("identifier")?,
-            chemical.chemicalID.as_str(),
+            chemical.chemical_id.as_str(),
         )?;
         self.graph.insert(
             &chemical_term,
             &CAT.get("chemicalName")?,
-            chemical.chemicalName.as_str(),
+            chemical.chemical_name.as_str(),
         )?;
         self.graph.insert(
             &chemical_term,
             &CAT.get("casNumber")?,
-            chemical.CASNumber.as_str(),
+            chemical.cas_number.as_str(),
         )?;
         self.graph.insert(
             &chemical_term,
             &ALLORES.get("AFR_0002295")?,
             chemical.smiles.as_str(),
         )?;
-        let molecular_mass = chemical.molecularMass.value.to_string();
+        let molecular_mass = chemical.molecular_mass.value.to_string();
         self.graph.insert(
             &chemical_term,
             &ALLORES.get("AFR_0002294")?,
@@ -161,7 +161,7 @@ impl GraphBuilder {
             &CAT.get("role")?,
             sample_item.role.as_str(),
         )?;
-        if let Some(expected_datum) = &sample_item.expectedDatum {
+        if let Some(expected_datum) = &sample_item.expected_datum {
             self.insert_observation_to_graph(
                 &sample_item_term,
                 &CAT.get("expectedDatum")?,
@@ -176,19 +176,19 @@ impl GraphBuilder {
         self.graph.insert(
             &sample_item_term,
             &PURL.get("identifier")?,
-            sample_item.sampleID.as_str(),
+            sample_item.sample_id.as_str(),
         )?;
         self.graph.insert(
             &sample_item_term,
             &ALLOQUAL.get("AFQ_0000111")?,
-            sample_item.physicalState.as_str(),
+            sample_item.physical_state.as_str(),
         )?;
         self.graph.insert(
             &sample_item_term,
             &CAT.get("internalBarCode")?,
-            sample_item.internalBarCode.as_str(),
+            sample_item.internal_bar_code.as_str(),
         )?;
-        self.add_chemical_to_graph(&sample_item_term, &sample_item.hasChemical)?;
+        self.add_chemical_to_graph(&sample_item_term, &sample_item.has_chemical)?;
         Ok(())
     }
 
@@ -206,21 +206,21 @@ impl GraphBuilder {
         self.insert_observation_to_graph(
             &sample_term,
             &CAT.get("expectedDatum")?,
-            &sample.expectedDatum,
+            &sample.expected_datum,
         )?;
         self.graph.insert(
             &sample_term,
             &CAT.get("vialShape")?,
-            sample.vialType.as_str(),
+            sample.vial_type.as_str(),
         )?;
         self.graph.insert(
             &sample_term,
             &ALLORES.get("AFR_0002464")?,
-            sample.vialID.as_str(),
+            sample.vial_id.as_str(),
         )?;
         self.graph
             .insert(&sample_term, &CAT.get("role")?, sample.role.as_str())?;
-        for sample_item in &sample.hasSample {
+        for sample_item in &sample.has_sample {
             self.add_sample_item_to_graph(&sample_term, &sample_item)?;
         }
         Ok(())
@@ -231,7 +231,7 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        match action.actionName {
+        match action.action_name {
             ActionName::AddAction => {
                 self.graph
                     .insert(subject, &RDF.get("type")?, &CAT.get("AddAction")?)?;
@@ -262,68 +262,68 @@ impl GraphBuilder {
         self.add_date_time_to_graph(
             &action_term,
             &ALLORES.get("AFX_0000622")?,
-            action.startTime.as_str(),
+            action.start_time.as_str(),
         )?;
         self.add_date_time_to_graph(
             &action_term,
             &ALLORES.get("AFR_0002423")?,
-            &action.endingTime.as_str(),
+            &action.ending_time.as_str(),
         )?;
         self.graph.insert(
             &action_term,
             &ALLORES.get("AFR_0001606")?,
-            action.methodName.as_str(),
+            action.method_name.as_str(),
         )?;
         self.graph.insert(
             &action_term,
             &ALLORES.get("AFR_0001723")?,
-            action.equipmentName.as_str(),
+            action.equipment_name.as_str(),
         )?;
         self.graph.insert(
             &action_term,
             &CAT.get("localEquipmentName")?,
-            action.subEquipmentName.as_str(),
+            action.sub_equipment_name.as_str(),
         )?;
-        if let Some(container_info) = &action.containerInfo {
+        if let Some(container_info) = &action.container_info {
             self.add_container_info_to_graph(&action_term, &container_info)?;
         }
-        if let Some(temperature_shaker) = &action.temperatureShaker {
+        if let Some(temperature_shaker) = &action.temperature_shaker {
             self.insert_observation_to_graph(
                 &action_term,
                 &CAT.get("temperatureShakerShape")?,
                 temperature_shaker,
             )?;
         }
-        if let Some(temperature_tumble_stirrer) = &action.temperatureTumbleStirrer {
+        if let Some(temperature_tumble_stirrer) = &action.temperature_tumble_stirrer {
             self.insert_observation_to_graph(
                 &action_term,
                 &CAT.get("temperatureTumbleStirrerShape")?,
                 temperature_tumble_stirrer,
             )?;
         }
-        if let Some(speed_shaker) = &action.speedShaker {
+        if let Some(speed_shaker) = &action.speed_shaker {
             self.insert_observation_to_graph(&action_term, &CAT.get("speedInRPM")?, speed_shaker)?;
         }
-        if let Some(dispense_type) = &action.dispenseType {
+        if let Some(dispense_type) = &action.dispense_type {
             self.graph.insert(
                 &action_term,
                 &CAT.get("dispenseType")?,
                 dispense_type.as_str(),
             )?;
         }
-        if let Some(dispense_state) = &action.dispenseState {
+        if let Some(dispense_state) = &action.dispense_state {
             self.graph.insert(
                 &action_term,
                 &ALLOQUAL.get("AFQ_0000111")?,
                 dispense_state.as_str(),
             )?;
         }
-        if let Some(container_positions) = &action.hasContainerPositionAndQuantity {
+        if let Some(container_positions) = &action.has_container_position_and_quantity {
             for container_position in container_positions {
                 self.insert_container_position_to_graph(&action_term, container_position)?;
             }
         }
-        if let Some(sample) = &action.hasSample {
+        if let Some(sample) = &action.has_sample {
             self.add_sample_to_graph(&action_term, sample)?;
         }
         self.add_action_type_to_graph(&action_term, action)?;
@@ -335,8 +335,8 @@ impl GraphBuilder {
         self.graph
             .insert(&batch_term, RDF.get("type")?, &CAT.get("Batch")?)?;
         self.graph
-            .insert(&batch_term, &SCHEMA.get("name")?, batch.batchID.as_str())?;
-        for action in &batch.Actions {
+            .insert(&batch_term, &SCHEMA.get("name")?, batch.batch_id.as_str())?;
+        for action in &batch.actions {
             self.add_action_to_graph(&batch_term, action)?;
         }
         Ok(())
