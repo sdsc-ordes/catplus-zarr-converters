@@ -1,7 +1,9 @@
 use crate::graph::namespaces::EX;
+use sophia_api::{
+    prelude::*,
+    term::{bnode_id::BnodeId, SimpleTerm},
+};
 use uuid::Uuid;
-use sophia_api::term::{bnode_id::BnodeId, SimpleTerm};
-use sophia_api::prelude::*;
 
 pub fn generate_bnode_term() -> SimpleTerm<'static> {
     let identifier = Uuid::new_v4().to_string();

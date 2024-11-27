@@ -1,10 +1,12 @@
-mod parser;
 mod graph;
-use parser::parser::parse_json;
+mod parser;
 use graph::graph_builder::GraphBuilder;
-use std::env;
-use std::fs::File;
-use std::io::{Read, Write};
+use parser::parser::parse_json;
+use std::{
+    env,
+    fs::File,
+    io::{Read, Write},
+};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
@@ -23,7 +25,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut graph_builder = GraphBuilder::new()?;
             graph_builder.add_batch(&batch)?;
             let serialized_graph = graph_builder.serialize_to_turtle()?;
-            println!("The resulting graph in Turtle format:\n{}", serialized_graph);
+            println!(
+                "The resulting graph in Turtle format:\n{}",
+                serialized_graph
+            );
             let mut output = File::create(output_file)?;
             output.write_all(serialized_graph.as_bytes())?;
             println!("Processed content written to {}", output_file);
