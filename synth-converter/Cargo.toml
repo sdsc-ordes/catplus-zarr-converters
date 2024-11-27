@@ -3,10 +3,12 @@ name = "synth-converter"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+path = "src/lib.rs"
 
 [[bin]]
 name = "synth-converter"
-path = "synth-converter/src/main.rs"
+path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0.215", features = ["derive"] }
