@@ -1,7 +1,7 @@
-use synth_converter::parser::parser::parse_json;
+use synth_converter::convert::json_to_turtle;
 
 #[test]
-fn test_parse_filtrate_action() {
+fn test_convert_filtrate_action() {
     let json_data = r#"
     {
         "batchID": "23",
@@ -19,13 +19,12 @@ fn test_parse_filtrate_action() {
         ]
     }
     "#;
-
-    let result = parse_json(json_data);
-    assert!(result.is_ok(), "Parsing failed: {:?}", result.err());
+    let result = json_to_turtle(json_data);
+    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
 
 #[test]
-fn test_parse_set_temperature_action() {
+fn test_convert_set_temperature_action() {
     let json_data = r#"
     {
         "batchID": "23",
@@ -56,12 +55,12 @@ fn test_parse_set_temperature_action() {
     }
     "#;
 
-    let result = parse_json(json_data);
-    assert!(result.is_ok(), "Parsing failed: {:?}", result.err());
+    let result = json_to_turtle(json_data);
+    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
 
 #[test]
-fn test_parse_add_action() {
+fn test_convert_add_action() {
     let json_data = r#"
     {
         "batchID": "23",
@@ -137,13 +136,12 @@ fn test_parse_add_action() {
         ]
     }
     "#;
-
-    let result = parse_json(json_data);
-    assert!(result.is_ok(), "Parsing failed: {:?}", result.err());
+    let result = json_to_turtle(json_data);
+    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
 
 #[test]
-fn test_parse_shake_action() {
+fn test_convert_shake_action() {
     let json_data = r#"
     {
         "batchID": "23",
@@ -170,12 +168,12 @@ fn test_parse_shake_action() {
     }
     "#;
 
-    let result = parse_json(json_data);
-    assert!(result.is_ok(), "Parsing failed: {:?}", result.err());
+    let result = json_to_turtle(json_data);
+    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
 
 #[test]
-fn test_parse_set_vacuum_action() {
+fn test_convert_set_vacuum_action() {
     let json_data = r#"
     {
         "batchID": "23",
@@ -197,7 +195,6 @@ fn test_parse_set_vacuum_action() {
         ]
     }
     "#;
-
-    let result = parse_json(json_data);
-    assert!(result.is_ok(), "Parsing failed: {:?}", result.err());
+    let result = json_to_turtle(json_data);
+    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
