@@ -30,7 +30,7 @@ impl GraphBuilder {
         })
     }
 
-    fn add_date_time_to_graph(
+    fn insert_a_date_time(
         &mut self,
         subject: &SimpleTerm,
         predicate: &NsTerm<'_>,
@@ -41,7 +41,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn add_container_info_to_graph(
+    fn insert_container_properties(
         &mut self,
         subject: &SimpleTerm,
         container_info: &ContainerInfo,
@@ -59,7 +59,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_observation_to_graph(
+    fn insert_an_observation(
         &mut self,
         subject: &SimpleTerm,
         property_term: &NsTerm<'_>,
@@ -78,7 +78,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_container_position_to_graph(
+    fn insert_a_container_position(
         &mut self,
         subject: &SimpleTerm,
         container_position: &ContainerPosition,
@@ -99,7 +99,7 @@ impl GraphBuilder {
             &ALLORES.get("AFR_0002240")?,
             container_position.position.as_str(),
         )?;
-        self.insert_observation_to_graph(
+        self.insert_an_observation(
             &container_position_term,
             &QUDT.get("quantity")?,
             &container_position.quantity,
@@ -107,7 +107,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn add_chemical_to_graph(
+    fn insert_a_chemical(
         &mut self,
         subject: &SimpleTerm,
         chemical: &Chemical,
@@ -146,7 +146,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn add_sample_item_to_graph(
+    fn insert_a_sample(
         &mut self,
         subject: &SimpleTerm,
         sample_item: &SampleItem,
@@ -162,7 +162,7 @@ impl GraphBuilder {
             sample_item.role.as_str(),
         )?;
         if let Some(expected_datum) = &sample_item.expected_datum {
-            self.insert_observation_to_graph(
+            self.insert_an_observation(
                 &sample_item_term,
                 &CAT.get("expectedDatum")?,
                 expected_datum,
@@ -188,11 +188,11 @@ impl GraphBuilder {
             &CAT.get("internalBarCode")?,
             sample_item.internal_bar_code.as_str(),
         )?;
-        self.add_chemical_to_graph(&sample_item_term, &sample_item.has_chemical)?;
+        self.insert_a_chemical(&sample_item_term, &sample_item.has_chemical)?;
         Ok(())
     }
 
-    fn add_sample_to_graph(
+    fn insert_samples(
         &mut self,
         subject: &SimpleTerm,
         sample: &Sample,
@@ -202,8 +202,8 @@ impl GraphBuilder {
             .insert(subject, &CAT.get("hasSample")?, &sample_term)?;
         self.graph
             .insert(&sample_term, &RDF.get("type")?, &CAT.get("Sample")?)?;
-        self.add_container_info_to_graph(&sample_term, &sample.container)?;
-        self.insert_observation_to_graph(
+        self.insert_container_properties(&sample_term, &sample.container)?;
+        self.insert_an_observation(
             &sample_term,
             &CAT.get("expectedDatum")?,
             &sample.expected_datum,
@@ -221,7 +221,7 @@ impl GraphBuilder {
         self.graph
             .insert(&sample_term, &CAT.get("role")?, sample.role.as_str())?;
         for sample_item in &sample.has_sample {
-            self.add_sample_item_to_graph(&sample_term, &sample_item)?;
+            self.insert_a_sample(&sample_term, &sample_item)?;
         }
         Ok(())
     }
@@ -251,7 +251,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn add_action_to_graph(
+    fn insert_an_action(
         &mut self,
         subject: &SimpleTerm,
         action: &Action,
@@ -259,12 +259,12 @@ impl GraphBuilder {
         let action_term: SimpleTerm = generate_uri_term()?;
         self.graph
             .insert(&action_term, &CAT.get("hasBatch")?, subject)?;
-        self.add_date_time_to_graph(
+        self.insert_a_date_time(
             &action_term,
             &ALLORES.get("AFX_0000622")?,
             action.start_time.as_str(),
         )?;
-        self.add_date_time_to_graph(
+        self.insert_a_date_time(
             &action_term,
             &ALLORES.get("AFR_0002423")?,
             &action.ending_time.as_str(),
@@ -285,24 +285,24 @@ impl GraphBuilder {
             action.sub_equipment_name.as_str(),
         )?;
         if let Some(container_info) = &action.container_info {
-            self.add_container_info_to_graph(&action_term, &container_info)?;
+            self.insert_container_properties(&action_term, &container_info)?;
         }
         if let Some(temperature_shaker) = &action.temperature_shaker {
-            self.insert_observation_to_graph(
+            self.insert_an_observation(
                 &action_term,
                 &CAT.get("temperatureShakerShape")?,
                 temperature_shaker,
             )?;
         }
         if let Some(temperature_tumble_stirrer) = &action.temperature_tumble_stirrer {
-            self.insert_observation_to_graph(
+            self.insert_an_observation(
                 &action_term,
                 &CAT.get("temperatureTumbleStirrerShape")?,
                 temperature_tumble_stirrer,
             )?;
         }
         if let Some(speed_shaker) = &action.speed_shaker {
-            self.insert_observation_to_graph(&action_term, &CAT.get("speedInRPM")?, speed_shaker)?;
+            self.insert_an_observation(&action_term, &CAT.get("speedInRPM")?, speed_shaker)?;
         }
         if let Some(dispense_type) = &action.dispense_type {
             self.graph.insert(
@@ -320,24 +320,24 @@ impl GraphBuilder {
         }
         if let Some(container_positions) = &action.has_container_position_and_quantity {
             for container_position in container_positions {
-                self.insert_container_position_to_graph(&action_term, container_position)?;
+                self.insert_a_container_position(&action_term, container_position)?;
             }
         }
         if let Some(sample) = &action.has_sample {
-            self.add_sample_to_graph(&action_term, sample)?;
+            self.insert_samples(&action_term, sample)?;
         }
         self.add_action_type_to_graph(&action_term, action)?;
         Ok(())
     }
 
-    pub fn add_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
         let batch_term = generate_bnode_term();
         self.graph
             .insert(&batch_term, RDF.get("type")?, &CAT.get("Batch")?)?;
         self.graph
             .insert(&batch_term, &SCHEMA.get("name")?, batch.batch_id.as_str())?;
         for action in &batch.actions {
-            self.add_action_to_graph(&batch_term, action)?;
+            self.insert_an_action(&batch_term, action)?;
         }
         Ok(())
     }
