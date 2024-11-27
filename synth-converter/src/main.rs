@@ -1,5 +1,3 @@
-// src/main.rs
-
 use std::{
     env,
     fs::File,
