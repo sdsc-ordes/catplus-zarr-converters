@@ -7,6 +7,10 @@ root_dir := `git rev-parse --show-toplevel`
 default:
   just --list
 
+build:
+    cd "{{root_dir}}" && \
+        cargo build --bin synth-converter
+
 # Enter a Nix development shell.
 nix-develop *args:
     echo "Starting nix developer shell in './tools/nix/flake.nix'."
