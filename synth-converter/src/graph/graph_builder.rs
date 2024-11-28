@@ -19,10 +19,18 @@ use sophia::{
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
 use sophia_turtle::serializer::turtle::{TurtleConfig, TurtleSerializer};
 
+/// An RDF Graph
 pub struct GraphBuilder {
     graph: LightGraph,
 }
 
+/// Builds an RDF graph of Synthesis data for the cat+ ontology.
+///
+/// The rust structure "actions" in /parser/actions is mapped to the cat+ ontology
+///
+/// # public methods:
+/// * insert_a_batch:  starts the process of building the graph from the input structure
+/// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
@@ -36,8 +44,10 @@ impl GraphBuilder {
         predicate: &NsTerm<'_>,
         date_time: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let object = date_time * xsd::dateTime;
         self.graph.insert(subject, predicate, &object)?;
+
         Ok(())
     }
 
@@ -46,6 +56,7 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         container_info: &ContainerInfo,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         self.graph.insert(
             subject,
             &CAT.get("containerID")?,
@@ -56,6 +67,7 @@ impl GraphBuilder {
             &CAT.get("containerBarcode")?,
             container_info.container_barcode.as_str(),
         )?;
+
         Ok(())
     }
 
@@ -65,7 +77,9 @@ impl GraphBuilder {
         property_term: &NsTerm<'_>,
         observation: &Observation,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let observation_term = generate_bnode_term();
+
         self.graph
             .insert(subject, property_term, &observation_term)?;
         self.graph.insert(
@@ -75,6 +89,7 @@ impl GraphBuilder {
         )?;
         self.graph
             .insert(&observation_term, &QUDT.get("value")?, observation.value)?;
+
         Ok(())
     }
 
@@ -83,7 +98,9 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         container_position: &ContainerPosition,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let container_position_term = generate_bnode_term();
+
         self.graph.insert(
             subject,
             &CAT.get("hasContainerPositionAndQuantity")?,
@@ -99,11 +116,13 @@ impl GraphBuilder {
             &ALLORES.get("AFR_0002240")?,
             container_position.position.as_str(),
         )?;
+
         self.insert_an_observation(
             &container_position_term,
             &QUDT.get("quantity")?,
             &container_position.quantity,
         )?;
+
         Ok(())
     }
 
@@ -112,7 +131,9 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         chemical: &Chemical,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let chemical_term: SimpleTerm = generate_uri_term()?;
+
         self.graph
             .insert(subject, &CAT.get("has_chemical")?, &chemical_term)?;
         self.graph
@@ -143,6 +164,7 @@ impl GraphBuilder {
             &ALLORES.get("AFR_0002294")?,
             &*molecular_mass,
         )?;
+
         Ok(())
     }
 
@@ -151,7 +173,9 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         sample_item: &SampleItem,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let sample_item_term = generate_bnode_term();
+
         self.graph
             .insert(&sample_item_term, &RDF.get("type")?, &CAT.get("Sample")?)?;
         self.graph
@@ -161,6 +185,7 @@ impl GraphBuilder {
             &CAT.get("role")?,
             sample_item.role.as_str(),
         )?;
+
         if let Some(expected_datum) = &sample_item.expected_datum {
             self.insert_an_observation(
                 &sample_item_term,
@@ -168,6 +193,7 @@ impl GraphBuilder {
                 expected_datum,
             )?;
         }
+
         self.graph.insert(
             &sample_item_term,
             &CAT.get("role")?,
@@ -189,6 +215,7 @@ impl GraphBuilder {
             sample_item.internal_bar_code.as_str(),
         )?;
         self.insert_a_chemical(&sample_item_term, &sample_item.has_chemical)?;
+
         Ok(())
     }
 
@@ -197,17 +224,22 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         sample: &Sample,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let sample_term = generate_bnode_term();
+
         self.graph
             .insert(subject, &CAT.get("hasSample")?, &sample_term)?;
         self.graph
             .insert(&sample_term, &RDF.get("type")?, &CAT.get("Sample")?)?;
+
         self.insert_container_properties(&sample_term, &sample.container)?;
+
         self.insert_an_observation(
             &sample_term,
             &CAT.get("expectedDatum")?,
             &sample.expected_datum,
         )?;
+
         self.graph.insert(
             &sample_term,
             &CAT.get("vialShape")?,
@@ -218,24 +250,29 @@ impl GraphBuilder {
             &ALLORES.get("AFR_0002464")?,
             sample.vial_id.as_str(),
         )?;
+
         self.graph
             .insert(&sample_term, &CAT.get("role")?, sample.role.as_str())?;
+
         for sample_item in &sample.has_sample {
             self.insert_a_sample(&sample_term, &sample_item)?;
         }
+
         Ok(())
     }
 
-    fn add_action_type_to_graph(
+    fn insert_action_type(
         &mut self,
         subject: &SimpleTerm,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         match action.action_name {
             ActionName::AddAction => {
                 self.graph
                     .insert(subject, &RDF.get("type")?, &CAT.get("AddAction")?)?;
             }
+
             ActionName::setTemperatureAction => {
                 self.graph.insert(
                     subject,
@@ -243,11 +280,13 @@ impl GraphBuilder {
                     &CAT.get("setTemperatureAction")?,
                 )?;
             }
+
             _ => {
                 self.graph
                     .insert(subject, &RDF.get("type")?, &ALLORES.get("AFRE_0000001")?)?;
             }
         }
+
         Ok(())
     }
 
@@ -256,9 +295,12 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
+
         let action_term: SimpleTerm = generate_uri_term()?;
+
         self.graph
             .insert(&action_term, &CAT.get("hasBatch")?, subject)?;
+
         self.insert_a_date_time(
             &action_term,
             &ALLORES.get("AFX_0000622")?,
@@ -284,9 +326,11 @@ impl GraphBuilder {
             &CAT.get("localEquipmentName")?,
             action.sub_equipment_name.as_str(),
         )?;
+
         if let Some(container_info) = &action.container_info {
             self.insert_container_properties(&action_term, &container_info)?;
         }
+
         if let Some(temperature_shaker) = &action.temperature_shaker {
             self.insert_an_observation(
                 &action_term,
@@ -294,6 +338,7 @@ impl GraphBuilder {
                 temperature_shaker,
             )?;
         }
+
         if let Some(temperature_tumble_stirrer) = &action.temperature_tumble_stirrer {
             self.insert_an_observation(
                 &action_term,
@@ -301,9 +346,11 @@ impl GraphBuilder {
                 temperature_tumble_stirrer,
             )?;
         }
+
         if let Some(speed_shaker) = &action.speed_shaker {
             self.insert_an_observation(&action_term, &CAT.get("speedInRPM")?, speed_shaker)?;
         }
+
         if let Some(dispense_type) = &action.dispense_type {
             self.graph.insert(
                 &action_term,
@@ -311,6 +358,7 @@ impl GraphBuilder {
                 dispense_type.as_str(),
             )?;
         }
+
         if let Some(dispense_state) = &action.dispense_state {
             self.graph.insert(
                 &action_term,
@@ -318,30 +366,51 @@ impl GraphBuilder {
                 dispense_state.as_str(),
             )?;
         }
+
         if let Some(container_positions) = &action.has_container_position_and_quantity {
             for container_position in container_positions {
                 self.insert_a_container_position(&action_term, container_position)?;
             }
         }
+
         if let Some(sample) = &action.has_sample {
             self.insert_samples(&action_term, sample)?;
         }
-        self.add_action_type_to_graph(&action_term, action)?;
+
+        self.insert_action_type(&action_term, action)?;
+
         Ok(())
     }
 
+    /// Insert a batch
+    ///
+    /// Assumes a new graph has been created
+    ///
+    /// # Returns
+    /// A `Result` containing () if successful, or an error if the graph building fails.
     pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
+
         let batch_term = generate_bnode_term();
+
         self.graph
             .insert(&batch_term, RDF.get("type")?, &CAT.get("Batch")?)?;
         self.graph
             .insert(&batch_term, &SCHEMA.get("name")?, batch.batch_id.as_str())?;
+
         for action in &batch.actions {
             self.insert_an_action(&batch_term, action)?;
         }
+
         Ok(())
     }
 
+    /// Get the turtle serilaization of the RDF graph
+    ///
+    /// Assumes a new graph has been created and built.
+    ///
+    /// # Returns
+    /// A `Result` containing the graph as turtle serialization, or an error
+    /// if the graph retrieval fails.
     pub fn serialize_to_turtle(&self) -> Result<String, Box<dyn std::error::Error>> {
         let prefix_map = generate_prefix_map();
         let config = TurtleConfig::default()
