@@ -1,8 +1,7 @@
 use crate::{
     graph::{
         namespaces::*,
-        utils::{generate_bnode_term},
-        rdf_serializers::serialize_graph_to_turtle,
+        utils::generate_bnode_term,
     },
     parser::actions::{
         Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPosition, Observation, Sample,
@@ -17,6 +16,7 @@ use sophia::{
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
+use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
 
 /// An RDF Graph
 pub struct GraphBuilder {
