@@ -1,4 +1,6 @@
 use synth_converter::convert::json_to_turtle;
+use synth_converter::rdf::rdf_parser::parse_turtle_to_graph;
+use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
 fn test_convert_filtrate_action() {
@@ -20,7 +22,30 @@ fn test_convert_filtrate_action() {
     }
     "#;
     let result = json_to_turtle(json_data);
-    assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
+    let expected_ttl = r#"
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX cat: <http://example.org/cat#>
+        PREFIX schema: <https://schema.org/>
+        PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX ex: <http://example.org/>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+        [] a allores:AFRE_0000001;
+        cat:containerBarcode "1";
+        cat:containerID "1";
+        cat:hasBatch [ a cat:Batch;
+            schema:name "23"];
+        cat:localEquipmentName "Filtration station";
+        allores:AFR_0001606 "filtrate";
+        allores:AFR_0001723 "Chemspeed SWING XL";
+        allores:AFR_0002423 "2024-07-25T12:16:50"^^xsd:dateTime;
+        allores:AFX_0000622 "2024-07-25T12:15:23"^^xsd:dateTime.
+    "#;
+    let expected_graph = parse_turtle_to_graph(&expected_ttl).unwrap();
+    let result_ttl = result.as_ref().unwrap().as_str();
+    let result_graph = parse_turtle_to_graph(&result_ttl).unwrap();
+    let graphs_match = isomorphic_graphs(&result_graph, &expected_graph);
+    assert_eq!(graphs_match.unwrap(), true);
 }
 
 #[test]
@@ -54,7 +79,6 @@ fn test_convert_set_temperature_action() {
         ]
     }
     "#;
-
     let result = json_to_turtle(json_data);
     assert!(result.is_ok(), "Conversion failed: {:?}", result.err());
 }
