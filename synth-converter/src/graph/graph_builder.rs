@@ -2,6 +2,7 @@ use crate::{
     graph::{
         namespaces::*,
         utils::{generate_bnode_term, generate_uri_term},
+        rdf_serializers::serialize_graph_to_turtle,
     },
     parser::actions::{
         Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPosition, Observation, Sample,
@@ -12,35 +13,10 @@ use sophia::{
     api::{
         graph::MutableGraph,
         ns::xsd,
-        serializer::{Stringifier, TripleSerializer},
     },
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
-use sophia_turtle::serializer::turtle::{TurtleConfig, TurtleSerializer};
-
-/// Serialize an RDF graph to Turtle format
-///
-/// # Parameters
-/// - `graph`: A reference to the graph to be serialized.
-///
-/// # Returns
-/// A `Result` containing the Turtle serialization as a `String`, or an error if serialization fails.
-pub fn serialize_graph_to_turtle(
-    graph: &LightGraph,
-) -> Result<String, Box<dyn std::error::Error>> {
-
-    let prefix_map = generate_prefix_map();
-
-    let config = TurtleConfig::default()
-        .with_pretty(true)
-        .with_own_prefix_map(prefix_map);
-
-    let mut serializer = TurtleSerializer::new_stringifier_with_config(config);
-    serializer.serialize_graph(graph)?;
-
-    Ok(serializer.as_str().to_string())
-}
 
 /// An RDF Graph
 pub struct GraphBuilder {
