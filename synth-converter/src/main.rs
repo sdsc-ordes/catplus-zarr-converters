@@ -1,32 +1,33 @@
+use clap::Parser;
 use std::{
-    env,
     fs::File,
     io::{Read, Write},
-    process,
 };
 use synth_converter::convert::json_to_turtle;
 
+/// A simple JSON to Turtle converter.
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Input JSON file
+    input_file: String,
+
+    /// Output Turtle file
+    output_file: String,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 3 {
-        eprintln!("Usage: {} <input_file> <output_file>", args[0]);
-        process::exit(1);
-    }
-    let input_file = &args[1];
-    let output_file = &args[2];
+    let args = Args::parse();
 
     let mut input_content = String::new();
-    File::open(input_file)?.read_to_string(&mut input_content)?;
+    File::open(&args.input_file)?.read_to_string(&mut input_content)?;
 
     match json_to_turtle(&input_content) {
         Ok(serialized_graph) => {
-            println!(
-                "{}",
-                serialized_graph
-            );
-            let mut output = File::create(output_file)?;
+            println!("{}", serialized_graph);
+            let mut output = File::create(&args.output_file)?;
             output.write_all(serialized_graph.as_bytes())?;
-            println!("Processed content written to {}", output_file);
+            println!("Processed content written to {}", args.output_file);
             Ok(())
         }
         Err(err) => {
