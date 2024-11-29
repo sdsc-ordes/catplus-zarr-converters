@@ -1,7 +1,7 @@
 use crate::{
     graph::{
         namespaces::*,
-        utils::{generate_bnode_term, generate_uri_term},
+        utils::{generate_bnode_term},
         rdf_serializers::serialize_graph_to_turtle,
     },
     parser::actions::{
@@ -131,7 +131,7 @@ impl GraphBuilder {
         chemical: &Chemical,
     ) -> Result<(), Box<dyn std::error::Error>> {
 
-        let chemical_term: SimpleTerm = generate_uri_term()?;
+        let chemical_term: SimpleTerm = generate_bnode_term();
 
         self.graph
             .insert(subject, &CAT.get("has_chemical")?, &chemical_term)?;
@@ -295,7 +295,7 @@ impl GraphBuilder {
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
 
-        let action_term: SimpleTerm = generate_uri_term()?;
+        let action_term: SimpleTerm = generate_bnode_term();
 
         self.graph
             .insert(&action_term, &CAT.get("hasBatch")?, subject)?;
