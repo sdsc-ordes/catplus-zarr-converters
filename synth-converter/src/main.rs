@@ -1,33 +1,53 @@
 use clap::Parser;
 use std::{
     fs::File,
-    io::{Read, Write},
+    io::{self, Read, Write},
+    path::Path,
 };
 use synth_converter::convert::json_to_turtle;
 
-/// A simple JSON to Turtle converter.
+/// Converts CAT+ Synthesis JSON input into RDF Turtle format.
+///
+/// This tool expects Synthesis data similar to example/1-Synth.json
+/// of a batch with actions. This data is then transformed to RDF and
+/// serialized as turtle.
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
 struct Args {
-    /// Input JSON file
+    /// Path to the input JSON file: relative or absolute
     input_file: String,
 
-    /// Output Turtle file
+    /// Path to the output Turtle file
     output_file: String,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    let mut input_content = String::new();
-    File::open(&args.input_file)?.read_to_string(&mut input_content)?;
+    // Validate input file
+    let input_path = Path::new(&args.input_file);
+    if !input_path.exists() {
+        eprintln!("Error: Input file '{}' does not exist.", args.input_file);
+        return Err(io::Error::new(io::ErrorKind::NotFound, "Input file not found").into());
+    }
+    if !input_path.is_file() {
+        eprintln!("Error: '{}' is not a valid file.", args.input_file);
+        return Err(io::Error::new(io::ErrorKind::InvalidInput, "Input is not a file").into());
+    }
 
+    // Read input file
+    let mut input_content = String::new();
+    File::open(input_path)?.read_to_string(&mut input_content)?;
+
+    // Process and convert to Turtle format
     match json_to_turtle(&input_content) {
         Ok(serialized_graph) => {
-            println!("{}", serialized_graph);
-            let mut output = File::create(&args.output_file)?;
+            println!("Conversion successful!");
+
+            // Write to output file
+            let output_path = Path::new(&args.output_file);
+            let mut output = File::create(output_path)?;
             output.write_all(serialized_graph.as_bytes())?;
-            println!("Processed content written to {}", args.output_file);
+            println!("Processed content written to '{}'", output_path.display());
             Ok(())
         }
         Err(err) => {
