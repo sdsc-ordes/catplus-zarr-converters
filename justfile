@@ -5,22 +5,20 @@ root_dir := `git rev-parse --show-toplevel`
 
 # Default recipe to list all recipes.
 default:
-  just --list
+    just --list
 
 # Build the synth-converter.
 build *args:
-    cd "{{root_dir}}/synth-converter" && \
-        cargo build --bin synth-converter {{args}}
+    cargo build --manifest-path "{{root_dir}}/synth-converter/Cargo.toml"
 
 # Test the synth-converter.
 test *args:
-    cd "{{root_dir}}/synth-converter" && \
-        cargo test --bin synth-converter {{args}}
+    cargo test --manifest-path "{{root_dir}}/synth-converter/Cargo.toml"
 
 # Run the synth-converter.
-run *args:
+run input_file output_file *args:
     cd "{{root_dir}}/synth-converter" && \
-        cargo run --bin synth-converter {{args}}
+    cargo run --bin synth-converter {{root_dir}}/{{input_file}} {{root_dir}}/{{output_file}} {{args}}
 
 # Enter a Nix development shell.
 nix-develop *args:
