@@ -1,4 +1,4 @@
-use crate::graph::namespaces::generate_prefix_map;
+use crate::graph::prefix_map::generate_prefix_map;
 use sophia::api::serializer::{Stringifier, TripleSerializer};
 use sophia::inmem::graph::LightGraph;
 use sophia_turtle::serializer::turtle::{TurtleConfig, TurtleSerializer};

@@ -27,12 +27,12 @@ fn test_convert_filtrate_action() {
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-        PREFIX ex: <http://example.org/>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
         [] a allores:AFRE_0000001;
         cat:containerBarcode "1";
         cat:containerID "1";
@@ -88,7 +88,6 @@ fn test_convert_set_temperature_action() {
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-        PREFIX ex: <http://example.org/>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
@@ -204,7 +203,6 @@ fn test_convert_add_action() {
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-        PREFIX ex: <http://example.org/>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
@@ -288,7 +286,6 @@ fn test_convert_shake_action() {
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-        PREFIX ex: <http://example.org/>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
@@ -347,7 +344,6 @@ fn test_convert_set_vacuum_action() {
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-        PREFIX ex: <http://example.org/>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
