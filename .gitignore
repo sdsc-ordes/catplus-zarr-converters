@@ -10,3 +10,4 @@ target
 #Folders
 data/**
 *.ttl
+*.json

@@ -4,20 +4,24 @@ use std::{
     io::{self, Read, Write},
     path::Path,
 };
-use synth_converter::convert::json_to_turtle;
+use synth_converter::convert::json_to_rdf; // Use the unified conversion function.
 
-/// Converts CAT+ Synthesis JSON input into RDF Turtle format.
+/// Converts CAT+ Synthesis JSON input into RDF formats.
 ///
 /// This tool expects Synthesis data similar to example/1-Synth.json
 /// of a batch with actions. This data is then transformed to RDF and
-/// serialized as turtle.
+/// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
     /// Path to the input JSON file: relative or absolute
     input_file: String,
 
-    /// Path to the output Turtle file
+    /// Path to the output RDF file
     output_file: String,
+
+    /// Output format: "ttl" (Turtle) or "jsonld" (JSON-LD)
+    #[arg(short, long, default_value = "ttl")]
+    format: String,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,8 +42,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut input_content = String::new();
     File::open(input_path)?.read_to_string(&mut input_content)?;
 
-    // Process and convert to Turtle format
-    match json_to_turtle(&input_content) {
+    // Use unified conversion function
+    match json_to_rdf(&input_content, &args.format) {
         Ok(serialized_graph) => {
             println!("Conversion successful!");
 
@@ -51,7 +55,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(())
         }
         Err(err) => {
-            eprintln!("Error converting JSON to Turtle: {}", err);
+            eprintln!("Error during conversion: {}", err);
             Err(err)
         }
     }

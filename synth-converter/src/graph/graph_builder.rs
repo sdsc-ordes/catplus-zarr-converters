@@ -17,6 +17,7 @@ use sophia::{
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
 use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
+use crate::rdf::rdf_serializers::serialize_graph_to_jsonld;
 
 /// An RDF Graph
 pub struct GraphBuilder {
@@ -412,5 +413,16 @@ impl GraphBuilder {
     /// if the graph retrieval fails.
     pub fn serialize_to_turtle(&self) -> Result<String, Box<dyn std::error::Error>> {
         serialize_graph_to_turtle(&self.graph)
+    }
+
+    /// Get the turtle serialization of the RDF graph
+    ///
+    /// Assumes a new graph has been created and built.
+    ///
+    /// # Returns
+    /// A `Result` containing the graph as jsonld serialization, or an error
+    /// if the graph retrieval fails.
+    pub fn serialize_to_jsonld(&self) -> Result<String, Box<dyn std::error::Error>> {
+        serialize_graph_to_jsonld(&self.graph)
     }
 }
