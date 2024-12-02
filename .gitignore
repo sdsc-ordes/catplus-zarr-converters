@@ -3,6 +3,7 @@
 
 # Rust Build
 target
+debug
 
 #OS specific
 .DS_Store
