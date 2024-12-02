@@ -26,6 +26,14 @@ just run example/1-Synth.json output.ttl
 just run example/1-Synth.json output.json --format jsonld
 ```
 
+### Architecture
+
+The json input is read with `serde_json`: the transformation of fields is described in the struct `synth-converter/src/batch.rs`
+
+The graph is build via `synth-converter/src/graph/graph_builder.rs` and uses `sophia_rs`. Besides `rdf` and `xsd` that have build in namespaces in `sophia_rs`, all namespaces and terms are provided in `synth-converter/src/graph/namespaces` as constants. This makes the code more readable and also ensures that the rdf iris and namespaces are controlled and spelt correctly.
+Graph serializers and parsers are provided in `synth-converter/src/rdf`. The turtle serializer there is needed for the test.
+The conversion is done in the public crate `synth-converter/src/convert.rs`
+
 ### Shacl Validation
 
 The rdf graph confirms to the cat+ ontology: https://github.com/sdsc-ordes/cat-plus-ontology. Currently rust offeres no Shacl Validation Library, but once such a library exists, it would make sense to add a Shacl Validation.
@@ -54,6 +62,7 @@ Available recipes:
     nix-develop *args                # Enter a Nix development shell.
     run input_file output_file *args # Run the synth-converter.
     test *args                       # Test the synth-converter.
+    fmt *arg                         # Format the synth-converter.
 ```
 
 ### Tests
