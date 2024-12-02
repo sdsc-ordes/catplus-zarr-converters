@@ -17,9 +17,9 @@ The `synth-converter` has three parameters:
 
 - inputfile: path to input file (relative to top level of the repo or absolute)
 - outputfile: path to output file (relative to top level of the repo or absolute)
-- format: default is "turtle", the other option is jsonld
+- format: default is "ttl", the other option is jsonld
 
-The `synth-converter` turns the inputfile into a rdf graph and serilizes it to either  turtle or jsonld. The serialization is written to an outputfile.
+The `synth-converter` turns the inputfile into a rdf graph and serilizes it to either turtle or jsonld. The serialization is written to an outputfile.
 
 ```
 just run example/1-Synth.json output.ttl
