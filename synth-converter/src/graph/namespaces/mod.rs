@@ -1,7 +1,7 @@
-pub mod cat;
-pub mod schema;
-pub mod obo;
-pub mod allores;
 pub mod alloqual;
-pub mod qudt;
+pub mod allores;
+pub mod cat;
+pub mod obo;
 pub mod purl;
+pub mod qudt;
+pub mod schema;

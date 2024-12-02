@@ -1,5 +1,4 @@
-use crate::{graph::graph_builder::GraphBuilder};
-use crate::batch::Batch;
+use crate::{batch::Batch, graph::graph_builder::GraphBuilder};
 use std::error::Error;
 
 /// Parse JSON and serialize the RDF graph to the specified format

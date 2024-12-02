@@ -1,10 +1,13 @@
 use crate::graph::prefix_map::generate_prefix_map;
-use sophia::api::serializer::{Stringifier, TripleSerializer};
-use sophia::inmem::graph::LightGraph;
+use sophia::{
+    api::{
+        prelude::*,
+        serializer::{Stringifier, TripleSerializer},
+    },
+    inmem::graph::LightGraph,
+    jsonld::{serializer::JsonLdSerializer, JsonLdOptions},
+};
 use sophia_turtle::serializer::turtle::{TurtleConfig, TurtleSerializer};
-use sophia::jsonld::{serializer::JsonLdSerializer, JsonLdOptions};
-use sophia::api::prelude::*;
-
 
 /// Serialize an RDF graph to Turtle format
 ///
@@ -13,10 +16,7 @@ use sophia::api::prelude::*;
 ///
 /// # Returns
 /// A `Result` containing the Turtle serialization as a `String`, or an error if serialization fails.
-pub fn serialize_graph_to_turtle(
-    graph: &LightGraph,
-) -> Result<String, Box<dyn std::error::Error>> {
-
+pub fn serialize_graph_to_turtle(graph: &LightGraph) -> Result<String, Box<dyn std::error::Error>> {
     let prefix_map = generate_prefix_map();
 
     let config = TurtleConfig::default()
@@ -29,12 +29,9 @@ pub fn serialize_graph_to_turtle(
     Ok(serializer.as_str().to_string())
 }
 
-pub fn serialize_graph_to_jsonld(
-    graph: &LightGraph,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let mut serializer = JsonLdSerializer::new_stringifier_with_options(
-        JsonLdOptions::new().with_spaces(2),
-    );
+pub fn serialize_graph_to_jsonld(graph: &LightGraph) -> Result<String, Box<dyn std::error::Error>> {
+    let mut serializer =
+        JsonLdSerializer::new_stringifier_with_options(JsonLdOptions::new().with_spaces(2));
 
     let triple_source = graph.triples();
     let quads = triple_source.to_quads();

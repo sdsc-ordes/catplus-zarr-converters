@@ -1,22 +1,22 @@
 use crate::{
-    graph::utils::generate_bnode_term,
     batch::{
         Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPosition, Observation, Sample,
         SampleItem,
     },
+    graph::{
+        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema},
+        utils::generate_bnode_term,
+    },
+    rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
-use crate::graph::namespaces::{cat,obo,purl,allores,alloqual,schema,qudt};
 use sophia::{
     api::{
         graph::MutableGraph,
-        ns::xsd,
-        ns::rdf
+        ns::{rdf, xsd},
     },
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
-use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
-use crate::rdf::rdf_serializers::serialize_graph_to_jsonld;
 
 /// An RDF Graph
 pub struct GraphBuilder {
@@ -43,7 +43,6 @@ impl GraphBuilder {
         predicate: &NsTerm<'_>,
         date_time: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let object = date_time * xsd::dateTime;
         self.graph.insert(subject, predicate, &object)?;
 
@@ -55,7 +54,6 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         container_info: &ContainerInfo,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         self.graph.insert(
             subject,
             cat::containerID,
@@ -76,16 +74,12 @@ impl GraphBuilder {
         property_term: &NsTerm<'_>,
         observation: &Observation,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let observation_term = generate_bnode_term();
 
         self.graph
             .insert(subject, property_term, &observation_term)?;
-        self.graph.insert(
-            &observation_term,
-            qudt::unit,
-            observation.unit.as_str(),
-        )?;
+        self.graph
+            .insert(&observation_term, qudt::unit, observation.unit.as_str())?;
         self.graph
             .insert(&observation_term, qudt::value, observation.value)?;
 
@@ -97,7 +91,6 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         container_position: &ContainerPosition,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let container_position_term = generate_bnode_term();
 
         self.graph.insert(
@@ -130,7 +123,6 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         chemical: &Chemical,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let chemical_term: SimpleTerm = generate_bnode_term();
 
         self.graph
@@ -147,22 +139,16 @@ impl GraphBuilder {
             cat::chemicalName,
             chemical.chemical_name.as_str(),
         )?;
-        self.graph.insert(
-            &chemical_term,
-            cat::casNumber,
-            chemical.cas_number.as_str(),
-        )?;
+        self.graph
+            .insert(&chemical_term, cat::casNumber, chemical.cas_number.as_str())?;
         self.graph.insert(
             &chemical_term,
             allores::AFR_0002295,
             chemical.smiles.as_str(),
         )?;
         let molecular_mass = chemical.molecular_mass.value.to_string();
-        self.graph.insert(
-            &chemical_term,
-            allores::AFR_0002294,
-            &*molecular_mass,
-        )?;
+        self.graph
+            .insert(&chemical_term, allores::AFR_0002294, &*molecular_mass)?;
 
         Ok(())
     }
@@ -172,32 +158,21 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         sample_item: &SampleItem,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let sample_item_term = generate_bnode_term();
 
         self.graph
             .insert(&sample_item_term, rdf::type_, cat::Sample)?;
         self.graph
             .insert(subject, cat::hasSample, &sample_item_term)?;
-        self.graph.insert(
-            &sample_item_term,
-            cat::role,
-            sample_item.role.as_str(),
-        )?;
+        self.graph
+            .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
 
         if let Some(expected_datum) = &sample_item.expected_datum {
-            self.insert_an_observation(
-                &sample_item_term,
-                &cat::expectedDatum,
-                expected_datum,
-            )?;
+            self.insert_an_observation(&sample_item_term, &cat::expectedDatum, expected_datum)?;
         }
 
-        self.graph.insert(
-            &sample_item_term,
-            cat::role,
-            sample_item.role.as_str(),
-        )?;
+        self.graph
+            .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
         self.graph.insert(
             &sample_item_term,
             purl::identifier,
@@ -223,32 +198,19 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         sample: &Sample,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let sample_term = generate_bnode_term();
 
-        self.graph
-            .insert(subject, cat::hasSample, &sample_term)?;
-        self.graph
-            .insert(&sample_term, rdf::type_, cat::Sample)?;
+        self.graph.insert(subject, cat::hasSample, &sample_term)?;
+        self.graph.insert(&sample_term, rdf::type_, cat::Sample)?;
 
         self.insert_container_properties(&sample_term, &sample.container)?;
 
-        self.insert_an_observation(
-            &sample_term,
-            &cat::expectedDatum,
-            &sample.expected_datum,
-        )?;
+        self.insert_an_observation(&sample_term, &cat::expectedDatum, &sample.expected_datum)?;
 
-        self.graph.insert(
-            &sample_term,
-            cat::vialShape,
-            sample.vial_type.as_str(),
-        )?;
-        self.graph.insert(
-            &sample_term,
-            allores::AFR_0002464,
-            sample.vial_id.as_str(),
-        )?;
+        self.graph
+            .insert(&sample_term, cat::vialShape, sample.vial_type.as_str())?;
+        self.graph
+            .insert(&sample_term, allores::AFR_0002464, sample.vial_id.as_str())?;
 
         self.graph
             .insert(&sample_term, cat::role, sample.role.as_str())?;
@@ -265,19 +227,14 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         match action.action_name {
             ActionName::AddAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::AddAction)?;
+                self.graph.insert(subject, rdf::type_, cat::AddAction)?;
             }
 
             ActionName::setTemperatureAction => {
-                self.graph.insert(
-                    subject,
-                    rdf::type_,
-                    cat::setTemperatureAction,
-                )?;
+                self.graph
+                    .insert(subject, rdf::type_, cat::setTemperatureAction)?;
             }
 
             _ => {
@@ -294,11 +251,9 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         action: &Action,
     ) -> Result<(), Box<dyn std::error::Error>> {
-
         let action_term: SimpleTerm = generate_bnode_term();
 
-        self.graph
-            .insert(&action_term, cat::hasBatch, subject)?;
+        self.graph.insert(&action_term, cat::hasBatch, subject)?;
 
         self.insert_a_date_time(
             &action_term,
@@ -351,19 +306,13 @@ impl GraphBuilder {
         }
 
         if let Some(dispense_type) = &action.dispense_type {
-            self.graph.insert(
-                &action_term,
-                cat::dispenseType,
-                dispense_type.as_str(),
-            )?;
+            self.graph
+                .insert(&action_term, cat::dispenseType, dispense_type.as_str())?;
         }
 
         if let Some(dispense_state) = &action.dispense_state {
-            self.graph.insert(
-                &action_term,
-                alloqual::AFQ_0000111,
-                dispense_state.as_str(),
-            )?;
+            self.graph
+                .insert(&action_term, alloqual::AFQ_0000111, dispense_state.as_str())?;
         }
 
         if let Some(container_positions) = &action.has_container_position_and_quantity {
@@ -388,11 +337,9 @@ impl GraphBuilder {
     /// # Returns
     /// A `Result` containing () if successful, or an error if the graph building fails.
     pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
-
         let batch_term = generate_bnode_term();
 
-        self.graph
-            .insert(&batch_term, rdf::type_, cat::Batch)?;
+        self.graph.insert(&batch_term, rdf::type_, cat::Batch)?;
         self.graph
             .insert(&batch_term, schema::name, batch.batch_id.as_str())?;
 
