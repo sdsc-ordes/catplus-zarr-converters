@@ -1,6 +1,6 @@
 use crate::{
     graph::utils::generate_bnode_term,
-    parser::actions::{
+    batch::{
         Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPosition, Observation, Sample,
         SampleItem,
     },

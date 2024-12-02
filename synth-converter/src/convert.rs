@@ -1,4 +1,5 @@
-use crate::{graph::graph_builder::GraphBuilder, parser::parser::parse_json};
+use crate::{graph::graph_builder::GraphBuilder};
+use crate::batch::Batch;
 use std::error::Error;
 
 /// Parse JSON and serialize the RDF graph to the specified format
@@ -25,4 +26,10 @@ pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String, Box<dyn Err
     };
 
     Ok(serialized_graph)
+}
+
+fn parse_json(json_data: &str) -> serde_json::Result<Batch> {
+    let batch: Batch = serde_json::from_str(json_data)?;
+
+    Ok(batch)
 }
