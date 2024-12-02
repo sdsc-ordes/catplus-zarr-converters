@@ -1,5 +1,5 @@
 use crate::{batch::Batch, graph::graph_builder::GraphBuilder};
-use std::error::Error;
+use anyhow::{Context, Result};
 
 /// Parse JSON and serialize the RDF graph to the specified format
 ///
@@ -13,22 +13,36 @@ use std::error::Error;
 ///
 /// # Returns
 /// A `Result` containing the serialized graph as a string or an error if the process fails.
-pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String, Box<dyn Error>> {
-    let batch = parse_json(input_content)?;
+pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
+    // Parse JSON into a Batch object
+    let batch = parse_json(input_content).context("Failed to parse JSON input")?;
 
-    let mut graph_builder = GraphBuilder::new()?;
-    graph_builder.insert_a_batch(&batch)?;
+    // Build the RDF graph
+    let mut graph_builder = GraphBuilder::new().context("Failed to initialize GraphBuilder")?;
+    graph_builder
+        .insert_a_batch(&batch)
+        .context("Failed to insert batch into RDF graph")?;
 
+    // Serialize the RDF graph to the specified format
     let serialized_graph = match fmt {
-        "jsonld" => graph_builder.serialize_to_jsonld()?,
-        _ => graph_builder.serialize_to_turtle()?, // Default to Turtle
+        "jsonld" => graph_builder
+            .serialize_to_jsonld()
+            .context("Failed to serialize RDF graph to JSON-LD")?,
+        _ => graph_builder
+            .serialize_to_turtle()
+            .context("Failed to serialize RDF graph to Turtle")?,
     };
 
     Ok(serialized_graph)
 }
 
-fn parse_json(json_data: &str) -> serde_json::Result<Batch> {
-    let batch: Batch = serde_json::from_str(json_data)?;
-
-    Ok(batch)
+/// Parses a JSON string into a `Batch` struct
+///
+/// # Arguments
+/// - `json_data`: The JSON data as a string.
+///
+/// # Returns
+/// A `Result` containing the parsed `Batch` struct or an error.
+fn parse_json(json_data: &str) -> Result<Batch> {
+    serde_json::from_str(json_data).map_err(|e| anyhow::Error::new(e))
 }

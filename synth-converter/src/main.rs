@@ -1,10 +1,11 @@
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::{
     fs::File,
-    io::{self, Read, Write},
+    io::{Read, Write},
     path::Path,
 };
-use synth_converter::convert::json_to_rdf; // Use the unified conversion function.
+use synth_converter::convert::json_to_rdf;
 
 /// Converts CAT+ Synthesis JSON input into RDF formats.
 ///
@@ -24,39 +25,39 @@ struct Args {
     format: String,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     // Validate input file
     let input_path = Path::new(&args.input_file);
     if !input_path.exists() {
-        eprintln!("Error: Input file '{}' does not exist.", args.input_file);
-        return Err(io::Error::new(io::ErrorKind::NotFound, "Input file not found").into());
+        anyhow::bail!("Input file '{}' does not exist.", args.input_file);
     }
     if !input_path.is_file() {
-        eprintln!("Error: '{}' is not a valid file.", args.input_file);
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "Input is not a file").into());
+        anyhow::bail!("'{}' is not a valid file.", args.input_file);
     }
 
     // Read input file
     let mut input_content = String::new();
-    File::open(input_path)?.read_to_string(&mut input_content)?;
+    File::open(input_path)
+        .with_context(|| format!("Failed to open input file '{}'", args.input_file))?
+        .read_to_string(&mut input_content)
+        .with_context(|| format!("Failed to read input file '{}'", args.input_file))?;
 
     // Use unified conversion function
-    match json_to_rdf(&input_content, &args.format) {
-        Ok(serialized_graph) => {
-            println!("Conversion successful!");
+    let serialized_graph = json_to_rdf(&input_content, &args.format)
+        .with_context(|| format!("Failed to convert JSON to RDF format '{}'", args.format))?;
 
-            // Write to output file
-            let output_path = Path::new(&args.output_file);
-            let mut output = File::create(output_path)?;
-            output.write_all(serialized_graph.as_bytes())?;
-            println!("Processed content written to '{}'", output_path.display());
-            Ok(())
-        }
-        Err(err) => {
-            eprintln!("Error during conversion: {}", err);
-            Err(err)
-        }
-    }
+    println!("Conversion successful!");
+
+    // Write to output file
+    let output_path = Path::new(&args.output_file);
+    let mut output = File::create(output_path)
+        .with_context(|| format!("Failed to create output file '{}'", args.output_file))?;
+    output
+        .write_all(serialized_graph.as_bytes())
+        .with_context(|| format!("Failed to write to output file '{}'", args.output_file))?;
+
+    println!("Processed content written to '{}'", output_path.display());
+    Ok(())
 }

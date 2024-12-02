@@ -9,6 +9,7 @@ use crate::{
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
+use anyhow::{Context, Result};
 use sophia::{
     api::{
         graph::MutableGraph,
@@ -31,7 +32,7 @@ pub struct GraphBuilder {
 /// * insert_a_batch:  starts the process of building the graph from the input structure
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new() -> Result<Self> {
         Ok(Self {
             graph: LightGraph::new(),
         })
@@ -42,7 +43,7 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         predicate: &NsTerm<'_>,
         date_time: &str,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<()> {
         let object = date_time * xsd::dateTime;
         self.graph.insert(subject, predicate, &object)?;
 
@@ -53,7 +54,7 @@ impl GraphBuilder {
         &mut self,
         subject: &SimpleTerm,
         container_info: &ContainerInfo,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<()> {
         self.graph.insert(
             subject,
             cat::containerID,
@@ -73,7 +74,7 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         property_term: &NsTerm<'_>,
         observation: &Observation,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<()> {
         let observation_term = generate_bnode_term();
 
         self.graph
@@ -90,7 +91,7 @@ impl GraphBuilder {
         &mut self,
         subject: &SimpleTerm,
         container_position: &ContainerPosition,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    ) -> Result<()> {
         let container_position_term = generate_bnode_term();
 
         self.graph.insert(
@@ -118,11 +119,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_a_chemical(
-        &mut self,
-        subject: &SimpleTerm,
-        chemical: &Chemical,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn insert_a_chemical(&mut self, subject: &SimpleTerm, chemical: &Chemical) -> Result<()> {
         let chemical_term: SimpleTerm = generate_bnode_term();
 
         self.graph
@@ -153,11 +150,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_a_sample(
-        &mut self,
-        subject: &SimpleTerm,
-        sample_item: &SampleItem,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn insert_a_sample(&mut self, subject: &SimpleTerm, sample_item: &SampleItem) -> Result<()> {
         let sample_item_term = generate_bnode_term();
 
         self.graph
@@ -193,11 +186,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_samples(
-        &mut self,
-        subject: &SimpleTerm,
-        sample: &Sample,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn insert_samples(&mut self, subject: &SimpleTerm, sample: &Sample) -> Result<()> {
         let sample_term = generate_bnode_term();
 
         self.graph.insert(subject, cat::hasSample, &sample_term)?;
@@ -216,17 +205,14 @@ impl GraphBuilder {
             .insert(&sample_term, cat::role, sample.role.as_str())?;
 
         for sample_item in &sample.has_sample {
-            self.insert_a_sample(&sample_term, &sample_item)?;
+            self.insert_a_sample(&sample_term, &sample_item)
+                .context("Failed to insert sample")?
         }
 
         Ok(())
     }
 
-    fn insert_action_type(
-        &mut self,
-        subject: &SimpleTerm,
-        action: &Action,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn insert_action_type(&mut self, subject: &SimpleTerm, action: &Action) -> Result<()> {
         match action.action_name {
             ActionName::AddAction => {
                 self.graph.insert(subject, rdf::type_, cat::AddAction)?;
@@ -246,11 +232,7 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_an_action(
-        &mut self,
-        subject: &SimpleTerm,
-        action: &Action,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    fn insert_an_action(&mut self, subject: &SimpleTerm, action: &Action) -> Result<()> {
         let action_term: SimpleTerm = generate_bnode_term();
 
         self.graph.insert(&action_term, cat::hasBatch, subject)?;
@@ -290,7 +272,8 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
-            )?;
+            )
+            .context("Failed to insert observation")?
         }
 
         if let Some(temperature_tumble_stirrer) = &action.temperature_tumble_stirrer {
@@ -298,7 +281,8 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
-            )?;
+            )
+            .context("Failed to insert observation")?
         }
 
         if let Some(speed_shaker) = &action.speed_shaker {
@@ -336,13 +320,14 @@ impl GraphBuilder {
     ///
     /// # Returns
     /// A `Result` containing () if successful, or an error if the graph building fails.
-    pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<()> {
         let batch_term = generate_bnode_term();
 
         self.graph.insert(&batch_term, rdf::type_, cat::Batch)?;
         self.graph
             .insert(&batch_term, schema::name, batch.batch_id.as_str())?;
 
+        // Propagate any error returned from `insert_an_action`
         for action in &batch.actions {
             self.insert_an_action(&batch_term, action)?;
         }
@@ -357,8 +342,8 @@ impl GraphBuilder {
     /// # Returns
     /// A `Result` containing the graph as Turtle serialization, or an error
     /// if the graph retrieval fails.
-    pub fn serialize_to_turtle(&self) -> Result<String, Box<dyn std::error::Error>> {
-        serialize_graph_to_turtle(&self.graph)
+    pub fn serialize_to_turtle(&self) -> Result<String> {
+        serialize_graph_to_turtle(&self.graph).context("Failed to serialize graph to Turtle")
     }
 
     /// Get the turtle serialization of the RDF graph
@@ -368,7 +353,7 @@ impl GraphBuilder {
     /// # Returns
     /// A `Result` containing the graph as jsonld serialization, or an error
     /// if the graph retrieval fails.
-    pub fn serialize_to_jsonld(&self) -> Result<String, Box<dyn std::error::Error>> {
-        serialize_graph_to_jsonld(&self.graph)
+    pub fn serialize_to_jsonld(&self) -> Result<String> {
+        serialize_graph_to_jsonld(&self.graph).context("Failed to serialize graph to JSON-LD")
     }
 }

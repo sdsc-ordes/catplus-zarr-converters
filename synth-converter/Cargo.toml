@@ -21,3 +21,4 @@ sophia_turtle = "0.8.0"
 uuid = { version = "1", features = ["v4"] }
 sophia_isomorphism = "0.8.0"
 clap = { version = "4.3.0", features = ["derive"] }
+anyhow = "1.0.93"
