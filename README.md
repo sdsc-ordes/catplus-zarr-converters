@@ -7,7 +7,30 @@ The data types are all in different formats, their data and metadata colluded to
 
 ## Tools
 
-- synth-converter: parses a json input into a turtle output file, that conforms to the cat+ ontology
+### synth-converter
+The Synth-converter parses a json input into an rdf graph and serializes the graph to either turtle or jsonld.
+It expects the input to conform to the cat+ ontology and the struct `synth-converter/src/batch.rs`. An example input file is provided in `example/1-Synth.json`.
+
+#### Usage
+
+The `synth-converter` has three parameters:
+
+- inputfile: path to input file (relative to top level of the repo or absolute)
+- outputfile: path to output file (relative to top level of the repo or absolute)
+- format: default is "turtle", the other option is jsonld
+
+The `synth-converter` turns the inputfile into a rdf graph and serilizes it to either  turtle or jsonld. The serialization is written to an outputfile.
+
+```
+just run example/1-Synth.json output.ttl
+just run example/1-Synth.json output.json --format jsonld
+```
+
+### Shacl Validation
+
+The rdf graph confirms to the cat+ ontology: https://github.com/sdsc-ordes/cat-plus-ontology. Currently rust offeres no Shacl Validation Library, but once such a library exists, it would make sense to add a Shacl Validation.
+
+TheShacl Validation can be done manually here: https://www.itb.ec.europa.eu/shacl/any/upload
 
 ## Installation guidelines
 
@@ -19,15 +42,24 @@ cd cat-plus-zarr-converters
 cargo build
 ```
 
-## How to Use
+From here on you can work with a just file:
 
-You can find an example input file at `/example/1-Synth.json`
+The rust commands can be started via a justfile:
 
 ```
-cargo run example/1-Synth.json 1-Synth.ttl
+just --list
+Available recipes:
+    build *args                      # Build the synth-converter.
+    default                          # Default recipe to list all recipes.
+    nix-develop *args                # Enter a Nix development shell.
+    run input_file output_file *args # Run the synth-converter.
+    test *args                       # Test the synth-converter.
 ```
 
-## Contribute
+### Tests
 
-To be defined.
+Run the tests with `just test`: only integration tests have been integrated that ensure that the serialized graph in turtle is isomorphic to an expected turtle serialization per valid substructure of the input data: this substructures are action that occur in the synthesis process.
 
+### Contribute
+
+The repo is a Poc under heavy development and not yet ready to take contributions.
