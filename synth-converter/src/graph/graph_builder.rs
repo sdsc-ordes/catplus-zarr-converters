@@ -26,7 +26,7 @@ pub struct GraphBuilder {
 
 /// Builds an RDF graph of Synthesis data for the cat+ ontology.
 ///
-/// The rust structure "actions" in /parser/actions is mapped to the cat+ ontology
+/// The rust structure `actions` in /parser/actions is mapped to the cat+ ontology
 ///
 /// # public methods:
 /// * insert_a_batch:  starts the process of building the graph from the input structure
