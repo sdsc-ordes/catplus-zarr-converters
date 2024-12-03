@@ -3,9 +3,12 @@
 
 # Rust Build
 target
+debug
 
 #OS specific
 .DS_Store
 
 #Folders
 data/**
+*.ttl
+*.json
