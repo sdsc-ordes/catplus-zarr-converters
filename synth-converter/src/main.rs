@@ -14,7 +14,7 @@ use synth_converter::convert::json_to_rdf;
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-    /// Path to the input JSON file: relative or absolute
+    /// Path to the input JSON file: relative or absolute.
     input_file: String,
 
     /// Path to the output RDF file.
