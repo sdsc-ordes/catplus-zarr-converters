@@ -327,7 +327,6 @@ impl GraphBuilder {
         self.graph
             .insert(&batch_term, schema::name, batch.batch_id.as_str())?;
 
-        // Propagate any error returned from `insert_an_action`
         for action in &batch.actions {
             self.insert_an_action(&batch_term, action)?;
         }
