@@ -17,7 +17,7 @@ struct Args {
     /// Path to the input JSON file: relative or absolute
     input_file: String,
 
-    /// Path to the output RDF file
+    /// Path to the output RDF file.
     output_file: String,
 
     /// Output format: "ttl" (Turtle) or "jsonld" (JSON-LD)
