@@ -350,7 +350,7 @@ impl GraphBuilder {
     /// Assumes a new graph has been created and built.
     ///
     /// # Returns
-    /// A `Result` containing the graph as jsonld serialization, or an error
+    ///  The `jsonld` serialization of the grap, or an error otherwise.
     /// if the graph retrieval fails.
     pub fn serialize_to_jsonld(&self) -> Result<String> {
         serialize_graph_to_jsonld(&self.graph).context("Failed to serialize graph to JSON-LD")
