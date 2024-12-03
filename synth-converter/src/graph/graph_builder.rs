@@ -319,7 +319,7 @@ impl GraphBuilder {
     /// Assumes a new graph has been created
     ///
     /// # Returns
-    /// A `Result` containing () if successful, or an error if the graph building fails.
+    /// A `Result` containing `()` if successful, or an error if the graph building fails.
     pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<()> {
         let batch_term = generate_bnode_term();
 
