@@ -31,7 +31,7 @@ pub fn generate_prefix_map() -> Vec<(Prefix<Box<str>>, Iri<Box<str>>)> {
         ),
         (
             "unit",
-            schema::ns
+            unit::ns
                 .get("")
                 .expect("Namespace URI should always be valid"),
         ),
