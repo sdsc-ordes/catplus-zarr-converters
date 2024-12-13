@@ -35,7 +35,7 @@ pub struct Action {
     #[serde(rename = "speedShaker")]
     pub speed_shaker: Option<Observation>,
     #[serde(rename = "hasContainerPositionAndQuantity")]
-    pub has_container_position_and_quantity: Option<Vec<ContainerPositionAndQuantityItem>>,
+    pub has_container_position_and_quantity: Option<Vec<ContainerPositionQuantityItem>>,
     #[serde(rename = "dispenseState")]
     pub dispense_state: Option<String>,
     #[serde(rename = "dispenseType")]
@@ -123,12 +123,12 @@ pub struct Chemical {
     #[serde(rename = "chemicalName")]
     pub chemical_name: String,
     #[serde(rename = "CASNumber")]
-    pub cas_number: String,
+    pub cas_number: Option<String>,
     #[serde(rename = "molecularMass")]
     pub molecular_mass: Observation,
     pub smiles: String,
     #[serde(rename = "swissCatNumber")]
-    pub swiss_cat_number: String,
+    pub swiss_cat_number: Option<String>,
     #[serde(rename = "Inchi")]
     pub inchi: String,
     pub keywords: Option<String>,
@@ -138,7 +138,7 @@ pub struct Chemical {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ContainerPositionAndQuantityItem {
+pub struct ContainerPositionQuantityItem {
     #[serde(rename = "containerID")]
     pub container_id: String,
     pub position: String,

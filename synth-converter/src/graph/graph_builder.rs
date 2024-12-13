@@ -1,10 +1,10 @@
 use crate::{
     batch::{
-        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionAndQuantityItem,
+        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
         Observation, Sample, SampleItem, ErrorMargin
     },
     graph::{
-        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema},
+        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema, unit},
         utils::generate_bnode_term,
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
@@ -91,6 +91,24 @@ impl GraphBuilder {
         Ok(())
     }
 
+    fn insert_a_density(
+        &mut self,
+        subject: &SimpleTerm,
+        property_term: &NsTerm<'_>,
+        observation: &Observation,
+    ) -> Result<()> {
+        let density_term = generate_bnode_term();
+
+        self.graph
+            .insert(subject, property_term, &density_term)?;
+        self.graph
+            .insert(&density_term, qudt::unit, unit::MilliGM)?;
+        self.graph
+            .insert(&density_term, qudt::value, observation.value)?;
+
+        Ok(())
+    }
+
     fn insert_an_error_margin(
         &mut self,
         subject: &SimpleTerm,
@@ -109,38 +127,38 @@ impl GraphBuilder {
         Ok(())
     }
 
-    fn insert_a_container_position(
+    fn insert_a_container_position_and_quantity(
         &mut self,
         subject: &SimpleTerm,
-        container_position_and_quantity: &ContainerPositionAndQuantityItem,
+        container_position_quantity_item: &ContainerPositionQuantityItem,
     ) -> Result<()> {
-        let container_position_and_quantity_item_term = generate_bnode_term();
+        let container_position_quantity_item_term = generate_bnode_term();
 
         self.graph.insert(
             subject,
             cat::hasContainerPositionAndQuantity,
-            &container_position_and_quantity_item_term,
+            &container_position_quantity_item_term,
         )?;
         self.graph.insert(
-            &container_position_and_quantity_item_term,
+            &container_position_quantity_item_term,
             rdf::type_,
             cat::ContainerPositionAndQuantity,
         )?;
         self.graph.insert(
-            &container_position_and_quantity_item_term,
+            &container_position_quantity_item_term,
             allores::AFR_0002240,
-            container_position_and_quantity.position.as_str(),
+            container_position_quantity_item.position.as_str(),
         )?;
         self.graph.insert(
-            &container_position_and_quantity_item_term,
-            &cat::containerID,
-            container_position_and_quantity.container_id.as_str(),
+            &container_position_quantity_item_term,
+            cat::containerID,
+            container_position_quantity_item.container_id.as_str(),
         )?;
 
         self.insert_an_observation(
-            &container_position_and_quantity_item_term,
+            &container_position_quantity_item_term,
             &qudt::quantity,
-            &container_position_and_quantity.quantity,
+            &container_position_quantity_item.quantity,
         )?;
 
         Ok(())
@@ -163,8 +181,10 @@ impl GraphBuilder {
             cat::chemicalName,
             chemical.chemical_name.as_str(),
         )?;
-        self.graph
-            .insert(&chemical_term, cat::casNumber, chemical.cas_number.as_str())?;
+        if let Some(cas_number) = &chemical.cas_number {
+            self.graph
+                .insert(&chemical_term, cat::casNumber, cas_number.as_str())?;
+        }
         self.graph.insert(
             &chemical_term,
             allores::AFR_0002295,
@@ -178,15 +198,17 @@ impl GraphBuilder {
             .insert(&chemical_term, allores::AFR_0002296, chemical.inchi.as_str())?;
         self.graph
             .insert(&chemical_term, allores::AFR_0001952, chemical.molecular_formula.as_str())?;
-        self.graph
-            .insert(&chemical_term, cat::swissCatNumber, chemical.swiss_cat_number.as_str())?;
+        if let Some(swiss_cat_number) = &chemical.swiss_cat_number {
+            self.graph
+                .insert(&chemical_term, cat::swissCatNumber, swiss_cat_number.as_str())?;
+        }
         if let Some(keywords) = &chemical.keywords {
             self.graph
                 .insert(&chemical_term, schema::keywords, keywords.as_str())?;
         }
 
         if let Some(density) = &chemical.density {
-            self.insert_an_observation(
+            self.insert_a_density(
                 &chemical_term,
                 &obo::PATO_0001019,
                 density,
@@ -369,9 +391,9 @@ impl GraphBuilder {
                 .insert(&action_term, alloqual::AFQ_0000111, dispense_state.as_str())?;
         }
 
-        if let Some(container_positions) = &action.has_container_position_and_quantity {
-            for container_position in container_positions {
-                self.insert_a_container_position(&action_term, container_position)?;
+        if let Some(container_position_and_quantities) = &action.has_container_position_and_quantity {
+            for container_position_quantity_item in container_position_and_quantities {
+                self.insert_a_container_position_and_quantity(&action_term, container_position_quantity_item)?;
             }
         }
 
