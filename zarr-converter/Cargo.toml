@@ -1,0 +1,10 @@
+[package]
+name = "zarr-converter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ndarray = "0.16.1"
+serde_json = "1.0.133"
+zarrs = "0.18.0"
+zarrs_filesystem = "0.2.0"
