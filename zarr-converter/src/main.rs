@@ -19,6 +19,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let array;
     let path_in_store = "/array";
     let array_shape= vec![3,4];
+    let json_metadata = serde_json::json!({"Zarr V3": "is great"});
     array = create_array(store, path_in_store, array_shape, json_metadata);
     
     // Store the array metadata
