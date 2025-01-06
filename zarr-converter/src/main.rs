@@ -1,39 +1,51 @@
-
-use zarrs::array::{ArrayBuilder, DataType, FillValue, ZARR_NAN_F32};
-use zarrs::array::codec::GzipCodec; // requires gzip feature
-use zarrs::array_subset::ArraySubset;
 use std::path::PathBuf;
+use zarrs::group::Group;
 
-use std::sync::Arc;
+use crate::manage_store::create_store;
+use crate::chunk::{add_chunk, erase_chunk};
+use crate::metadata_add::{add_root_metadata, add_array_metadata, add_group_metadata, collect_metadata};
+use crate::manage_arrays::{create_array, add_array_subset, retrieve_ndarray};
+use crate::manage_groups::create_group;
 
-use zarr_converter::manage_store::create_store;
-use zarr_converter::metadata_add::add_root_metadata;
-use zarr_converter::chunk::{create_array, add_chunk, add_array_subset};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     
+    // CREATE STORE
     let store_path: PathBuf = "../zarr-files/hierarchy.zarr".into();
     let store;
     store = create_store(&store_path);
-    add_root_metadata(&mut store);    
+    add_root_group(&mut store);    
 
-    let array;
-    let path_in_store = "/array";
+    // CREATE ARRAY & its METADATA
+    let array_path = "/array";
     let array_shape= vec![3,4];
-    let json_metadata = serde_json::json!({"Zarr V3": "is great"});
-    array = create_array(store, path_in_store, array_shape, json_metadata);
+    let dimension_names = ["y", "x"];
+    let json_metadata = serde_json::json!({"Zarr V3": "is great"}).as_object().unwrap().clone();
+    create_array(&mut store, array_path, array_shape);
+    add_array_metadata(&mut store, array_path, json_metadata);
+
+    // CREATE GROUP & its METADATA
+    let group_path = "/new_group";
+    let json_metadata = serde_json::json!({"Group name": "the best"}).as_object().unwrap().clone();
+    create_group(&mut store, group_path);
+    add_group_metadata(&mut store, group_path, json_metadata);
+
     
-    // Store the array metadata
-    array.store_metadata()?;
-    // Consolidate metadata (get all metadata in a store)
-    //To do write a function
+    // CONSOLIDATE METADATA
+    let metadata = collect_metadata(&mut store)?;
+    let metadata_json = serde_json::to_string_pretty(&metadata)?;
+    println!("{}", metadata_json);
 
     // CHUNKING
     let chunk_indices = [0, 0];
-    let chunk_elements = [0.2, 0.3, 1.2, 1.3]
-    array = add_chunk(array, chunk_indices, chunk)
+    let chunk_elements = [0.2, 0.3, 1.2, 1.3];
+    add_chunk(&mut store, array_path, chunk_indices, chunk_elements);
     let array_indices = [1, 1];  
     let array_subset = ndarray::array![[-1.1, -1.2], [-2.1, -2.2]];
-    array = add_array_subset(array, array_indices, array_subset)
+    add_array_subset(&mut store, array_path, array_indices, array_subset);
+
+    // Retrieve all array elements as an ndarray
+    let array_ndarray;
+    array_ndarray = retrieve_ndarray(array);
 
     return Ok(());
 }
