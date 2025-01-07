@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 ndarray = "0.16.1"
 serde_json = "1.0.133"
-zarrs = "0.18.0"
+zarrs = "0.18.3"
 zarrs_filesystem = "0.2.0"
