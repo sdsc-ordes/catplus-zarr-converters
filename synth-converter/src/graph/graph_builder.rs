@@ -74,18 +74,20 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         property_term: &NsTerm<'_>,
         observation: &Observation,
+        observation_unit: &NsTerm<'_>,
     ) -> Result<()> {
         let observation_term = generate_bnode_term();
 
         self.graph
             .insert(subject, property_term, &observation_term)?;
         self.graph
-            .insert(&observation_term, qudt::unit, observation.unit.as_str())?;
+            .insert(&observation_term, qudt::unit, observation_unit)?;
         self.graph
             .insert(&observation_term, qudt::value, observation.value)?;
 
         if let Some(error_margin) = &observation.error_margin {
-            self.insert_an_error_margin(&observation_term, &cat::errorMargin, error_margin)?;
+            self.insert_an_error_margin(
+                &observation_term, &cat::errorMargin, error_margin, observation_unit)?;
         }
 
         Ok(())
@@ -102,7 +104,7 @@ impl GraphBuilder {
         self.graph
             .insert(subject, property_term, &density_term)?;
         self.graph
-            .insert(&density_term, qudt::unit, unit::MilliGM)?;
+            .insert(&density_term, qudt::unit, unit::GM_PER_MilliL)?;
         self.graph
             .insert(&density_term, qudt::value, observation.value)?;
 
@@ -114,13 +116,14 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         property_term: &NsTerm<'_>,
         error_margin: &ErrorMargin,
+        observation_unit: &NsTerm<'_>,
     ) -> Result<()> {
         let error_margin_term = generate_bnode_term();
 
         self.graph
             .insert(subject, property_term, &error_margin_term)?;
         self.graph
-            .insert(&error_margin_term, qudt::unit, error_margin.unit.as_str())?;
+            .insert(&error_margin_term, qudt::unit, observation_unit)?;
         self.graph
             .insert(&error_margin_term, qudt::value, error_margin.value)?;
 
@@ -159,6 +162,7 @@ impl GraphBuilder {
             &container_position_quantity_item_term,
             &qudt::quantity,
             &container_position_quantity_item.quantity,
+            &unit::MilliGM,
         )?;
 
         Ok(())
@@ -229,15 +233,18 @@ impl GraphBuilder {
             .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
 
         if let Some(expected_datum) = &sample_item.expected_datum {
-            self.insert_an_observation(&sample_item_term, &cat::expectedDatum, expected_datum)?;
+            self.insert_an_observation(
+                &sample_item_term, &cat::expectedDatum, expected_datum, &unit::MilliGM)?;
         }
 
         if let Some(measured_quantity) = &sample_item.measured_quantity {
-            self.insert_an_observation(&sample_item_term, &cat::measuredQuantity, measured_quantity)?;
+            self.insert_an_observation(
+                &sample_item_term, &cat::measuredQuantity, measured_quantity, &unit::MilliGM)?;
         }
 
         if let Some(concentration) = &sample_item.measured_quantity {
-            self.insert_an_observation(&sample_item_term, &allores::AFR_0002036, concentration)?;
+            self.insert_an_observation(
+                &sample_item_term, &allores::AFR_0002036, concentration, &unit::MOL_PER_L)?;
         }
 
 
@@ -271,7 +278,8 @@ impl GraphBuilder {
 
         self.insert_container_properties(&sample_term, &sample.container)?;
 
-        self.insert_an_observation(&sample_term, &cat::expectedDatum, &sample.expected_datum)?;
+        self.insert_an_observation(
+            &sample_term, &cat::expectedDatum, &sample.expected_datum, &unit::MilliGM)?;
 
         self.graph
             .insert(&sample_term, cat::vialShape, sample.vial_type.as_str())?;
@@ -364,6 +372,7 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
+                &unit::REV_PER_MIN,
             )
             .context("Failed to insert observation")?
         }
@@ -373,12 +382,14 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
+                &unit::REV_PER_MIN,
             )
             .context("Failed to insert observation")?
         }
 
         if let Some(speed_shaker) = &action.speed_shaker {
-            self.insert_an_observation(&action_term, &cat::speedInRPM, speed_shaker)?;
+            self.insert_an_observation(
+                &action_term, &cat::speedInRPM, speed_shaker, &unit::REV_PER_MIN)?;
         }
 
         if let Some(dispense_type) = &action.dispense_type {
