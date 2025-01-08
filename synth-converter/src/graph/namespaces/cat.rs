@@ -12,6 +12,7 @@ namespace! {
     SetTemperatureAction,
     SetVacuumAction,
     ShakeAction,
+    speedTumbleStirrerShape,
     casNumber,
     chemicalName,
     containerBarcode,

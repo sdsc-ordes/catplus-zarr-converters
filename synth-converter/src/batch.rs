@@ -48,6 +48,8 @@ pub struct Action {
     pub temperature_tumble_stirrer: Option<Observation>,
     #[serde(rename = "temperatureShaker")]
     pub temperature_shaker: Option<Observation>,
+    #[serde(rename = "pressureMeasurement")]
+    pub pressure_measurement: Option<Observation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -2,13 +2,8 @@ use lazy_static::lazy_static;
 use sophia::api::ns::Namespace;
 use sophia_api::namespace;
 namespace! {
-    "https://qudt.org/vocab/unit/",
-    Bar,
-    DEG_C,
-    MilliGM,
-    GM_PER_MilliL,
-    MOL_PER_L,
-    REV_PER_MIN
+    "http://purl.allotrope.org/ontologies/process#",
+    AFP_0002677
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();

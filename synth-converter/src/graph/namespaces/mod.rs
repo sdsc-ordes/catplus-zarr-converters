@@ -1,5 +1,6 @@
 pub mod alloqual;
 pub mod allores;
+pub mod alloproc;
 pub mod cat;
 pub mod obo;
 pub mod purl;

@@ -4,7 +4,7 @@ use crate::{
         Observation, Sample, SampleItem, ErrorMargin
     },
     graph::{
-        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema, unit},
+        namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema, unit},
         utils::generate_bnode_term,
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
@@ -372,7 +372,17 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
-                &unit::REV_PER_MIN,
+                &unit::DEG_C,
+            )
+            .context("Failed to insert observation")?
+        }
+
+        if let Some(pressure_measurement) = &action.pressure_measurement {
+            self.insert_an_observation(
+                &action_term,
+                &alloproc::AFP_0002677,
+                pressure_measurement,
+                &unit::Bar,
             )
             .context("Failed to insert observation")?
         }
@@ -382,7 +392,7 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
-                &unit::REV_PER_MIN,
+                &unit::DEG_C,
             )
             .context("Failed to insert observation")?
         }
@@ -390,6 +400,11 @@ impl GraphBuilder {
         if let Some(speed_shaker) = &action.speed_shaker {
             self.insert_an_observation(
                 &action_term, &cat::speedInRPM, speed_shaker, &unit::REV_PER_MIN)?;
+        }
+
+        if let Some(speed_tumble_stirrer) = &action.speed_tumble_stirrer {
+            self.insert_an_observation(
+                &action_term, &cat::speedTumbleStirrerShape, speed_tumble_stirrer, &unit::REV_PER_MIN)?;
         }
 
         if let Some(dispense_type) = &action.dispense_type {
