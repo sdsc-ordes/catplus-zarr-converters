@@ -1,18 +1,19 @@
 use zarrs::array::{Array, ArrayBuilder, DataType, FillValue, ZARR_NAN_F32};
 use zarrs::array::codec::GzipCodec; // requires gzip feature
 use zarrs::storage::ReadableWritableListableStorage;
-use std::array;
+//use std::array;
 use std::sync::Arc;
 use serde_json::{Value, Map};
 
 pub fn create_array(store: &mut ReadableWritableListableStorage, 
     array_path: &str, array_shape: Vec<u64>, 
+    chunking_shape: Vec<u64>,
     dimension_names: Vec<&str>,
     metadata: Map<String, Value>)-> Result<(), Box<dyn std::error::Error>>{
     let _array = ArrayBuilder::new(
-        array_shape, // array shape
+        array_shape,
         DataType::Float32,
-        vec![2, 2].try_into()?, // regular chunk shape (non-zero elements)
+        chunking_shape.try_into()?,
         FillValue::from(ZARR_NAN_F32),
     )
     .bytes_to_bytes_codecs(vec![
@@ -22,7 +23,6 @@ pub fn create_array(store: &mut ReadableWritableListableStorage,
     .attributes(metadata)
     .build(store.clone(), array_path)?;
     _array.store_metadata()?;
-    println!("{}", array_path);
     Ok(())
 }
 

@@ -3,3 +3,7 @@ pub mod manage_groups;
 pub mod metadata_add;
 pub mod manage_store;
 pub mod chunk;
+pub mod extractor;
+pub mod agilent;
+pub mod utils;
+pub mod array_builder;
