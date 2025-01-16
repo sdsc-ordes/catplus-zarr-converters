@@ -32,7 +32,6 @@ pub fn chunk(data: &ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>,
             add_chunk(&store, array_path, chunk_indices, chunk_elements)?;
         }
     }
-    println!("Done chunking");
     return Ok(());
 }
 

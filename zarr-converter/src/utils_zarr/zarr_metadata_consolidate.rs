@@ -13,8 +13,12 @@ fn add_metadata<'all_metadata>(all_metadata: &'all_metadata mut Map<String, Valu
 
 fn iterate_groups<'all_metadata>(store: ReadableWritableListableStorage, group_path: &str, all_metadata: &'all_metadata mut Map<String, Value>)->Result<(), Box<dyn std::error::Error>>{
     let group = Group::open(store.clone(), group_path)?;
+    println!("{}", group_path);
     let children_paths = group.child_group_paths(true)?;
+    println!("{}", "children paths retrieved");
+    println!("{:?}", children_paths);
     for child_path in children_paths{
+        println!("{}", child_path);
         let child_group = Group::open(store.clone(), &child_path.to_string())?;
         let group_attrs = child_group.attributes().clone();
         add_metadata(all_metadata, &child_path.to_string(), group_attrs)?;
@@ -28,6 +32,7 @@ fn iterate_arrays<'all_metadata>(store: ReadableWritableListableStorage, group_p
     let group = Group::open(store.clone(), group_path)?;
     let children_paths = group.child_array_paths(true)?;
     for child_path in children_paths{
+        println!("{}", child_path);
         let child_group = Array::open(store.clone(), &child_path.to_string())?;
         let group_attrs = child_group.attributes().clone();
         add_metadata(all_metadata, &child_path.to_string(), group_attrs)?;
@@ -41,7 +46,7 @@ pub fn collect_metadata(store: &mut ReadableWritableListableStorage) -> Result<V
     let root_group = Group::open(store.clone(), root_path)?;
     let mut all_metadata = serde_json::Map::new();
 
-    // Collect metadata for the group itself
+    // Collect metadata for the root group itself
     let group_attrs: serde_json::Map<std::string::String, Value> = root_group.attributes().clone();
     add_metadata(&mut all_metadata, "root", group_attrs)?;
     iterate_groups(store.clone(), root_path, &mut all_metadata)?;

@@ -1,8 +1,4 @@
-pub mod manage_arrays;
-pub mod manage_groups;
-pub mod metadata_add;
-pub mod manage_store;
-pub mod chunk;
+pub mod utils_zarr;
 pub mod extractor;
 pub mod agilent;
 pub mod utils;

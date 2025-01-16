@@ -1,11 +1,10 @@
 
-use zarrs::group::{self, GroupBuilder};
+use zarrs::group::GroupBuilder;
 use zarrs::storage::ReadableWritableListableStorage;
 use serde_json::{Value, Map};
 
 
 pub fn add_root_group(store: &mut ReadableWritableListableStorage) -> Result<(), Box<dyn std::error::Error>>{
-    // // Write the root group metadata
     GroupBuilder::new().build(store.clone(), "/")?.store_metadata()?;
     Ok(())
 }
