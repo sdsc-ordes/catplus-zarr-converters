@@ -4,7 +4,7 @@ use crate::{
         Observation, Sample, SampleItem, ErrorMargin
     },
     graph::{
-        namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema, unit},
+        namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema},
         utils::generate_bnode_term,
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
@@ -19,6 +19,7 @@ use sophia::{
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
+use crate::graph::namespaces::unit::ToNsTerm;
 
 /// An RDF Graph
 pub struct GraphBuilder {
@@ -105,7 +106,7 @@ impl GraphBuilder {
         self.graph
             .insert(subject, property_term, &density_term)?;
         self.graph
-            .insert(&density_term, qudt::unit, unit::Unit::GMPerMilliL.display_name())?;
+            .insert(&density_term, qudt::unit, Unit::GMPerMilliL.to_ns_term())?;
         self.graph
             .insert(&density_term, qudt::value, observation.value)?;
 
@@ -163,7 +164,7 @@ impl GraphBuilder {
             &container_position_quantity_item_term,
             &qudt::quantity,
             &container_position_quantity_item.quantity,
-            &unit::ns.get(Unit::MilliGM.display_name()).unwrap(),
+            &Unit::MilliGM.to_ns_term(),
         )?;
 
         Ok(())
@@ -238,7 +239,8 @@ impl GraphBuilder {
                 &sample_item_term,
                 &cat::expectedDatum,
                 expected_datum,
-                &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
+                &Unit::MilliGM.to_ns_term(),
+            )?;
         }
 
         if let Some(measured_quantity) = &sample_item.measured_quantity {
@@ -246,13 +248,17 @@ impl GraphBuilder {
                 &sample_item_term,
                 &cat::measuredQuantity,
                 measured_quantity,
-                &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
+                &Unit::MilliGM.to_ns_term(),
+            )?;
         }
 
         if let Some(concentration) = &sample_item.measured_quantity {
             self.insert_an_observation(
-                &sample_item_term, &allores::AFR_0002036, concentration,
-                &unit::ns.get(Unit::MolPerL.display_name()).unwrap())?;
+                &sample_item_term,
+                &allores::AFR_0002036,
+                concentration,
+                &Unit::MolPerL.to_ns_term(),
+            )?;
         }
 
 
@@ -290,7 +296,8 @@ impl GraphBuilder {
             &sample_term,
             &cat::expectedDatum,
             &sample.expected_datum,
-            &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
+            &Unit::MilliGM.to_ns_term(),
+        )?;
 
         self.graph
             .insert(&sample_term, cat::vialShape, sample.vial_type.as_str())?;
@@ -383,7 +390,7 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
-                &unit::ns.get(Unit::DegC.display_name()).unwrap(),
+                &Unit::DegC.to_ns_term(),
             )
             .context("Failed to insert observation")?
         }
@@ -393,7 +400,7 @@ impl GraphBuilder {
                 &action_term,
                 &alloproc::AFP_0002677,
                 pressure_measurement,
-                &unit::ns.get(Unit::Bar.display_name()).unwrap(),
+                &Unit::Bar.to_ns_term(),
             )
             .context("Failed to insert observation")?
         }
@@ -403,21 +410,27 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
-                &unit::ns.get(Unit::DegC.display_name()).unwrap(),
+                &Unit::DegC.to_ns_term(),
             )
             .context("Failed to insert observation")?
         }
 
         if let Some(speed_shaker) = &action.speed_shaker {
             self.insert_an_observation(
-                &action_term, &cat::speedInRPM, speed_shaker,
-                &unit::ns.get(Unit::RevPerMin.display_name()).unwrap())?;
+                &action_term,
+                &cat::speedInRPM,
+                speed_shaker,
+                &Unit::RevPerMin.to_ns_term(),
+            )?;
         }
 
         if let Some(speed_tumble_stirrer) = &action.speed_tumble_stirrer {
             self.insert_an_observation(
-                &action_term, &cat::speedTumbleStirrerShape, speed_tumble_stirrer,
-                &unit::ns.get(Unit::RevPerMin.display_name()).unwrap())?;
+                &action_term,
+                &cat::speedTumbleStirrerShape,
+                speed_tumble_stirrer,
+                &Unit::RevPerMin.to_ns_term(),
+            )?;
         }
 
         if let Some(dispense_type) = &action.dispense_type {

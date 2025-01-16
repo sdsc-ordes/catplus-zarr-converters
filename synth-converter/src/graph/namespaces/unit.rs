@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use sophia::api::ns::Namespace;
 use sophia_api::namespace;
+use sophia_api::ns::NsTerm;
 
 // Rust cannot handle underscores in variable names, therefore this
 // namespace needs display names the contain the real literals with
@@ -41,8 +42,15 @@ impl Unit {
     }
 }
 
-impl Into<&str> for Unit {
-    fn into(self) -> &'str {
-        self.display_name()
+// Define the trait
+pub trait ToNsTerm {
+    fn to_ns_term(&self) -> NsTerm<'_>;
+}
+
+// Implement the trait for Unit
+impl ToNsTerm for Unit {
+    fn to_ns_term(&self) -> NsTerm<'_> {
+        // Borrow the term to match the return type
+        ns.get(self.display_name()).expect("Term not found in namespace")
     }
 }
