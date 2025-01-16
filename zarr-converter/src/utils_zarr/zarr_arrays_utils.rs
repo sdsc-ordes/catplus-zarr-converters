@@ -4,6 +4,15 @@ use zarrs::storage::ReadableWritableListableStorage;
 use std::sync::Arc;
 use serde_json::{Value, Map};
 
+/// Create Zarr Array 
+/// 
+/// # Arguments
+/// - `store`: The store in which the array will be added
+/// - `array_path`: The path within the store where the array should be created
+/// - `array_shape`: The shape of the array
+/// - `chunking_shape`: The shape of the chunks in which the array will be stored
+/// - `dimension_names`: The names of the dimensions of the array
+/// - `metadata`: The metadata to be added to the array
 pub fn create_array(store: &mut ReadableWritableListableStorage, 
     array_path: &str, array_shape: Vec<u64>, 
     chunking_shape: Vec<u64>,
@@ -25,6 +34,14 @@ pub fn create_array(store: &mut ReadableWritableListableStorage,
     Ok(())
 }
 
+/// Retrieves the entire Array from a Zarr store and returns it as an NDarray
+/// 
+/// # Arguments
+/// - `store`: The store in which the array is stored
+/// - `array_path`: The path within the store where the array is stored
+/// 
+/// # Returns
+/// A `Result` containing the array formatted as an NDarray
 pub fn retrieve_ndarray(store: &mut ReadableWritableListableStorage, array_path: &str)-> Result<ndarray::ArrayD<f32>, Box<dyn std::error::Error>>{
     let _array = Array::open(store.clone(), array_path)?;
     let array_ndarray = _array.retrieve_array_subset_ndarray::<f32>(&_array.subset_all())?;

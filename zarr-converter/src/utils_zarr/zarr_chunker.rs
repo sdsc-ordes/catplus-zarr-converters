@@ -3,7 +3,13 @@ use zarrs::storage::ReadableWritableListableStorage;
 use ndarray::{ArrayBase, Dim, IxDynImpl, ArrayViewD};
 use ndarray::s;
 
-
+/// Chunk an ndarray and store the chunks in a Zarr array
+///     
+/// # Arguments
+/// - `data` : The NDarray to be chunked into a Zarr array
+/// - `chunk_shape` : The shape of the chunks
+/// - `store` : The store where the Zarr array is stored
+/// - `array_path` : The path in the store to the Zarr array
 pub fn chunk(data: &ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>, 
     chunk_shape: [usize; 2],
     store: &ReadableWritableListableStorage, 
@@ -35,7 +41,14 @@ pub fn chunk(data: &ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>,
     return Ok(());
 }
 
-pub fn add_chunk(store: &ReadableWritableListableStorage, array_path: &str, chunk_indices: [u64; 2], chunk_elements: Vec<f32>)-> Result<(), Box<dyn std::error::Error>>{
+/// Add a chunk to a Zarr array
+/// 
+/// # Arguments
+/// - `store` : The store where the Zarr array is stored
+/// - `array_path` : The path in the store to the Zarr array
+/// - `chunk_indices` : The indices where the chunk should be added within the array
+/// - `chunk_elements` : The elements of the chunk
+fn add_chunk(store: &ReadableWritableListableStorage, array_path: &str, chunk_indices: [u64; 2], chunk_elements: Vec<f32>)-> Result<(), Box<dyn std::error::Error>>{
     let _array = Array::open(store.clone(), array_path)?;
     _array.store_chunk_elements::<f32>(
         &chunk_indices, 
@@ -44,6 +57,12 @@ pub fn add_chunk(store: &ReadableWritableListableStorage, array_path: &str, chun
     Ok(())
 }
 
+/// Erase a chunk from a Zarr array
+/// 
+/// # Arguments
+/// - `store` : The store where the Zarr array is stored
+/// - `array_path` : The path in the store to the Zarr array
+/// - `chunk_indices` : The indices of the chunk to be erased
 pub fn erase_chunk(store: &mut ReadableWritableListableStorage, array_path: &str, chunk_indices: [u64; 2])-> Result<(), Box<dyn std::error::Error>>{
     let _array = Array::open(store.clone(), array_path)?;
     _array.erase_chunk(&chunk_indices)?;

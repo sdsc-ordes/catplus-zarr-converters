@@ -1,6 +1,13 @@
 use serde_json::Value;
 use ndarray::{ArrayBase, Dim, IxDynImpl, Array2, stack, Axis};
 
+/// Convert a vector into a 2D NDarray
+/// 
+/// # Arguments
+/// - `measures` - A vector of vectors of numbers
+/// 
+/// # Returns
+/// A `Result` containing the 2D NDarray.
 pub fn convert_to_2d_ndarray(measures: &Vec<Value>) -> Result<ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>, Box<dyn std::error::Error>> {
     let rows = measures.len();
     let cols = measures[0]
@@ -32,7 +39,14 @@ pub fn convert_to_2d_ndarray(measures: &Vec<Value>) -> Result<ArrayBase<ndarray:
 }
 
 
-
+/// Build a 2D NDarray from two vectors of numbers
+/// 
+/// # Arguments
+/// - `measures` - A vector of numbers
+/// - `dimensions` - A vector of numbers
+/// 
+/// # Returns
+/// A `Result` containing the 2D NDarray.
 pub fn build_2d_ndarray(
     measures: &Vec<Value>,
     dimensions: &Vec<Value>,

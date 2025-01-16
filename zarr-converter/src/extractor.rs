@@ -1,5 +1,12 @@
 use serde_json::{Map, Value};
 
+/// Extracts and separates data and metadata from a JSON object.
+/// 
+/// The keys used to identify the data are `data cube` and `peak`.
+/// # Arguments
+/// - `json`: A JSON object from which to extract data and metadata from.
+/// - `data_map`: The map where the data metadata and data vectors will be stored.
+/// - `metadata_map`: The map where the metadata will be stored.
 pub fn extract_and_separate(
     json: &Value,
     data_map: &mut Map<String, Value>,

@@ -58,6 +58,8 @@ The agilent JSON file will be placed in the `data` folder. In this same folder, 
 
 - Units Tests
 - Allow a Store with multigroup 
+- Decide on how to process the 3D data from AGILENT
+- Create an extractor to separate data metadata from data (current status: only separate high level metadata from data (data metadata & data))
 - Adapt conversion to other file types : UV, IR (infrared), and NMR data
 
 ## Installation guidelines
