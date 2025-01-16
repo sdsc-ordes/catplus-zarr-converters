@@ -40,3 +40,9 @@ impl Unit {
         }
     }
 }
+
+impl Into<&str> for Unit {
+    fn into(self) -> &'str {
+        self.display_name()
+    }
+}
