@@ -180,22 +180,22 @@ fn test_convert_set_temperature_action() {
                 schema:name "23"];
             cat:speedInRPM [
                 cat:errorMargin [
-                    qudt:unit unit:REV_PER_MIN;
+                    qudt:unit unit:REV-PER-MIN;
                     qudt:value "5"^^xsd:double];
-                qudt:unit unit:REV_PER_MIN;
+                qudt:unit unit:REV-PER-MIN;
                 qudt:value "152"^^xsd:double];
             cat:subEquipmentName "heater";
             cat:temperatureShakerShape [
                 cat:errorMargin [
-                    qudt:unit unit:DEG_C;
+                    qudt:unit unit:DEG-C;
                     qudt:value "1"^^xsd:double];
-                qudt:unit unit:DEG_C;
+                qudt:unit unit:DEG-C;
                 qudt:value "25"^^xsd:double];
             cat:temperatureTumbleStirrerShape [
                 cat:errorMargin [
-                    qudt:unit unit:DEG_C;
+                    qudt:unit unit:DEG-C;
                     qudt:value "2"^^xsd:double];
-                qudt:unit unit:DEG_C;
+                qudt:unit unit:DEG-C;
                 qudt:value "25"^^xsd:double];
             allores:AFR_0001606 "set_temperature";
             allores:AFR_0001723 "Chemspeed SWING XL";
@@ -363,7 +363,7 @@ fn test_convert_set_temperature_action() {
                 allores:AFR_0002295 "COC1=CC=C(C=C1)C=O";
                 allores:AFR_0002296 "1S/C8H8O2/c1-10-8-4-2-7(6-9)3-5-8/h2-6H,1H3";
                 obo:PATO_0001019 [
-                    qudt:unit unit:GM_PER_MilliL;
+                    qudt:unit unit:GM-PER-MilliL;
                     qudt:value "1.119"^^xsd:double]];
             cat:internalBarCode "2";
             cat:measuredQuantity [
@@ -377,18 +377,18 @@ fn test_convert_set_temperature_action() {
             alloqual:AFQ_0000111 "Liquid";
             allores:AFR_0002036 [
                 cat:errorMargin [
-                    qudt:unit unit:MOL_PER_L;
+                    qudt:unit unit:MOL-PER-L;
                     qudt:value "0.001"^^xsd:double];
-                qudt:unit unit:MOL_PER_L;
+                qudt:unit unit:MOL-PER-L;
                 qudt:value "1"^^xsd:double]];
         cat:role "reagent";
         cat:vialShape "storage vial";
         allores:AFR_0002464 "17"];
     cat:speedInRPM [
         cat:errorMargin [
-            qudt:unit unit:REV_PER_MIN;
+            qudt:unit unit:REV-PER-MIN;
             qudt:value "1"^^xsd:double];
-        qudt:unit unit:REV_PER_MIN;
+        qudt:unit unit:REV-PER-MIN;
         qudt:value "152"^^xsd:double];
     cat:subEquipmentName "GDU-V";
     alloqual:AFQ_0000111 "Liquid";
@@ -468,22 +468,22 @@ fn test_convert_shake_action() {
             schema:name "23"];
         cat:speedTumbleStirrerShape [
             cat:errorMargin [
-                qudt:unit unit:REV_PER_MIN;
+                qudt:unit unit:REV-PER-MIN;
                 qudt:value "1"^^xsd:double];
-            qudt:unit unit:REV_PER_MIN;
+            qudt:unit unit:REV-PER-MIN;
             qudt:value "600"^^xsd:double];
         cat:subEquipmentName "Tumble Stirrer";
         cat:temperatureShakerShape [
             cat:errorMargin [
-                qudt:unit unit:DEG_C;
+                qudt:unit unit:DEG-C;
                 qudt:value "2"^^xsd:double];
-            qudt:unit unit:DEG_C;
+            qudt:unit unit:DEG-C;
             qudt:value "25"^^xsd:double];
         cat:temperatureTumbleStirrerShape [
             cat:errorMargin [
-                qudt:unit unit:DEG_C;
+                qudt:unit unit:DEG-C;
                 qudt:value "1"^^xsd:double];
-            qudt:unit unit:DEG_C;
+            qudt:unit unit:DEG-C;
             qudt:value "25"^^xsd:double];
         allores:AFR_0001606 "shake";
         allores:AFR_0001723 "Chemspeed SWING XL";
