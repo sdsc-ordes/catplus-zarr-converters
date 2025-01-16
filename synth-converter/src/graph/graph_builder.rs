@@ -9,6 +9,7 @@ use crate::{
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
+use crate::graph::namespaces::unit::Unit;
 use anyhow::{Context, Result};
 use sophia::{
     api::{
@@ -104,7 +105,7 @@ impl GraphBuilder {
         self.graph
             .insert(subject, property_term, &density_term)?;
         self.graph
-            .insert(&density_term, qudt::unit, unit::GM_PER_MilliL)?;
+            .insert(&density_term, qudt::unit, unit::Unit::GMPerMilliL.display_name())?;
         self.graph
             .insert(&density_term, qudt::value, observation.value)?;
 
@@ -162,7 +163,7 @@ impl GraphBuilder {
             &container_position_quantity_item_term,
             &qudt::quantity,
             &container_position_quantity_item.quantity,
-            &unit::MilliGM,
+            &unit::ns.get(Unit::MilliGM.display_name()).unwrap(),
         )?;
 
         Ok(())
@@ -234,17 +235,24 @@ impl GraphBuilder {
 
         if let Some(expected_datum) = &sample_item.expected_datum {
             self.insert_an_observation(
-                &sample_item_term, &cat::expectedDatum, expected_datum, &unit::MilliGM)?;
+                &sample_item_term,
+                &cat::expectedDatum,
+                expected_datum,
+                &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
         }
 
         if let Some(measured_quantity) = &sample_item.measured_quantity {
             self.insert_an_observation(
-                &sample_item_term, &cat::measuredQuantity, measured_quantity, &unit::MilliGM)?;
+                &sample_item_term,
+                &cat::measuredQuantity,
+                measured_quantity,
+                &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
         }
 
         if let Some(concentration) = &sample_item.measured_quantity {
             self.insert_an_observation(
-                &sample_item_term, &allores::AFR_0002036, concentration, &unit::MOL_PER_L)?;
+                &sample_item_term, &allores::AFR_0002036, concentration,
+                &unit::ns.get(Unit::MolPerL.display_name()).unwrap())?;
         }
 
 
@@ -279,7 +287,10 @@ impl GraphBuilder {
         self.insert_container_properties(&sample_term, &sample.container)?;
 
         self.insert_an_observation(
-            &sample_term, &cat::expectedDatum, &sample.expected_datum, &unit::MilliGM)?;
+            &sample_term,
+            &cat::expectedDatum,
+            &sample.expected_datum,
+            &unit::ns.get(Unit::MilliGM.display_name()).unwrap())?;
 
         self.graph
             .insert(&sample_term, cat::vialShape, sample.vial_type.as_str())?;
@@ -372,7 +383,7 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
-                &unit::DEG_C,
+                &unit::ns.get(Unit::DegC.display_name()).unwrap(),
             )
             .context("Failed to insert observation")?
         }
@@ -382,7 +393,7 @@ impl GraphBuilder {
                 &action_term,
                 &alloproc::AFP_0002677,
                 pressure_measurement,
-                &unit::Bar,
+                &unit::ns.get(Unit::Bar.display_name()).unwrap(),
             )
             .context("Failed to insert observation")?
         }
@@ -392,19 +403,21 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
-                &unit::DEG_C,
+                &unit::ns.get(Unit::DegC.display_name()).unwrap(),
             )
             .context("Failed to insert observation")?
         }
 
         if let Some(speed_shaker) = &action.speed_shaker {
             self.insert_an_observation(
-                &action_term, &cat::speedInRPM, speed_shaker, &unit::REV_PER_MIN)?;
+                &action_term, &cat::speedInRPM, speed_shaker,
+                &unit::ns.get(Unit::RevPerMin.display_name()).unwrap())?;
         }
 
         if let Some(speed_tumble_stirrer) = &action.speed_tumble_stirrer {
             self.insert_an_observation(
-                &action_term, &cat::speedTumbleStirrerShape, speed_tumble_stirrer, &unit::REV_PER_MIN)?;
+                &action_term, &cat::speedTumbleStirrerShape, speed_tumble_stirrer,
+                &unit::ns.get(Unit::RevPerMin.display_name()).unwrap())?;
         }
 
         if let Some(dispense_type) = &action.dispense_type {
