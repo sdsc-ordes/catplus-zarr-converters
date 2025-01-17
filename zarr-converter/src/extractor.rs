@@ -1,7 +1,7 @@
 use serde_json::{Map, Value};
 
 /// Extracts and separates data and metadata from a JSON object.
-/// 
+///
 /// The keys used to identify the data are `data cube` and `peak`.
 /// # Arguments
 /// - `json`: A JSON object from which to extract data and metadata from.
@@ -52,7 +52,7 @@ pub fn extract_and_separate(
             }
 
             if !data_array.is_empty() {
-                *data_map = data_map.clone(); 
+                *data_map = data_map.clone();
                 data_map.insert("data".to_string(), Value::Array(data_array));
             }
             if !metadata_array.is_empty() {
@@ -60,9 +60,7 @@ pub fn extract_and_separate(
                 metadata_map.insert("metadata".to_string(), Value::Array(metadata_array));
             }
         }
-        _ => {
-            
-        }
+        _ => {}
     }
     Ok(())
 }

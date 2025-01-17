@@ -1,14 +1,16 @@
+use ndarray::{stack, Array2, ArrayBase, Axis, Dim, IxDynImpl};
 use serde_json::Value;
-use ndarray::{ArrayBase, Dim, IxDynImpl, Array2, stack, Axis};
 
 /// Convert a vector into a 2D NDarray
-/// 
+///
 /// # Arguments
 /// - `measures` - A vector of vectors of numbers
-/// 
+///
 /// # Returns
 /// A `Result` containing the 2D NDarray.
-pub fn convert_to_2d_ndarray(measures: &Vec<Value>) -> Result<ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>, Box<dyn std::error::Error>> {
+pub fn convert_to_2d_ndarray(
+    measures: &Vec<Value>,
+) -> Result<ArrayBase<ndarray::OwnedRepr<f32>, Dim<IxDynImpl>>, Box<dyn std::error::Error>> {
     let rows = measures.len();
     let cols = measures[0]
         .as_array()
@@ -35,16 +37,14 @@ pub fn convert_to_2d_ndarray(measures: &Vec<Value>) -> Result<ArrayBase<ndarray:
     let array_2d = Array2::from_shape_vec((rows, cols), flat_values)?;
     let array_dyn = array_2d.into_dyn();
     Ok(array_dyn)
-
 }
 
-
 /// Build a 2D NDarray from two vectors of numbers
-/// 
+///
 /// # Arguments
 /// - `measures` - A vector of numbers
 /// - `dimensions` - A vector of numbers
-/// 
+///
 /// # Returns
 /// A `Result` containing the 2D NDarray.
 pub fn build_2d_ndarray(
@@ -71,10 +71,7 @@ pub fn build_2d_ndarray(
     let measures_array = ndarray::Array1::from_vec(parsed_measures);
     let dimensions_array = ndarray::Array1::from_vec(parsed_dimensions);
 
-    let array_2d = stack(
-        Axis(1),
-        &[measures_array.view(), dimensions_array.view()],
-    )?;
+    let array_2d = stack(Axis(1), &[measures_array.view(), dimensions_array.view()])?;
     let array_dyn = array_2d.into_dyn();
     Ok(array_dyn)
 }
