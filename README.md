@@ -38,7 +38,7 @@ The conversion is done in the public crate `synth-converter/src/convert.rs`
 
 The rdf graph confirms to the cat+ ontology: https://github.com/sdsc-ordes/cat-plus-ontology. Currently rust offeres no Shacl Validation Library, but once such a library exists, it would make sense to add a Shacl Validation.
 
-TheShacl Validation can be done manually here: https://www.itb.ec.europa.eu/shacl/any/upload
+The SHACL Validation can be done manually here: https://www.itb.ec.europa.eu/shacl/any/upload
 
 ## Tools: ZARR Converters
 
