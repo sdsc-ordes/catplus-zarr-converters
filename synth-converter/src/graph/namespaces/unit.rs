@@ -3,9 +3,9 @@ use sophia::api::ns::Namespace;
 use sophia_api::namespace;
 use sophia_api::ns::NsTerm;
 
-// Rust cannot handle underscores in variable names, therefore this
-// namespace needs display names the contain the real literals with
-// underscores.
+// Rust cannot handle dashes in variable names, therefore this
+// namespace uses rust adapted term names and then maps them on output
+// to the real ontology units
 namespace! {
     "https://qudt.org/vocab/unit/",
     Bar,
