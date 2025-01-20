@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::array_builder::{build_2d_ndarray, convert_to_2d_ndarray};
 
-/// Formatting the Ultraviolet Data Cube of the AGILENT data into an NDarray
+/// Formatting the Ultraviolet Data Cube of the Agilent data into an NDarray
 ///
 /// # Arguments
 /// - `data_cubes_extracted` - HashMap of all extracted data cubes
