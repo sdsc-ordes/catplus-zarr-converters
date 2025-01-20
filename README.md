@@ -52,7 +52,7 @@ The Zarr converter has been developed (as first draft) as a CLI to handle the co
 cd zarr-converter
 cargo run data/agilent-example.json /agilent
 ```
-The agilent JSON file will be placed in the `data` folder. In this same folder, the `consolidated_metadata.json` will be generated (for all the metadata in the Zarr Store). The Zarr hierarchy and zarr files will be generated in the `zarr-files` folder.
+The Agilent JSON file will be placed in the `data` folder. In this same folder, the `consolidated_metadata.json` will be generated (for all the metadata in the Zarr Store). The Zarr hierarchy and zarr files will be generated in the `zarr-files` folder.
 
 ##### Road Map 
 
