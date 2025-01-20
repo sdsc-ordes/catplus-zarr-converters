@@ -44,7 +44,7 @@ TheShacl Validation can be done manually here: https://www.itb.ec.europa.eu/shac
 
 ### zarr-converter
 
-The Zarr converter has been developed (as first draft) as a CLI to handle the conversion of an AGILENT data file (JSON) into a Zarr array. The file is first processed, to extract the data from the metadata. The data is then transformed into NDarrays. In future works, the metadata will be converted to RDF via an `agilent-converter` (see RDF Converters). 
+The Zarr converter has been developed (as first draft) as a CLI to handle the conversion of an Agilent data file (JSON) into a Zarr array. The file is first processed, to extract the data from the metadata. The data is then transformed into NDarrays. In future works, the metadata will be converted to RDF via an `agilent-converter` (see RDF Converters). 
 
 ##### Example Usage
 
