@@ -316,37 +316,15 @@ impl GraphBuilder {
     }
 
     fn insert_action_type(&mut self, subject: &SimpleTerm, action: &Action) -> Result<()> {
-        match action.action_name {
-            ActionName::AddAction => {
-                self.graph.insert(subject, rdf::type_, cat::AddAction)?;
-            }
-
-            ActionName::setTemperatureAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::SetTemperatureAction)?;
-            }
-
-            ActionName::setPressureAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::SetPressureAction)?;
-            }
-
-            ActionName::shakeAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::ShakeAction)?;
-            }
-
-            ActionName::setVacuumAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::SetVacuumAction)?;
-            }
-
-            ActionName::filtrateAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::FiltrateAction)?;
-            }
-        }
-
+        let action_term = match action.action_name {
+            ActionName::AddAction => cat::AddAction,
+            ActionName::setTemperatureAction => cat::SetTemperatureAction,
+            ActionName::setPressureAction => cat::SetPressureAction,
+            ActionName::shakeAction => cat::ShakeAction,
+            ActionName::setVacuumAction => cat::SetVacuumAction,
+            ActionName::filtrateAction => cat::FiltrateAction,
+        };
+        self.graph.insert(subject, rdf::type_, action_term)?;
         Ok(())
     }
 
