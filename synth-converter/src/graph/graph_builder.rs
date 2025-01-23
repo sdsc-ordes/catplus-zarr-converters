@@ -1,5 +1,5 @@
 use crate::{
-    batch::{
+    models::{
         Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
         Observation, Sample, SampleItem, ErrorMargin
     },
@@ -432,26 +432,6 @@ impl GraphBuilder {
         }
 
         self.insert_action_type(&action_term, action)?;
-
-        Ok(())
-    }
-
-    /// Insert a batch
-    ///
-    /// Assumes a new graph has been created
-    ///
-    /// # Returns
-    /// A `Result` containing `()` if successful, or an error if the graph building fails.
-    pub fn insert_a_batch(&mut self, batch: &Batch) -> Result<()> {
-        let batch_term = generate_bnode_term();
-
-        self.graph.insert(&batch_term, rdf::type_, cat::Batch)?;
-        self.graph
-            .insert(&batch_term, schema::name, batch.batch_id.as_str())?;
-
-        for action in &batch.actions {
-            self.insert_an_action(&batch_term, action)?;
-        }
 
         Ok(())
     }

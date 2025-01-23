@@ -1,4 +1,4 @@
-use crate::{batch::Batch, graph::graph_builder::GraphBuilder};
+use crate::{models::Batch, graph::graph_builder::GraphBuilder};
 use anyhow::{Context, Result};
 
 /// Parse JSON and serialize the RDF graph to the specified format
