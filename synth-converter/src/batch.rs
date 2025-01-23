@@ -1,46 +1,44 @@
+// The structure follows the input data as descibed in the
+// https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
+// https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
     pub batch_id: String,
     #[serde(rename = "Actions")]
     pub actions: Vec<Action>,
+    pub batch_name: Option<String>,
+    #[serde(rename = "ReactionType")]
+    pub reaction_type: Option<String>,
+    #[serde(rename = "OptimizationType")]
+    pub optimization_type: Option<String>,
+    #[serde(rename = "Link")]
+    pub link: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Action {
-    #[serde(rename = "actionName")]
     pub action_name: ActionName,
-    #[serde(rename = "startTime")]
     pub start_time: String,
-    #[serde(rename = "endingTime")]
     pub ending_time: String,
-    #[serde(rename = "methodName")]
     pub method_name: String,
-    #[serde(rename = "equipmentName")]
     pub equipment_name: String,
-    #[serde(rename = "subEquipmentName")]
     pub sub_equipment_name: String,
     #[serde(flatten)]
     pub container_info: Option<ContainerInfo>,
-    #[serde(rename = "speedShaker")]
     pub speed_shaker: Option<Observation>,
-    #[serde(flatten)]
-    #[serde(rename = "hasContainerPositionAndQuantity")]
-    pub has_container_position_and_quantity: Option<Vec<ContainerPosition>>,
-    #[serde(rename = "dispenseState")]
+    pub has_container_position_and_quantity: Option<Vec<ContainerPositionQuantityItem>>,
     pub dispense_state: Option<String>,
-    #[serde(rename = "dispenseType")]
     pub dispense_type: Option<String>,
-    #[serde(rename = "hasSample")]
     pub has_sample: Option<Sample>,
-    #[serde(rename = "speedTumbleStirrer")]
     pub speed_tumble_stirrer: Option<Observation>,
-    #[serde(rename = "temperatureTumbleStirrer")]
     pub temperature_tumble_stirrer: Option<Observation>,
-    #[serde(rename = "temperatureShaker")]
     pub temperature_shaker: Option<Observation>,
+    pub pressure_measurement: Option<Observation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -55,64 +53,76 @@ pub enum ActionName {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ContainerInfo {
     #[serde(rename = "containerID")]
     pub container_id: String,
-    #[serde(rename = "containerBarcode")]
     pub container_barcode: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Observation {
+    pub value: f64,
+    pub unit: String,
+    pub error_margin: Option<ErrorMargin>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ErrorMargin {
     pub value: f64,
     pub unit: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Sample {
     #[serde(flatten)]
     pub container: ContainerInfo,
     #[serde(rename = "vialID")]
     pub vial_id: String,
-    #[serde(rename = "vialType")]
     pub vial_type: String,
     pub role: String,
-    #[serde(rename = "expectedDatum")]
     pub expected_datum: Observation,
-    #[serde(rename = "hasSample")]
     pub has_sample: Vec<SampleItem>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SampleItem {
     #[serde(rename = "sampleID")]
     pub sample_id: String,
     pub role: String,
-    #[serde(rename = "internalBarCode")]
     pub internal_bar_code: String,
-    #[serde(rename = "expectedDatum")]
     pub expected_datum: Option<Observation>,
-    #[serde(rename = "physicalState")]
+    pub measured_quantity: Option<Observation>,
+    pub concentration: Option<Observation>,
     pub physical_state: String,
-    #[serde(rename = "hasChemical")]
     pub has_chemical: Chemical,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Chemical {
     #[serde(rename = "chemicalID")]
     pub chemical_id: String,
-    #[serde(rename = "chemicalName")]
     pub chemical_name: String,
     #[serde(rename = "CASNumber")]
-    pub cas_number: String,
-    #[serde(rename = "molecularMass")]
+    pub cas_number: Option<String>,
     pub molecular_mass: Observation,
     pub smiles: String,
+    pub swiss_cat_number: Option<String>,
+    #[serde(rename = "Inchi")]
+    pub inchi: String,
+    pub keywords: Option<String>,
+    pub molecular_formula: String,
+    pub density: Option<Observation>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ContainerPosition {
+pub struct ContainerPositionQuantityItem {
+    #[serde(rename = "containerID")]
+    pub container_id: String,
     pub position: String,
     pub quantity: Observation,
 }

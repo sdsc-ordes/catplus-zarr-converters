@@ -1,4 +1,4 @@
-use crate::graph::namespaces::{alloqual, allores, cat, obo, purl, qudt, schema};
+use crate::graph::namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema, unit};
 use sophia_api::{prefix::Prefix, prelude::Iri};
 
 use lazy_static::lazy_static;
@@ -30,8 +30,20 @@ pub fn generate_prefix_map() -> Vec<(Prefix<Box<str>>, Iri<Box<str>>)> {
                 .expect("Namespace URI should always be valid"),
         ),
         (
+            "unit",
+            unit::ns
+                .get("")
+                .expect("Namespace URI should always be valid"),
+        ),
+        (
             "allores",
             allores::ns
+                .get("")
+                .expect("Namespace URI should always be valid"),
+        ),
+        (
+            "alloproc",
+            alloproc::ns
                 .get("")
                 .expect("Namespace URI should always be valid"),
         ),

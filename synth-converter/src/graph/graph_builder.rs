@@ -1,14 +1,15 @@
 use crate::{
     batch::{
-        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPosition, Observation, Sample,
-        SampleItem,
+        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
+        Observation, Sample, SampleItem, ErrorMargin
     },
     graph::{
-        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema},
+        namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema},
         utils::generate_bnode_term,
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
+use crate::graph::namespaces::unit::Unit;
 use anyhow::{Context, Result};
 use sophia::{
     api::{
@@ -18,6 +19,7 @@ use sophia::{
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
+use crate::graph::namespaces::unit::ToNsTerm;
 
 /// An RDF Graph
 pub struct GraphBuilder {
@@ -74,46 +76,95 @@ impl GraphBuilder {
         subject: &SimpleTerm,
         property_term: &NsTerm<'_>,
         observation: &Observation,
+        observation_unit: &NsTerm<'_>,
     ) -> Result<()> {
         let observation_term = generate_bnode_term();
 
         self.graph
             .insert(subject, property_term, &observation_term)?;
         self.graph
-            .insert(&observation_term, qudt::unit, observation.unit.as_str())?;
+            .insert(&observation_term, qudt::unit, observation_unit)?;
         self.graph
             .insert(&observation_term, qudt::value, observation.value)?;
+
+        if let Some(error_margin) = &observation.error_margin {
+            self.insert_an_error_margin(
+                &observation_term, &cat::errorMargin, error_margin, observation_unit)?;
+        }
 
         Ok(())
     }
 
-    fn insert_a_container_position(
+    fn insert_a_density(
         &mut self,
         subject: &SimpleTerm,
-        container_position: &ContainerPosition,
+        property_term: &NsTerm<'_>,
+        observation: &Observation,
     ) -> Result<()> {
-        let container_position_term = generate_bnode_term();
+        let density_term = generate_bnode_term();
+
+        self.graph
+            .insert(subject, property_term, &density_term)?;
+        self.graph
+            .insert(&density_term, qudt::unit, Unit::GMPerMilliL.to_ns_term())?;
+        self.graph
+            .insert(&density_term, qudt::value, observation.value)?;
+
+        Ok(())
+    }
+
+    fn insert_an_error_margin(
+        &mut self,
+        subject: &SimpleTerm,
+        property_term: &NsTerm<'_>,
+        error_margin: &ErrorMargin,
+        observation_unit: &NsTerm<'_>,
+    ) -> Result<()> {
+        let error_margin_term = generate_bnode_term();
+
+        self.graph
+            .insert(subject, property_term, &error_margin_term)?;
+        self.graph
+            .insert(&error_margin_term, qudt::unit, observation_unit)?;
+        self.graph
+            .insert(&error_margin_term, qudt::value, error_margin.value)?;
+
+        Ok(())
+    }
+
+    fn insert_a_container_position_and_quantity(
+        &mut self,
+        subject: &SimpleTerm,
+        container_position_quantity_item: &ContainerPositionQuantityItem,
+    ) -> Result<()> {
+        let container_position_quantity_item_term = generate_bnode_term();
 
         self.graph.insert(
             subject,
             cat::hasContainerPositionAndQuantity,
-            &container_position_term,
+            &container_position_quantity_item_term,
         )?;
         self.graph.insert(
-            &container_position_term,
+            &container_position_quantity_item_term,
             rdf::type_,
             cat::ContainerPositionAndQuantity,
         )?;
         self.graph.insert(
-            &container_position_term,
+            &container_position_quantity_item_term,
             allores::AFR_0002240,
-            container_position.position.as_str(),
+            container_position_quantity_item.position.as_str(),
+        )?;
+        self.graph.insert(
+            &container_position_quantity_item_term,
+            cat::containerID,
+            container_position_quantity_item.container_id.as_str(),
         )?;
 
         self.insert_an_observation(
-            &container_position_term,
+            &container_position_quantity_item_term,
             &qudt::quantity,
-            &container_position.quantity,
+            &container_position_quantity_item.quantity,
+            &Unit::MilliGM.to_ns_term(),
         )?;
 
         Ok(())
@@ -136,8 +187,10 @@ impl GraphBuilder {
             cat::chemicalName,
             chemical.chemical_name.as_str(),
         )?;
-        self.graph
-            .insert(&chemical_term, cat::casNumber, chemical.cas_number.as_str())?;
+        if let Some(cas_number) = &chemical.cas_number {
+            self.graph
+                .insert(&chemical_term, cat::casNumber, cas_number.as_str())?;
+        }
         self.graph.insert(
             &chemical_term,
             allores::AFR_0002295,
@@ -146,6 +199,27 @@ impl GraphBuilder {
         let molecular_mass = chemical.molecular_mass.value.to_string();
         self.graph
             .insert(&chemical_term, allores::AFR_0002294, &*molecular_mass)?;
+
+        self.graph
+            .insert(&chemical_term, allores::AFR_0002296, chemical.inchi.as_str())?;
+        self.graph
+            .insert(&chemical_term, allores::AFR_0001952, chemical.molecular_formula.as_str())?;
+        if let Some(swiss_cat_number) = &chemical.swiss_cat_number {
+            self.graph
+                .insert(&chemical_term, cat::swissCatNumber, swiss_cat_number.as_str())?;
+        }
+        if let Some(keywords) = &chemical.keywords {
+            self.graph
+                .insert(&chemical_term, schema::keywords, keywords.as_str())?;
+        }
+
+        if let Some(density) = &chemical.density {
+            self.insert_a_density(
+                &chemical_term,
+                &obo::PATO_0001019,
+                density,
+            )?;
+        }
 
         Ok(())
     }
@@ -161,8 +235,32 @@ impl GraphBuilder {
             .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
 
         if let Some(expected_datum) = &sample_item.expected_datum {
-            self.insert_an_observation(&sample_item_term, &cat::expectedDatum, expected_datum)?;
+            self.insert_an_observation(
+                &sample_item_term,
+                &cat::expectedDatum,
+                expected_datum,
+                &Unit::MilliGM.to_ns_term(),
+            )?;
         }
+
+        if let Some(measured_quantity) = &sample_item.measured_quantity {
+            self.insert_an_observation(
+                &sample_item_term,
+                &cat::measuredQuantity,
+                measured_quantity,
+                &Unit::MilliGM.to_ns_term(),
+            )?;
+        }
+
+        if let Some(concentration) = &sample_item.measured_quantity {
+            self.insert_an_observation(
+                &sample_item_term,
+                &allores::AFR_0002036,
+                concentration,
+                &Unit::MolPerL.to_ns_term(),
+            )?;
+        }
+
 
         self.graph
             .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
@@ -194,7 +292,12 @@ impl GraphBuilder {
 
         self.insert_container_properties(&sample_term, &sample.container)?;
 
-        self.insert_an_observation(&sample_term, &cat::expectedDatum, &sample.expected_datum)?;
+        self.insert_an_observation(
+            &sample_term,
+            &cat::expectedDatum,
+            &sample.expected_datum,
+            &Unit::MilliGM.to_ns_term(),
+        )?;
 
         self.graph
             .insert(&sample_term, cat::vialShape, sample.vial_type.as_str())?;
@@ -213,22 +316,15 @@ impl GraphBuilder {
     }
 
     fn insert_action_type(&mut self, subject: &SimpleTerm, action: &Action) -> Result<()> {
-        match action.action_name {
-            ActionName::AddAction => {
-                self.graph.insert(subject, rdf::type_, cat::AddAction)?;
-            }
-
-            ActionName::setTemperatureAction => {
-                self.graph
-                    .insert(subject, rdf::type_, cat::setTemperatureAction)?;
-            }
-
-            _ => {
-                self.graph
-                    .insert(subject, rdf::type_, allores::AFRE_0000001)?;
-            }
-        }
-
+        let action_term = match action.action_name {
+            ActionName::AddAction => cat::AddAction,
+            ActionName::setTemperatureAction => cat::SetTemperatureAction,
+            ActionName::setPressureAction => cat::SetPressureAction,
+            ActionName::shakeAction => cat::ShakeAction,
+            ActionName::setVacuumAction => cat::SetVacuumAction,
+            ActionName::filtrateAction => cat::FiltrateAction,
+        };
+        self.graph.insert(subject, rdf::type_, action_term)?;
         Ok(())
     }
 
@@ -259,7 +355,7 @@ impl GraphBuilder {
         )?;
         self.graph.insert(
             &action_term,
-            cat::localEquipmentName,
+            cat::subEquipmentName,
             action.sub_equipment_name.as_str(),
         )?;
 
@@ -272,6 +368,17 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureShakerShape,
                 temperature_shaker,
+                &Unit::DegC.to_ns_term(),
+            )
+            .context("Failed to insert observation")?
+        }
+
+        if let Some(pressure_measurement) = &action.pressure_measurement {
+            self.insert_an_observation(
+                &action_term,
+                &alloproc::AFP_0002677,
+                pressure_measurement,
+                &Unit::Bar.to_ns_term(),
             )
             .context("Failed to insert observation")?
         }
@@ -281,12 +388,27 @@ impl GraphBuilder {
                 &action_term,
                 &cat::temperatureTumbleStirrerShape,
                 temperature_tumble_stirrer,
+                &Unit::DegC.to_ns_term(),
             )
             .context("Failed to insert observation")?
         }
 
         if let Some(speed_shaker) = &action.speed_shaker {
-            self.insert_an_observation(&action_term, &cat::speedInRPM, speed_shaker)?;
+            self.insert_an_observation(
+                &action_term,
+                &cat::speedInRPM,
+                speed_shaker,
+                &Unit::RevPerMin.to_ns_term(),
+            )?;
+        }
+
+        if let Some(speed_tumble_stirrer) = &action.speed_tumble_stirrer {
+            self.insert_an_observation(
+                &action_term,
+                &cat::speedTumbleStirrerShape,
+                speed_tumble_stirrer,
+                &Unit::RevPerMin.to_ns_term(),
+            )?;
         }
 
         if let Some(dispense_type) = &action.dispense_type {
@@ -299,9 +421,9 @@ impl GraphBuilder {
                 .insert(&action_term, alloqual::AFQ_0000111, dispense_state.as_str())?;
         }
 
-        if let Some(container_positions) = &action.has_container_position_and_quantity {
-            for container_position in container_positions {
-                self.insert_a_container_position(&action_term, container_position)?;
+        if let Some(container_position_and_quantities) = &action.has_container_position_and_quantity {
+            for container_position_quantity_item in container_position_and_quantities {
+                self.insert_a_container_position_and_quantity(&action_term, container_position_quantity_item)?;
             }
         }
 
