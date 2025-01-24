@@ -32,7 +32,8 @@ pub fn link_node<N>(source_uri: SimpleTerm, predicate: SimpleTerm, node: N) -> V
 }
 
 pub trait ToGraph {
-    fn to_triples(&self, subject: SimpleTerm) -> Vec<[SimpleTerm; 3]>;
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
+    where 'c: 'b, 'a: 'b;
 
     fn to_graph(&self, subject: SimpleTerm) -> anyhow::Result<LightGraph> {
         let mut graph = LightGraph::new();
@@ -111,7 +112,8 @@ pub struct Action {
 }
 
 impl ToGraph for Action {
-    fn to_triples(&self, subject: SimpleTerm) -> Vec<[SimpleTerm; 3]> {
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]> 
+    where 'c: 'b, 'a: 'b {
         let subject: SimpleTerm = generate_bnode_term();
 
         // Data properties.
@@ -124,6 +126,7 @@ impl ToGraph for Action {
             (&rdf::type_, &self.action_name.to_string()),
         ];
 
+        // Optional data properties.
         if let Some(dispense_type) = &self.dispense_type {
             data_properties.push((&cat::dispenseType, dispense_type));
         }
@@ -135,8 +138,10 @@ impl ToGraph for Action {
             (cat::speedInRPM, self.speed_shaker),
             (cat::speedTumbleStirrerShape, self.speed_tumble_stirrer),
             (alloproc::AFP_0002677, self.pressure_measurement),
+            (cat::hasSample, self.has_sample),
         ];
 
+        // Multivalued data properties.
         if let Some(container_pos) = &self.has_container_position_and_quantity {
             for container_item in container_pos {
                 object_properties.push(
@@ -168,11 +173,6 @@ impl ToGraph for Action {
             triples.append(container_info.to_triples(subject.clone()));
         };
 
-
-        if let Some(sample) = &self.has_sample {
-            self.insert_samples(&action_term, sample)?;
-        }
-        
         triples
     }
 
@@ -221,10 +221,68 @@ pub struct Observation {
     pub error_margin: Option<ErrorMargin>,
 }
 
+impl ToGraph for Observation {
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]> 
+    where 'c: 'b, 'a: 'b {
+
+        let data_properties = [
+            (&rdf::type_, &cat::Observation.as_simple()),
+            (&qudt::unit, &self.unit.as_simple()),
+            (&qudt::value, &self.value.as_simple()),
+        ];
+
+
+        let object_properties = [
+            (cat::errorMargin, &self.error_margin),
+        ];
+
+        let mut triples: Vec<[SimpleTerm; 3]> = data_properties
+            .into_iter()
+            .map(|(predicate, object)| {
+            [subject.clone(), predicate.as_simple(), object.as_simple()]
+            })
+            .collect();
+
+
+        for (pred, object) in object_properties {
+            if let Some(obj) = object {
+                triples.append(&mut link_node(
+                    subject.clone(),
+                    pred.as_simple(),
+                    obj,
+                ));
+            }
+        }
+
+        triples
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ErrorMargin {
     pub value: f64,
     pub unit: String,
+}
+
+impl ToGraph for ErrorMargin {
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
+    where 'c: 'b, 'a: 'b {
+
+        let data_properties = [
+            (&qudt::unit, self.unit.as_simple()),
+            (&qudt::value, self.value.as_simple()),
+        ];
+
+        let triples = data_properties
+            .into_iter()
+            .map(|(predicate, object)| {
+            [subject.clone(), predicate.as_simple(), object]
+            })
+            .collect();
+
+
+        triples
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -238,6 +296,27 @@ pub struct Sample {
     pub role: String,
     pub expected_datum: Observation,
     pub has_sample: Vec<SampleItem>,
+}
+
+impl ToGraph for Sample {
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
+    where 'c: 'b, 'a: 'b {
+
+        let data_properties = [
+            (&qudt::unit, self.unit.as_simple()),
+            (&qudt::value, self.value.as_simple()),
+        ];
+
+        let triples = data_properties
+            .into_iter()
+            .map(|(predicate, object)| {
+            [subject.clone(), predicate.as_simple(), object]
+            })
+            .collect();
+
+
+        triples
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -7,6 +7,7 @@ namespace! {
     Batch,
     ContainerPositionAndQuantity,
     FiltrateAction,
+    Observation,
     Sample,
     SetPressureAction,
     SetTemperatureAction,
