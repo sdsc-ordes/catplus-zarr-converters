@@ -1,4 +1,4 @@
-use crate::{models::Batch, graph::graph_builder::GraphBuilder};
+use crate::{models::{Batch, ToGraph}, graph::graph_builder::GraphBuilder};
 use anyhow::{Context, Result};
 
 /// Parse JSON and serialize the RDF graph to the specified format
@@ -19,8 +19,9 @@ pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
 
     // Build the RDF graph
     let mut graph_builder = GraphBuilder::new().context("Failed to initialize GraphBuilder")?;
-    graph_builder
-        .insert_a_batch(&batch)
+    graph_builder.add_graph(
+        &batch.to_graph(batch.get_uri()).unwrap()
+    )
         .context("Failed to insert batch into RDF graph")?;
 
     // Serialize the RDF graph to the specified format
