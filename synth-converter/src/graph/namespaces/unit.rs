@@ -1,7 +1,6 @@
 use lazy_static::lazy_static;
 use sophia::api::ns::Namespace;
-use sophia_api::namespace;
-use sophia_api::ns::NsTerm;
+use sophia_api::{namespace, ns::NsTerm};
 
 // Rust cannot handle dashes in variable names, therefore this
 // namespace uses rust adapted term names and then maps them on output
@@ -17,7 +16,8 @@ namespace! {
 }
 
 lazy_static! {
-    pub static ref ns: Namespace<&'static str> = Namespace::new("https://qudt.org/vocab/unit/").unwrap();
+    pub static ref ns: Namespace<&'static str> =
+        Namespace::new("https://qudt.org/vocab/unit/").unwrap();
 }
 
 pub enum Unit {
@@ -26,7 +26,7 @@ pub enum Unit {
     MilliGM,
     GMPerMilliL,
     MolPerL,
-    RevPerMin
+    RevPerMin,
 }
 
 impl Unit {
@@ -51,6 +51,7 @@ pub trait ToNsTerm {
 impl ToNsTerm for Unit {
     fn to_ns_term(&self) -> NsTerm<'_> {
         // Borrow the term to match the return type
-        ns.get(self.display_name()).expect("Term not found in namespace")
+        ns.get(self.display_name())
+            .expect("Term not found in namespace")
     }
 }

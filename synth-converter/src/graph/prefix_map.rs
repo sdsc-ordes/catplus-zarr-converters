@@ -1,4 +1,4 @@
-use crate::graph::namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema, unit};
+use crate::graph::namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema, unit};
 use sophia_api::{prefix::Prefix, prelude::Iri};
 
 use lazy_static::lazy_static;

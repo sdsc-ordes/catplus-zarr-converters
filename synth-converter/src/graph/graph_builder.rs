@@ -1,4 +1,5 @@
 use crate::{
+    graph::namespaces::unit::ToNsTerm,
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
 use anyhow::{Context, Result};
@@ -10,7 +11,6 @@ use sophia::{
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm, triple::Triple};
-use crate::graph::namespaces::unit::ToNsTerm;
 
 /// An RDF Graph
 pub struct GraphBuilder {
