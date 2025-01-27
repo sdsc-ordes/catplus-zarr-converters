@@ -24,7 +24,7 @@ namespace! {
     hasBatch,
     hasContainerPositionAndQuantity,
     hasSample,
-    has_chemical,
+    hasChemical,
     internalBarCode,
     measuredQuantity,
     role,
