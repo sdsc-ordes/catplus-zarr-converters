@@ -31,10 +31,25 @@ pub fn link_node<N>(source_uri: SimpleTerm, predicate: SimpleTerm, node: N) -> V
     triples
 }
 
+/// Convert a struct into an RDF graph.
 pub trait ToGraph {
+    /// Represent the struct as a collection of triples.
+    ///
+    /// # Arguments
+    /// - `subject`: The URI to use for the struct being converted.
+    ///
+    /// # Returns
+    /// A collection of triples.
     fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
     where 'c: 'b, 'a: 'b;
 
+    /// Convert the struct to a graph.
+    ///
+    /// # Arguments
+    /// - `subject`: The URI to use for the struct being converted.
+    ///
+    /// # Returns
+    /// The graph representation of the struct.
     fn to_graph(&self, subject: SimpleTerm) -> anyhow::Result<LightGraph> {
         let mut graph = LightGraph::new();
         let triples = self.to_triples(subject);
@@ -44,6 +59,12 @@ pub trait ToGraph {
         return Ok(graph)
     }
 
+    /// Get the URI for the struct.
+    ///
+    /// The default implementation generates a random blank node URI.
+    ///
+    /// # Returns
+    /// The URI for the struct.
     fn get_uri(&self) -> SimpleTerm<'static> { 
       generate_bnode_term()
     }
