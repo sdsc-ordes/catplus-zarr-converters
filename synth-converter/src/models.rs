@@ -1,8 +1,8 @@
-use std::{fmt, intrinsics::mir::mir};
 
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
+use std::fmt;
 use crate::graph::{
     namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
     utils::generate_bnode_term,
@@ -12,22 +12,25 @@ use serde::{Deserialize, Serialize};
 use sophia::{
     api::{
         graph::MutableGraph,
-        ns::{rdf, xsd},
+        ns::rdf,
     },
     inmem::graph::LightGraph,
 };
 use sophia_api::{
     ns::NsTerm,
-    term::{FromTerm, SimpleTerm, Term},
+    term::{SimpleTerm, Term},
 };
 
 fn to_graph_box<T: ToGraph + 'static>(item: T) -> Box<dyn ToGraph> {
     Box::new(item)
 }
 
-pub fn link_node<N>(source_uri: SimpleTerm, predicate: SimpleTerm, node: N) -> Vec<[SimpleTerm; 3]>
+pub fn link_node<'a, 'b, 'c, 'd, N>(source_uri: SimpleTerm<'a>, predicate: SimpleTerm<'b>, node: &'d N) -> Vec<[SimpleTerm<'c>; 3]>
 where
-    N: ToGraph,
+    N: ToGraph + ?Sized,
+    'a: 'c,
+    'b: 'c,
+    'd: 'c
 {
     let node_uri = node.get_uri();
     let mut triples = vec![[source_uri.clone(), predicate.clone(), node_uri.clone()]];
@@ -42,7 +45,7 @@ pub trait ToGraph {
     ///
     /// # Arguments
     /// - `subject`: The URI to use for the struct being converted.
-    ///
+    //
     /// # Returns
     /// A collection of triples.
     fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
@@ -77,7 +80,7 @@ pub trait ToGraph {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
@@ -94,18 +97,22 @@ pub struct Batch {
 }
 
 impl ToGraph for Batch {
-    fn to_triples(&self, subject: SimpleTerm) -> Vec<[SimpleTerm; 3]> {
+    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
+    where
+        'c: 'b,
+        'a: 'b,
+    {
         let mut triples: Vec<[SimpleTerm; 3]> =
-            [(&rdf::type_, &cat::Batch), (&schema::name, &self::batch_id)]
+            [(&rdf::type_, cat::Batch.as_simple()), (&schema::name, self.batch_id.as_simple())]
                 .into_iter()
                 .map(|(predicate, object)| {
-                    [subject.clone(), predicate.as_simple(), object.as_simple()]
+                    [subject.clone(), predicate.as_simple(), object]
                 })
                 .collect();
 
         for action in &self.actions {
             let action_subject = action.get_uri();
-            triples.push([action_subject, cat::hasBatch.as_simple(), subject.clone()]);
+            triples.push([action_subject.clone(), cat::hasBatch.as_simple(), subject.clone()]);
 
             triples.append(&mut action.to_triples(action_subject));
         }
@@ -114,7 +121,7 @@ impl ToGraph for Batch {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Action {
     pub action_name: ActionName,
@@ -202,7 +209,7 @@ impl ToGraph for Action {
                 triples.append(&mut link_node(
                     subject.clone(),
                     pred.as_simple(),
-                    obj.into(),
+                    obj.as_ref(),
                 ));
             }
         }
@@ -242,7 +249,7 @@ impl fmt::Display for ActionName {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContainerInfo {
     #[serde(rename = "containerID")]
@@ -270,7 +277,7 @@ impl ToGraph for ContainerInfo {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Observation {
     pub value: f64,
@@ -307,7 +314,7 @@ impl ToGraph for Observation {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorMargin {
     pub value: f64,
     pub unit: String,
@@ -333,7 +340,7 @@ impl ToGraph for ErrorMargin {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Sample {
     #[serde(flatten)]
@@ -388,7 +395,7 @@ impl ToGraph for Sample {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SampleItem {
     #[serde(rename = "sampleID")]
@@ -450,7 +457,7 @@ impl ToGraph for SampleItem {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Chemical {
     #[serde(rename = "chemicalID")]
@@ -520,7 +527,7 @@ impl ToGraph for Chemical {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerPositionQuantityItem {
     #[serde(rename = "containerID")]
     pub container_id: String,
