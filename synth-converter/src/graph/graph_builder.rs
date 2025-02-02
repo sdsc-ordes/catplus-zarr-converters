@@ -1,15 +1,17 @@
 use crate::{
-    batch::{
-        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
-        Observation, Sample, SampleItem, ErrorMargin
-    },
     graph::{
-        namespaces::{alloqual, allores, alloproc, cat, obo, purl, qudt, schema},
+        namespaces::{
+            alloproc, alloqual, allores, cat, obo, purl, qudt, schema,
+            unit::{ToNsTerm, Unit},
+        },
         utils::generate_bnode_term,
+    },
+    models::{
+        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
+        ErrorMargin, Observation, Sample, SampleItem,
     },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
-use crate::graph::namespaces::unit::Unit;
 use anyhow::{Context, Result};
 use sophia::{
     api::{
@@ -19,11 +21,10 @@ use sophia::{
     inmem::graph::LightGraph,
 };
 use sophia_api::{ns::NsTerm, term::SimpleTerm};
-use crate::graph::namespaces::unit::ToNsTerm;
 
 /// An RDF Graph
 pub struct GraphBuilder {
-    graph: LightGraph,
+    pub graph: LightGraph,
 }
 
 /// Builds an RDF graph of Synthesis data for the cat+ ontology.
@@ -34,10 +35,10 @@ pub struct GraphBuilder {
 /// * insert_a_batch:  starts the process of building the graph from the input structure
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
-    pub fn new() -> Result<Self> {
-        Ok(Self {
+    pub fn new() -> Self {
+        Self {
             graph: LightGraph::new(),
-        })
+        }
     }
 
     fn insert_a_date_time(
@@ -89,7 +90,11 @@ impl GraphBuilder {
 
         if let Some(error_margin) = &observation.error_margin {
             self.insert_an_error_margin(
-                &observation_term, &cat::errorMargin, error_margin, observation_unit)?;
+                &observation_term,
+                &cat::errorMargin,
+                error_margin,
+                observation_unit,
+            )?;
         }
 
         Ok(())
@@ -103,8 +108,7 @@ impl GraphBuilder {
     ) -> Result<()> {
         let density_term = generate_bnode_term();
 
-        self.graph
-            .insert(subject, property_term, &density_term)?;
+        self.graph.insert(subject, property_term, &density_term)?;
         self.graph
             .insert(&density_term, qudt::unit, Unit::GMPerMilliL.to_ns_term())?;
         self.graph
@@ -200,13 +204,22 @@ impl GraphBuilder {
         self.graph
             .insert(&chemical_term, allores::AFR_0002294, &*molecular_mass)?;
 
-        self.graph
-            .insert(&chemical_term, allores::AFR_0002296, chemical.inchi.as_str())?;
-        self.graph
-            .insert(&chemical_term, allores::AFR_0001952, chemical.molecular_formula.as_str())?;
+        self.graph.insert(
+            &chemical_term,
+            allores::AFR_0002296,
+            chemical.inchi.as_str(),
+        )?;
+        self.graph.insert(
+            &chemical_term,
+            allores::AFR_0001952,
+            chemical.molecular_formula.as_str(),
+        )?;
         if let Some(swiss_cat_number) = &chemical.swiss_cat_number {
-            self.graph
-                .insert(&chemical_term, cat::swissCatNumber, swiss_cat_number.as_str())?;
+            self.graph.insert(
+                &chemical_term,
+                cat::swissCatNumber,
+                swiss_cat_number.as_str(),
+            )?;
         }
         if let Some(keywords) = &chemical.keywords {
             self.graph
@@ -214,11 +227,7 @@ impl GraphBuilder {
         }
 
         if let Some(density) = &chemical.density {
-            self.insert_a_density(
-                &chemical_term,
-                &obo::PATO_0001019,
-                density,
-            )?;
+            self.insert_a_density(&chemical_term, &obo::PATO_0001019, density)?;
         }
 
         Ok(())
@@ -260,7 +269,6 @@ impl GraphBuilder {
                 &Unit::MolPerL.to_ns_term(),
             )?;
         }
-
 
         self.graph
             .insert(&sample_item_term, cat::role, sample_item.role.as_str())?;
@@ -421,9 +429,13 @@ impl GraphBuilder {
                 .insert(&action_term, alloqual::AFQ_0000111, dispense_state.as_str())?;
         }
 
-        if let Some(container_position_and_quantities) = &action.has_container_position_and_quantity {
+        if let Some(container_position_and_quantities) = &action.has_container_position_and_quantity
+        {
             for container_position_quantity_item in container_position_and_quantities {
-                self.insert_a_container_position_and_quantity(&action_term, container_position_quantity_item)?;
+                self.insert_a_container_position_and_quantity(
+                    &action_term,
+                    container_position_quantity_item,
+                )?;
             }
         }
 
