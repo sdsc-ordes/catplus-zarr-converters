@@ -1,5 +1,5 @@
 use crate::graph::{
-    insert_into::{AttachTo, InsertIntoGraph},
+    insert_into::{InsertIntoGraph, Link},
     namespaces::{cat, qudt},
 };
 use anyhow;
@@ -10,7 +10,7 @@ use super::{ErrorMargin, Observation};
 
 /// Implementation for concrete [Observation].
 impl InsertIntoGraph for Observation {
-    fn insert(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (
                 rdf::type_,
@@ -20,13 +20,13 @@ impl InsertIntoGraph for Observation {
             (qudt::value, &self.value.as_simple() as &dyn InsertIntoGraph),
             (cat::errorMargin, &self.error_margin as &dyn InsertIntoGraph),
         ] {
-            value.attach_and_insert(
+            value.attach_and_insert_into(
                 graph,
-                None,
-                Some(AttachTo {
-                    iri: iri.clone(),
+                Link {
+                    source_iri: iri.clone(),
                     pred: prop.as_simple(),
-                }),
+                    target_iri: None,
+                },
             )?;
         }
 
@@ -36,7 +36,7 @@ impl InsertIntoGraph for Observation {
 
 /// Implementation for concrete [Observation].
 impl InsertIntoGraph for ErrorMargin {
-    fn insert(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (
                 rdf::type_,
@@ -45,13 +45,13 @@ impl InsertIntoGraph for ErrorMargin {
             (qudt::unit, &self.unit.as_simple() as &dyn InsertIntoGraph),
             (qudt::value, &self.value.as_simple() as &dyn InsertIntoGraph),
         ] {
-            value.attach_and_insert(
+            value.attach_and_insert_into(
                 graph,
-                None,
-                Some(AttachTo {
-                    iri: iri.clone(),
+                Link {
+                    source_iri: iri.clone(),
                     pred: prop.as_simple(),
-                }),
+                    target_iri: None,
+                },
             )?;
         }
 
@@ -82,7 +82,7 @@ mod tests {
 
         let mut b = GraphBuilder::new();
         let i = IriRef::new_unchecked("http://test.com/my-obersvation");
-        observation.attach_and_insert(&mut b.graph, Some(i.as_simple()), None)?;
+        observation.insert_into(&mut b.graph, i.as_simple())?;
         println!("Graph\n{}", b.serialize_to_turtle().unwrap());
 
         Ok(())

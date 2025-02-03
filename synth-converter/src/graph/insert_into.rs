@@ -8,32 +8,29 @@ use sophia_api::{
 use super::utils::generate_bnode_term;
 
 /// Used in [InsertIntoGraph::attach_and_insert].
-pub struct AttachTo<'a, 'b> {
-    pub iri: SimpleTerm<'a>,
+pub struct Link<'a, 'b, 'c> {
+    pub source_iri: SimpleTerm<'a>,
     pub pred: SimpleTerm<'b>,
+    pub target_iri: Option<SimpleTerm<'c>>,
 }
 
 /// InsertIntoGraph provides a trait to implement the conversion into a graph
 /// by different types.
 pub trait InsertIntoGraph {
-    /// Insert inserts `&self` into `graph` with instance name `iri`
-    fn insert(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()>;
+    /// Insert inserts `&self` into `graph` with subject IRI `iri`
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()>;
 
-    /// Insert inserts `&self` into `graph` with instance name `iri` (default to a blank node)
+    /// Insert inserts `&self` into `graph` with subject IRI `iri` (default to a blank node)
     /// and will attach to `attach_link` if its not empty.
-    fn attach_and_insert(
-        &self,
-        graph: &mut LightGraph,
-        iri: Option<SimpleTerm>,
-        attach_link: Option<AttachTo>,
-    ) -> anyhow::Result<()> {
-        let new_iri = iri.unwrap_or_else(|| generate_bnode_term());
+    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
+        let iri = attach.target_iri.unwrap_or_else(|| self.get_uri());
+        _ = graph.insert(&attach.source_iri, &attach.pred, &iri);
 
-        if let Some(a) = attach_link {
-            _ = graph.insert(&a.iri, &a.pred, new_iri.clone());
-        }
+        self.insert_into(graph, iri)
+    }
 
-        self.insert(graph, new_iri)
+    fn get_uri(&self) -> SimpleTerm<'static> {
+        generate_bnode_term()
     }
 }
 
@@ -42,21 +39,16 @@ impl<T> InsertIntoGraph for Option<T>
 where
     T: InsertIntoGraph,
 {
-    fn insert(&self, archive: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, archive: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         if let Some(v) = self {
-            v.insert(archive, iri)?
+            v.insert_into(archive, iri)?
         }
         Ok(())
     }
 
-    fn attach_and_insert(
-        &self,
-        archive: &mut LightGraph,
-        iri: Option<SimpleTerm>,
-        attach_link: Option<AttachTo>,
-    ) -> anyhow::Result<()> {
+    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
         if let Some(v) = self {
-            v.attach_and_insert(archive, iri, attach_link)?
+            v.attach_and_insert_into(graph, attach)?
         }
         Ok(())
     }
@@ -64,30 +56,17 @@ where
 
 /// Default stupid implementation for [SimpleTerm].
 impl<'a> InsertIntoGraph for SimpleTerm<'a> {
-    fn insert(&self, _archive: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
-        panic!(
+    fn insert_into(&self, _graph: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
+        unimplemented!(
             "cannot insert {:?} into graph, use `attach_and_insert`",
             &self
         )
     }
 
-    fn attach_and_insert(
-        &self,
-        graph: &mut LightGraph,
-        _iri: Option<SimpleTerm>,
-        attach_to: Option<AttachTo>,
-    ) -> anyhow::Result<()> {
-        if attach_to.is_none() {
-            return Err(anyhow!(
-                "cannot insert {:?} into graph without 'attach_to'",
-                &self
-            ));
-        }
+    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
         assert!(!self.is_triple());
 
-        if let Some(a) = attach_to {
-            _ = graph.insert(&a.iri, &a.pred, self);
-        }
+        _ = graph.insert(&attach.source_iri, &attach.pred, self);
 
         Ok(())
     }
