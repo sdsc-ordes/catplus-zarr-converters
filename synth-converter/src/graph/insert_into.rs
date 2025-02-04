@@ -1,4 +1,3 @@
-use anyhow::anyhow;
 use sophia::inmem::graph::LightGraph;
 use sophia_api::{
     graph::MutableGraph,
@@ -8,6 +7,7 @@ use sophia_api::{
 use super::utils::generate_bnode_term;
 
 /// Used in [InsertIntoGraph::attach_and_insert].
+#[derive(Clone)]
 pub struct Link<'a, 'b, 'c> {
     pub source_iri: SimpleTerm<'a>,
     pub pred: SimpleTerm<'b>,
@@ -17,12 +17,12 @@ pub struct Link<'a, 'b, 'c> {
 /// InsertIntoGraph provides a trait to implement the conversion into a graph
 /// by different types.
 pub trait InsertIntoGraph {
-    /// Insert inserts `&self` into `graph` with subject IRI `iri`
+    /// Inserts `&self` into `graph` with subject IRI `iri`
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()>;
 
-    /// Insert inserts `&self` into `graph` with subject IRI `iri` (default to a blank node)
-    /// and will attach to `attach_link` if its not empty.
-    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
+    /// Inserts `&self` into `graph` with subject IRI `iri` (default to a blank node)
+    /// and "attach" self to an existing node with an additional triple.
+    fn attach_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
         let iri = attach.target_iri.unwrap_or_else(|| self.get_uri());
         _ = graph.insert(&attach.source_iri, &attach.pred, &iri);
 
@@ -34,7 +34,7 @@ pub trait InsertIntoGraph {
     }
 }
 
-/// Blanket implementation for [Option<T>].
+/// Default implementation for [Option<T>].
 impl<T> InsertIntoGraph for Option<T>
 where
     T: InsertIntoGraph,
@@ -46,15 +46,34 @@ where
         Ok(())
     }
 
-    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
+    fn attach_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
         if let Some(v) = self {
-            v.attach_and_insert_into(graph, attach)?
+            v.attach_into(graph, attach)?
         }
         Ok(())
     }
 }
 
-/// Default stupid implementation for [SimpleTerm].
+impl<T> InsertIntoGraph for Vec<T>
+where 
+    T: InsertIntoGraph,
+{
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for item in self {
+            item.insert_into(graph, iri.clone())?;
+        }
+        Ok(())
+    }
+
+    fn attach_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
+        for item in self {
+            item.attach_into(graph, attach.clone())?;
+        }
+        Ok(())
+    }
+}
+
+/// Default implementation for [SimpleTerm].
 impl<'a> InsertIntoGraph for SimpleTerm<'a> {
     fn insert_into(&self, _graph: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
         unimplemented!(
@@ -63,7 +82,7 @@ impl<'a> InsertIntoGraph for SimpleTerm<'a> {
         )
     }
 
-    fn attach_and_insert_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
+    fn attach_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {
         assert!(!self.is_triple());
 
         _ = graph.insert(&attach.source_iri, &attach.pred, self);

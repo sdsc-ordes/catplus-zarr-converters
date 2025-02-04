@@ -1,26 +1,8 @@
-use crate::{
-    graph::{
-        namespaces::{
-            alloproc, alloqual, allores, cat, obo, purl, qudt, schema,
-            unit::{ToNsTerm, Unit},
-        },
-        utils::generate_bnode_term,
-    },
-    models::{
-        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
-        ErrorMargin, Observation, Sample, SampleItem,
-    },
-    rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
-};
+use crate::rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle};
 use anyhow::{Context, Result};
-use sophia::{
-    api::{
-        graph::{Graph, MutableGraph},
-        ns::{rdf, xsd},
-    },
-    inmem::graph::LightGraph,
-};
-use sophia_api::{ns::NsTerm, term::SimpleTerm, triple::Triple};
+use sophia::inmem::graph::LightGraph;
+
+use super::insert_into::InsertIntoGraph;
 
 /// An RDF Graph
 pub struct GraphBuilder {
@@ -32,7 +14,7 @@ pub struct GraphBuilder {
 /// The rust structure `actions` in /parser/actions is mapped to the cat+ ontology
 ///
 /// # public methods:
-/// * insert_a_batch:  starts the process of building the graph from the input structure
+/// * insert:  starts the process of building the graph from the input structure
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
     pub fn new() -> Self {
@@ -41,12 +23,10 @@ impl GraphBuilder {
         }
     }
 
-    pub fn add_graph(&mut self, other: &LightGraph) -> Result<()> {
-        for t in other.triples() {
-            let t = t?;
-            let spo = t.spo();
-            self.graph.insert(spo[0], spo[1], spo[2])?;
-        }
+    /// Inserts a new object into the graph as a collection of triples.
+    pub fn insert(&mut self, other: &dyn InsertIntoGraph) -> Result<()> {
+        other.insert_into(&mut self.graph, other.get_uri())?;
+
         Ok(())
     }
 
