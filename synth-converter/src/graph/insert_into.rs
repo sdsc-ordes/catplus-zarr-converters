@@ -76,10 +76,7 @@ where
 /// Default implementation for [SimpleTerm].
 impl<'a> InsertIntoGraph for SimpleTerm<'a> {
     fn insert_into(&self, _graph: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
-        unimplemented!(
-            "cannot insert {:?} into graph, use `attach_and_insert`",
-            &self
-        )
+        unimplemented!("cannot insert {:?} into graph, use `attach_and_insert`", &self)
     }
 
     fn attach_into(&self, graph: &mut LightGraph, attach: Link) -> anyhow::Result<()> {

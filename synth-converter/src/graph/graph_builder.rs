@@ -18,9 +18,7 @@ pub struct GraphBuilder {
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
     pub fn new() -> Self {
-        Self {
-            graph: LightGraph::new(),
-        }
+        Self { graph: LightGraph::new() }
     }
 
     /// Inserts a new object into the graph as a collection of triples.

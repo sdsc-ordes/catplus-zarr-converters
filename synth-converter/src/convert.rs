@@ -19,9 +19,7 @@ pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
 
     // Build the RDF graph
     let mut graph_builder = GraphBuilder::new();
-    graph_builder
-        .insert(&batch)
-        .context("Failed to build RDF graph")?;
+    graph_builder.insert(&batch).context("Failed to build RDF graph")?;
 
     // Serialize the RDF graph to the specified format
     let serialized_graph = match fmt {
