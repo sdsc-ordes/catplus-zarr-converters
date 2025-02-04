@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
 use crate::graph::namespaces::{cat, unit};
-use std::fmt;
+use serde::{Deserialize, Serialize};
 use sophia_api::ns::NsTerm;
+use std::fmt;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[allow(non_snake_case, non_camel_case_types)]

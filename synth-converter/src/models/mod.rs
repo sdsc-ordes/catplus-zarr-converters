@@ -1,6 +1,6 @@
-pub mod types;
 pub mod enums;
+pub mod types;
 
 // Re-export all models;
-pub use types::*;
 pub use enums::*;
+pub use types::*;

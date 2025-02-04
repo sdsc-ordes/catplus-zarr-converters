@@ -1,13 +1,12 @@
-
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
 use crate::{
-    models::enums::{ActionName, Unit},
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
     },
+    models::enums::{ActionName, Unit},
 };
 use anyhow;
 use serde::{Deserialize, Serialize};
@@ -19,7 +18,6 @@ use sophia_api::{
     graph::MutableGraph,
     term::{SimpleTerm, Term},
 };
-
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -39,25 +37,22 @@ pub struct Batch {
 
 impl InsertIntoGraph for Batch {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-
-
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple()),
             (schema::name, &self.batch_id.as_simple()),
         ] {
             value.attach_into(
-            graph,
-            Link {
-                source_iri: iri.clone(),
-                pred: pred.as_simple(),
-                target_iri: None,
-            },
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: pred.as_simple(),
+                    target_iri: None,
+                },
             )?;
         }
 
         // NOTE: for actions, the direction is reversed (action hasbatch batch)
         for action in &self.actions {
-
             let action_uri = action.get_uri();
             graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
             action.insert_into(graph, action_uri)?;
@@ -91,23 +86,43 @@ pub struct Action {
 
 impl InsertIntoGraph for Action {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-
         for (pred, value) in [
-            (rdf::type_,           &self.action_name.iri().as_simple() as &dyn InsertIntoGraph),
-            (allores::AFX_0000622, &(self.start_time.as_str() * xsd::dateTime).as_simple()),
-            (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
+            (
+                rdf::type_,
+                &self.action_name.iri().as_simple() as &dyn InsertIntoGraph,
+            ),
+            (
+                allores::AFX_0000622,
+                &(self.start_time.as_str() * xsd::dateTime).as_simple(),
+            ),
+            (
+                allores::AFR_0002423,
+                &(self.ending_time.as_str() * xsd::dateTime).as_simple(),
+            ),
             (allores::AFR_0001606, &self.method_name.as_simple()),
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
-            (cat::subEquipmentName,&self.sub_equipment_name.as_simple()),
-            (cat::speedInRPM,      &self.speed_shaker),
-            (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
+            (cat::subEquipmentName, &self.sub_equipment_name.as_simple()),
+            (cat::speedInRPM, &self.speed_shaker),
+            (
+                cat::temperatureTumbleStirrerShape,
+                &self.temperature_tumble_stirrer,
+            ),
             (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
             (cat::temperatureShakerShape, &self.temperature_shaker),
             (alloproc::AFP_0002677, &self.pressure_measurement),
             (cat::hasSample, &self.has_sample),
-            (cat::hasContainerPositionAndQuantity, &self.has_container_position_and_quantity),
-            (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
-            (cat::dispenseType,    &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
+            (
+                cat::hasContainerPositionAndQuantity,
+                &self.has_container_position_and_quantity,
+            ),
+            (
+                alloqual::AFQ_0000111,
+                &self.dispense_state.as_ref().clone().map(|s| s.as_simple()),
+            ),
+            (
+                cat::dispenseType,
+                &self.dispense_type.as_ref().clone().map(|s| s.as_simple()),
+            ),
         ] {
             value.attach_into(
                 graph,
@@ -126,8 +141,6 @@ impl InsertIntoGraph for Action {
     }
 }
 
-
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContainerInfo {
@@ -138,10 +151,11 @@ pub struct ContainerInfo {
 
 impl InsertIntoGraph for ContainerInfo {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        
         for (prop, value) in [
-            (&cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
-                       
+            (
+                &cat::containerID,
+                &self.container_id.as_simple() as &dyn InsertIntoGraph,
+            ),
             (&cat::containerBarcode, &self.container_barcode.as_simple()),
         ] {
             value.attach_into(
@@ -165,7 +179,6 @@ pub struct Observation {
     pub error_margin: Option<ErrorMargin>,
 }
 
-
 /// Implementation for concrete [Observation].
 impl InsertIntoGraph for Observation {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
@@ -176,7 +189,10 @@ impl InsertIntoGraph for Observation {
                 &cat::Observation.as_simple() as &dyn InsertIntoGraph,
             ),
             */
-            (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
+            (
+                qudt::unit,
+                &self.unit.iri().as_simple() as &dyn InsertIntoGraph,
+            ),
             (qudt::value, &self.value.as_simple()),
             (cat::errorMargin, &self.error_margin),
         ] {
@@ -200,7 +216,6 @@ pub struct ErrorMargin {
     pub unit: Unit,
 }
 
-
 /// Implementation for concrete [Observation].
 impl InsertIntoGraph for ErrorMargin {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
@@ -211,7 +226,10 @@ impl InsertIntoGraph for ErrorMargin {
                 &cat::errorMargin.as_simple() as &dyn InsertIntoGraph,
             ),
             */
-            (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
+            (
+                qudt::unit,
+                &self.unit.iri().as_simple() as &dyn InsertIntoGraph,
+            ),
             (qudt::value, &self.value.as_simple()),
         ] {
             value.attach_into(
@@ -243,7 +261,6 @@ pub struct Sample {
 
 impl InsertIntoGraph for Sample {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-    
         for (prop, value) in [
             (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
             (cat::role, &self.role.as_simple()),
@@ -261,7 +278,7 @@ impl InsertIntoGraph for Sample {
                 },
             )?;
         }
-        
+
         // NOTE: for container_info, we attach triples directly to the sample
         let _ = &self.container.insert_into(graph, iri.clone())?;
 
@@ -285,7 +302,6 @@ pub struct SampleItem {
 
 impl InsertIntoGraph for SampleItem {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-
         for (prop, value) in [
             (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
             (purl::identifier, &self.sample_id.as_simple()),
@@ -298,12 +314,12 @@ impl InsertIntoGraph for SampleItem {
             (cat::hasChemical, &self.has_chemical),
         ] {
             value.attach_into(
-            graph,
-            Link {
-                source_iri: iri.clone(),
-                pred: prop.as_simple(),
-                target_iri: None,
-            },
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
             )?;
         }
 
@@ -331,27 +347,42 @@ pub struct Chemical {
 
 impl InsertIntoGraph for Chemical {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-
         for (prop, value) in [
-            (rdf::type_, &obo::CHEBI_25367.as_simple() as &dyn InsertIntoGraph),
+            (
+                rdf::type_,
+                &obo::CHEBI_25367.as_simple() as &dyn InsertIntoGraph,
+            ),
             (purl::identifier, &self.chemical_id.as_simple()),
             (cat::chemicalName, &self.chemical_name.as_simple()),
             (allores::AFR_0001952, &self.molecular_formula.as_simple()),
             (allores::AFR_0002295, &self.smiles.as_simple()),
             (allores::AFR_0002294, &self.molecular_mass),
             (allores::AFR_0002296, &self.inchi.as_simple()),
-            (cat::casNumber, &self.cas_number.as_ref().clone().map(|s| s.as_simple())),
-            (cat::swissCatNumber, &self.swiss_cat_number.as_ref().clone().map(|s| s.as_simple())),
-            (schema::keywords, &self.keywords.as_ref().clone().map(|s| s.as_simple())),
+            (
+                cat::casNumber,
+                &self.cas_number.as_ref().clone().map(|s| s.as_simple()),
+            ),
+            (
+                cat::swissCatNumber,
+                &self
+                    .swiss_cat_number
+                    .as_ref()
+                    .clone()
+                    .map(|s| s.as_simple()),
+            ),
+            (
+                schema::keywords,
+                &self.keywords.as_ref().clone().map(|s| s.as_simple()),
+            ),
             (obo::PATO_0001019, &self.density),
         ] {
             value.attach_into(
-            graph,
-            Link {
-                source_iri: iri.clone(),
-                pred: prop.as_simple(),
-                target_iri: None,
-            },
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
             )?;
         }
 
@@ -369,10 +400,11 @@ pub struct ContainerPositionQuantityItem {
 
 impl InsertIntoGraph for ContainerPositionQuantityItem {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-
-
         for (pred, value) in [
-            (rdf::type_, &cat::ContainerPositionAndQuantity.as_simple() as &dyn InsertIntoGraph),
+            (
+                rdf::type_,
+                &cat::ContainerPositionAndQuantity.as_simple() as &dyn InsertIntoGraph,
+            ),
             (cat::containerID, &self.container_id.as_simple()),
             (allores::AFR_0002240, &self.position.as_simple()),
             (qudt::quantity, &self.quantity),
@@ -390,7 +422,6 @@ impl InsertIntoGraph for ContainerPositionQuantityItem {
         Ok(())
     }
 }
-
 
 #[cfg(test)]
 mod tests {

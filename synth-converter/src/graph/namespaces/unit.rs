@@ -20,4 +20,3 @@ lazy_static! {
     pub static ref ns: Namespace<&'static str> =
         Namespace::new("https://qudt.org/vocab/unit/").unwrap();
 }
-

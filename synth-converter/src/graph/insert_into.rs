@@ -55,7 +55,7 @@ where
 }
 
 impl<T> InsertIntoGraph for Vec<T>
-where 
+where
     T: InsertIntoGraph,
 {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
