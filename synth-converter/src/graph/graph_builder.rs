@@ -1,5 +1,15 @@
 use crate::{
-    graph::namespaces::unit::ToNsTerm,
+    graph::{
+        namespaces::{
+            alloproc, alloqual, allores, cat, obo, purl, qudt, schema,
+            unit::{ToNsTerm, Unit},
+        },
+        utils::generate_bnode_term,
+    },
+    models::{
+        Action, ActionName, Batch, Chemical, ContainerInfo, ContainerPositionQuantityItem,
+        ErrorMargin, Observation, Sample, SampleItem,
+    },
     rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle},
 };
 use anyhow::{Context, Result};
@@ -14,7 +24,7 @@ use sophia_api::{ns::NsTerm, term::SimpleTerm, triple::Triple};
 
 /// An RDF Graph
 pub struct GraphBuilder {
-    graph: LightGraph,
+    pub graph: LightGraph,
 }
 
 /// Builds an RDF graph of Synthesis data for the cat+ ontology.
@@ -25,10 +35,10 @@ pub struct GraphBuilder {
 /// * insert_a_batch:  starts the process of building the graph from the input structure
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
-    pub fn new() -> Result<Self> {
-        Ok(Self {
+    pub fn new() -> Self {
+        Self {
             graph: LightGraph::new(),
-        })
+        }
     }
 
     pub fn add_graph(&mut self, other: &LightGraph) -> Result<()> {
