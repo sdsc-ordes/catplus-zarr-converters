@@ -2,81 +2,92 @@
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
-use std::fmt;
+use std::fmt::{self};
 use crate::graph::{
-    namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
-    utils::generate_bnode_term,
+    insert_into::{InsertIntoGraph, Link}, namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema, unit}
 };
 use anyhow;
 use serde::{Deserialize, Serialize};
 use sophia::{
-    api::{
-        graph::MutableGraph,
-        ns::rdf,
-    },
+    api::ns::{rdf, xsd},
     inmem::graph::LightGraph,
 };
 use sophia_api::{
-    ns::NsTerm,
+    graph::MutableGraph,
     term::{SimpleTerm, Term},
 };
+// import NsTerm
+use sophia_api::ns::NsTerm;
 
-fn to_graph_box<T: ToGraph + 'static>(item: T) -> Box<dyn ToGraph> {
-    Box::new(item)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[allow(non_snake_case, non_camel_case_types)]
+pub enum Unit {
+    #[serde(rename = "bar")]
+    Bar,
+    #[serde(rename = "°C")]
+    DegC,
+    #[serde(rename = "mg")]
+    MilliGM,
+    #[serde(rename = "g/mL")]
+    GMPerMilliL,
+    #[serde(rename = "g/mol")]
+    GMPerMol,
+    #[serde(rename = "mol/L")]
+    MolPerL,
+    #[serde(rename = "rpm")]
+    RevPerMin,
 }
 
-pub fn link_node<'a, 'b, 'c, 'd, N>(source_uri: SimpleTerm<'a>, predicate: SimpleTerm<'b>, node: &'d N) -> Vec<[SimpleTerm<'c>; 3]>
-where
-    N: ToGraph + ?Sized,
-    'a: 'c,
-    'b: 'c,
-    'd: 'c
-{
-    let node_uri = node.get_uri();
-    let mut triples = vec![[source_uri.clone(), predicate.clone(), node_uri.clone()]];
-    triples.append(&mut node.to_triples(node_uri.clone()));
-
-    triples
-}
-
-/// Convert a struct into an RDF graph.
-pub trait ToGraph {
-    /// Represent the struct as a collection of triples.
-    ///
-    /// # Arguments
-    /// - `subject`: The URI to use for the struct being converted.
-    //
-    /// # Returns
-    /// A collection of triples.
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b;
-
-    /// Convert the struct to a graph.
-    ///
-    /// # Arguments
-    /// - `subject`: The URI to use for the struct being converted.
-    ///
-    /// # Returns
-    /// The graph representation of the struct.
-    fn to_graph(&self, subject: SimpleTerm) -> anyhow::Result<LightGraph> {
-        let mut graph = LightGraph::new();
-        let triples = self.to_triples(subject);
-        for triple in triples {
-            graph.insert(&triple[0], &triple[1], &triple[2])?;
+impl Unit {
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            Unit::Bar => "Bar",
+            Unit::DegC => "DEG-C",
+            Unit::MilliGM => "MilliGM",
+            Unit::GMPerMilliL => "GM-PER-MilliL",
+            Unit::GMPerMol => "GM-PER-MOL",
+            Unit::MolPerL => "MOL-PER-L",
+            Unit::RevPerMin => "REV-PER-MIN",
         }
-        return Ok(graph);
     }
+    pub fn iri(&self) -> NsTerm<'_> {
+        unit::ns.get(self.display_name()).expect("Term not found")
+    }
+}
 
-    /// Get the URI for the struct.
-    ///
-    /// The default implementation generates a random blank node URI.
-    ///
-    /// # Returns
-    /// The URI for the struct.
-    fn get_uri(&self) -> SimpleTerm<'static> {
-        generate_bnode_term()
+impl fmt::Display for Unit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<{}>", self.iri().to_string())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[allow(non_snake_case, non_camel_case_types)]
+pub enum ActionName {
+    AddAction,
+    setTemperatureAction,
+    filtrateAction,
+    shakeAction,
+    setVacuumAction,
+    setPressureAction,
+}
+
+impl fmt::Display for ActionName {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<{}>", self.iri().to_string())
+    }
+}
+
+impl ActionName {
+    fn iri(&self) -> NsTerm {
+        match self {
+            Self::AddAction => cat::AddAction,
+            Self::setTemperatureAction => cat::SetTemperatureAction,
+            Self::setPressureAction => cat::SetPressureAction,
+            Self::shakeAction => cat::ShakeAction,
+            Self::setVacuumAction => cat::SetVacuumAction,
+            Self::filtrateAction => cat::FiltrateAction,
+        }
     }
 }
 
@@ -96,28 +107,33 @@ pub struct Batch {
     pub link: Option<String>,
 }
 
-impl ToGraph for Batch {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let mut triples: Vec<[SimpleTerm; 3]> =
-            [(&rdf::type_, cat::Batch.as_simple()), (&schema::name, self.batch_id.as_simple())]
-                .into_iter()
-                .map(|(predicate, object)| {
-                    [subject.clone(), predicate.as_simple(), object]
-                })
-                .collect();
+impl InsertIntoGraph for Batch {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
 
-        for action in &self.actions {
-            let action_subject = action.get_uri();
-            triples.push([action_subject.clone(), cat::hasBatch.as_simple(), subject.clone()]);
 
-            triples.append(&mut action.to_triples(action_subject));
+        for (pred, value) in [
+            (rdf::type_, &cat::Batch.as_simple()),
+            (schema::name, &self.batch_id.as_simple()),
+        ] {
+            value.attach_into(
+            graph,
+            Link {
+                source_iri: iri.clone(),
+                pred: pred.as_simple(),
+                target_iri: None,
+            },
+            )?;
         }
 
-        triples
+        // NOTE: for actions, the direction is reversed (action hasbatch batch)
+        for action in &self.actions {
+
+            let action_uri = action.get_uri();
+            graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
+            action.insert_into(graph, action_uri)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -143,111 +159,44 @@ pub struct Action {
     pub pressure_measurement: Option<Observation>,
 }
 
-impl ToGraph for Action {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let subject: SimpleTerm = generate_bnode_term();
+impl InsertIntoGraph for Action {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
 
-        // Data properties.
-        let mut data_properties = vec![
-            (&allores::AFX_0000622, &self.start_time),
-            (&allores::AFR_0002423, &self.ending_time),
-            (&allores::AFR_0001606, &self.method_name),
-            (&allores::AFR_0001723, &self.equipment_name),
-            (&cat::subEquipmentName, &self.sub_equipment_name),
-            (&rdf::type_, &self.action_name.to_string()),
-        ];
-
-        // Optional data properties.
-        if let Some(dispense_type) = &self.dispense_type {
-            data_properties.push((&cat::dispenseType, dispense_type));
-        }
-
-        // Object properties
-        let mut object_properties: Vec<(NsTerm, Option<Box<dyn ToGraph>>)> = vec![
-            (
-                cat::temperatureShakerShape,
-                self.temperature_shaker.map(to_graph_box),
-            ),
-            (
-                cat::temperatureTumbleStirrerShape,
-                self.temperature_tumble_stirrer.map(to_graph_box),
-            ),
-            (cat::speedInRPM, self.speed_shaker.map(to_graph_box)),
-            (
-                cat::speedTumbleStirrerShape,
-                self.speed_tumble_stirrer.map(to_graph_box),
-            ),
-            (
-                alloproc::AFP_0002677,
-                self.pressure_measurement.map(to_graph_box),
-            ),
-            (cat::hasSample, self.has_sample.map(to_graph_box)),
-        ];
-
-        // Multivalued object properties.
-        if let Some(container_pos) = &self.has_container_position_and_quantity {
-            for container_item in container_pos {
-                object_properties.push((
-                    cat::hasContainerPositionAndQuantity,
-                    Some(to_graph_box(*container_item)),
-                ))
-            }
-        }
-
-        // Generate triples.
-        let mut triples: Vec<[SimpleTerm; 3]> = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object.as_simple()])
-            .collect();
-
-        for (pred, object) in object_properties {
-            if let Some(obj) = object {
-                triples.append(&mut link_node(
-                    subject.clone(),
-                    pred.as_simple(),
-                    obj.as_ref(),
-                ));
-            }
+        for (pred, value) in [
+            (rdf::type_,           &self.action_name.iri().as_simple() as &dyn InsertIntoGraph),
+            (allores::AFX_0000622, &(self.start_time.as_str() * xsd::dateTime).as_simple()),
+            (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
+            (allores::AFR_0001606, &self.method_name.as_simple()),
+            (allores::AFR_0001723, &self.equipment_name.as_simple()),
+            (cat::subEquipmentName,&self.sub_equipment_name.as_simple()),
+            (cat::speedInRPM,      &self.speed_shaker),
+            (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
+            (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
+            (cat::temperatureShakerShape, &self.temperature_shaker),
+            (alloproc::AFP_0002677, &self.pressure_measurement),
+            (cat::hasSample, &self.has_sample),
+            (cat::hasContainerPositionAndQuantity, &self.has_container_position_and_quantity),
+            (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
+            (cat::dispenseType,    &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: pred.as_simple(),
+                    target_iri: None,
+                },
+            )?;
         }
 
         // NOTE: for container_info, we attach triples directly to the action
-        if let Some(container_info) = &self.container_info {
-            triples.append(&mut container_info.to_triples(subject.clone()));
-        };
+        let _ = &self.container_info.insert_into(graph, iri.clone())?;
 
-        triples
+        Ok(())
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[allow(non_snake_case, non_camel_case_types)]
-pub enum ActionName {
-    AddAction,
-    setTemperatureAction,
-    filtrateAction,
-    shakeAction,
-    setVacuumAction,
-    setPressureAction,
-}
 
-impl fmt::Display for ActionName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let term = match self {
-            Self::AddAction => cat::AddAction,
-            Self::setTemperatureAction => cat::SetTemperatureAction,
-            Self::setPressureAction => cat::SetPressureAction,
-            Self::shakeAction => cat::ShakeAction,
-            Self::setVacuumAction => cat::SetVacuumAction,
-            Self::filtrateAction => cat::FiltrateAction,
-        };
-
-        write!(f, "{}", term.to_string())
-    }
-}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -257,23 +206,24 @@ pub struct ContainerInfo {
     pub container_barcode: String,
 }
 
-impl ToGraph for ContainerInfo {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let data_properties = [
-            (&cat::containerID, &self.container_id.as_simple()),
+impl InsertIntoGraph for ContainerInfo {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        
+        for (prop, value) in [
+            (&cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
+                       
             (&cat::containerBarcode, &self.container_barcode.as_simple()),
-        ];
-
-        let triples = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object.to_owned()])
-            .collect();
-
-        triples
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
+            )?;
+        }
+        Ok(())
     }
 }
 
@@ -281,62 +231,70 @@ impl ToGraph for ContainerInfo {
 #[serde(rename_all = "camelCase")]
 pub struct Observation {
     pub value: f64,
-    pub unit: String,
+    pub unit: Unit,
     pub error_margin: Option<ErrorMargin>,
 }
 
-impl ToGraph for Observation {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let data_properties = [
-            (&rdf::type_, &cat::Observation.as_simple()),
-            (&qudt::unit, &self.unit.as_simple()),
-            (&qudt::value, &self.value.as_simple()),
-        ];
 
-        let object_properties = [(cat::errorMargin, &self.error_margin)];
-
-        let mut triples: Vec<[SimpleTerm; 3]> = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object.as_simple()])
-            .collect();
-
-        for (pred, object) in object_properties {
-            if let Some(obj) = object {
-                triples.append(&mut link_node(subject.clone(), pred.as_simple(), *obj));
-            }
+/// Implementation for concrete [Observation].
+impl InsertIntoGraph for Observation {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            /*
+            (
+                rdf::type_,
+                &cat::Observation.as_simple() as &dyn InsertIntoGraph,
+            ),
+            */
+            (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
+            (qudt::value, &self.value.as_simple()),
+            (cat::errorMargin, &self.error_margin),
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
+            )?;
         }
 
-        triples
+        Ok(())
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorMargin {
     pub value: f64,
-    pub unit: String,
+    pub unit: Unit,
 }
 
-impl ToGraph for ErrorMargin {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let data_properties = [
-            (&qudt::unit, self.unit.as_simple()),
-            (&qudt::value, self.value.as_simple()),
-        ];
 
-        let triples = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object])
-            .collect();
+/// Implementation for concrete [Observation].
+impl InsertIntoGraph for ErrorMargin {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            /*
+            (
+                rdf::type_,
+                &cat::errorMargin.as_simple() as &dyn InsertIntoGraph,
+            ),
+            */
+            (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
+            (qudt::value, &self.value.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
+            )?;
+        }
 
-        triples
+        Ok(())
     }
 }
 
@@ -353,45 +311,31 @@ pub struct Sample {
     pub has_sample: Vec<SampleItem>,
 }
 
-impl ToGraph for Sample {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let data_properties = [
-            (&rdf::type_, cat::Sample.as_simple()),
-            (&cat::role, self.role.as_simple()),
-            (&cat::vialShape, self.vial_type.as_simple()),
-            (&allores::AFR_0002464, self.vial_type.as_simple()),
-        ];
-
-        let mut object_properties: Vec<(NsTerm, Box<dyn ToGraph>)> =
-            vec![(cat::expectedDatum, to_graph_box(self.expected_datum))];
-
-        // Multivalued object properties.
-        for item in &self.has_sample {
-            object_properties.push((cat::hasSample, to_graph_box(*item)))
+impl InsertIntoGraph for Sample {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    
+        for (prop, value) in [
+            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
+            (cat::role, &self.role.as_simple()),
+            (cat::vialShape, &self.vial_type.as_simple()),
+            (allores::AFR_0002464, &self.vial_type.as_simple()),
+            (cat::expectedDatum, &self.expected_datum),
+            (cat::hasSample, &self.has_sample),
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: prop.as_simple(),
+                    target_iri: None,
+                },
+            )?;
         }
+        
+        // NOTE: for container_info, we attach triples directly to the sample
+        let _ = &self.container.insert_into(graph, iri.clone())?;
 
-        // Generate triples
-        let mut triples: Vec<[SimpleTerm; 3]> = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object])
-            .collect();
-
-        for (pred, obj) in object_properties {
-            triples.append(&mut link_node(
-                subject.clone(),
-                pred.as_simple(),
-                obj.into(),
-            ));
-        }
-
-        // NOTE: for container_info, we attach triples directly to the Sample
-        triples.append(&mut self.container.to_triples(subject.clone()));
-
-        triples
+        Ok(())
     }
 }
 
@@ -409,51 +353,31 @@ pub struct SampleItem {
     pub has_chemical: Chemical,
 }
 
-impl ToGraph for SampleItem {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let data_properties: Vec<(NsTerm, Option<SimpleTerm>)> = vec![
-            (rdf::type_, cat::Sample.as_simple()),
-            (purl::identifier, self.sample_id.as_simple()),
-            (cat::role, self.role.as_simple()),
-            (cat::internalBarCode, self.internal_bar_code.as_simple()),
-            (alloqual::AFQ_0000111, self.physical_state.as_simple()),
-        ]
-        .into_iter()
-        .map(|(p, o)| (p, Some(o)))
-        .collect();
+impl InsertIntoGraph for SampleItem {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
 
-        let object_properties: Vec<(NsTerm, Option<Box<dyn ToGraph>>)> = vec![
-            (cat::expectedDatum, self.expected_datum.map(to_graph_box)),
-            (
-                cat::measuredQuantity,
-                self.measured_quantity.map(to_graph_box),
-            ),
-            (allores::AFR_0002036, self.concentration.map(to_graph_box)),
-            (cat::hasChemical, Some(to_graph_box(self.has_chemical))),
-        ];
-
-        let mut triples: Vec<[SimpleTerm<'b>; 3]> = data_properties
-            .into_iter()
-            .filter(|(_, o)| o.is_some())
-            .map(|(p, o)| (p, o.unwrap()))
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object])
-            .collect();
-
-        for (pred, object) in object_properties {
-            if let Some(obj) = object {
-                triples.append(&mut link_node(
-                    subject.clone(),
-                    pred.as_simple(),
-                    obj.into(),
-                ));
-            }
+        for (prop, value) in [
+            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
+            (purl::identifier, &self.sample_id.as_simple()),
+            (cat::role, &self.role.as_simple()),
+            (cat::internalBarCode, &self.internal_bar_code.as_simple()),
+            (alloqual::AFQ_0000111, &self.physical_state.as_simple()),
+            (cat::expectedDatum, &self.expected_datum),
+            (cat::measuredQuantity, &self.measured_quantity),
+            (allores::AFR_0002036, &self.concentration),
+            (cat::hasChemical, &self.has_chemical),
+        ] {
+            value.attach_into(
+            graph,
+            Link {
+                source_iri: iri.clone(),
+                pred: prop.as_simple(),
+                target_iri: None,
+            },
+            )?;
         }
 
-        triples
+        Ok(())
     }
 }
 
@@ -475,55 +399,33 @@ pub struct Chemical {
     pub density: Option<Observation>,
 }
 
-impl ToGraph for Chemical {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let mut data_properties: Vec<(NsTerm, Option<SimpleTerm>)> = vec![
-            (rdf::type_, obo::CHEBI_25367.as_simple()),
-            (purl::identifier, self.chemical_id.as_simple()),
-            (cat::chemicalName, self.chemical_name.as_simple()),
-            (allores::AFR_0001952, self.molecular_formula.as_simple()),
-            (allores::AFR_0002295, self.smiles.as_simple()),
-            (allores::AFR_0002294, self.molecular_mass.value.as_simple()),
-            (allores::AFR_0002296, self.inchi.as_simple()),
-        ]
-        .into_iter()
-        .map(|(p, o)| (p, Some(o)))
-        .collect();
+impl InsertIntoGraph for Chemical {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
 
-        // Optional data properties.
-        data_properties.append(&mut vec![
-            (cat::casNumber, self.cas_number.map(|o| o.as_simple())),
-            (
-                cat::swissCatNumber,
-                self.swiss_cat_number.map(|o| o.as_simple()),
-            ),
-            (schema::keywords, self.keywords.map(|o| o.as_simple())),
-        ]);
-
-        let object_properties: Vec<(NsTerm, Option<Box<dyn ToGraph>>)> =
-            vec![(obo::PATO_0001019, self.density.map(to_graph_box))];
-
-        // Generate triples
-        let mut triples: Vec<[SimpleTerm<'b>; 3]> = data_properties
-            .into_iter()
-            .map(|(p, o)| [subject.clone(), p.as_simple(), o.unwrap()])
-            .collect();
-
-        for (pred, object) in object_properties {
-            if let Some(obj) = object {
-                triples.append(&mut link_node(
-                    subject.clone(),
-                    pred.as_simple(),
-                    obj.into(),
-                ));
-            }
+        for (prop, value) in [
+            (rdf::type_, &obo::CHEBI_25367.as_simple() as &dyn InsertIntoGraph),
+            (purl::identifier, &self.chemical_id.as_simple()),
+            (cat::chemicalName, &self.chemical_name.as_simple()),
+            (allores::AFR_0001952, &self.molecular_formula.as_simple()),
+            (allores::AFR_0002295, &self.smiles.as_simple()),
+            (allores::AFR_0002294, &self.molecular_mass),
+            (allores::AFR_0002296, &self.inchi.as_simple()),
+            (cat::casNumber, &self.cas_number.as_ref().clone().map(|s| s.as_simple())),
+            (cat::swissCatNumber, &self.swiss_cat_number.as_ref().clone().map(|s| s.as_simple())),
+            (schema::keywords, &self.keywords.as_ref().clone().map(|s| s.as_simple())),
+            (obo::PATO_0001019, &self.density),
+        ] {
+            value.attach_into(
+            graph,
+            Link {
+                source_iri: iri.clone(),
+                pred: prop.as_simple(),
+                target_iri: None,
+            },
+            )?;
         }
 
-        triples
+        Ok(())
     }
 }
 
@@ -535,34 +437,58 @@ pub struct ContainerPositionQuantityItem {
     pub quantity: Observation,
 }
 
-impl ToGraph for ContainerPositionQuantityItem {
-    fn to_triples<'a, 'b, 'c>(&'c self, subject: SimpleTerm<'a>) -> Vec<[SimpleTerm<'b>; 3]>
-    where
-        'c: 'b,
-        'a: 'b,
-    {
-        let mut data_properties = vec![
-            (&rdf::type_, cat::ContainerPositionAndQuantity.as_simple()),
-            (&cat::containerID, self.container_id.as_simple()),
-            (&allores::AFR_0002240, self.position.as_simple()),
-        ];
+impl InsertIntoGraph for ContainerPositionQuantityItem {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
 
-        let mut object_project = vec![(qudt::quantity, to_graph_box(self.quantity))];
 
-        // Generate triples
-        let mut triples: Vec<[SimpleTerm<'b>; 3]> = data_properties
-            .into_iter()
-            .map(|(predicate, object)| [subject.clone(), predicate.as_simple(), object])
-            .collect();
-
-        for (pred, object) in object_project {
-            triples.append(&mut link_node(
-                subject.clone(),
-                pred.as_simple(),
-                object.into(),
-            ));
+        for (pred, value) in [
+            (rdf::type_, &cat::ContainerPositionAndQuantity.as_simple() as &dyn InsertIntoGraph),
+            (cat::containerID, &self.container_id.as_simple()),
+            (allores::AFR_0002240, &self.position.as_simple()),
+            (qudt::quantity, &self.quantity),
+        ] {
+            value.attach_into(
+                graph,
+                Link {
+                    source_iri: iri.clone(),
+                    pred: pred.as_simple(),
+                    target_iri: None,
+                },
+            )?;
         }
 
-        triples
+        Ok(())
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sophia::iri::IriRef;
+    use sophia_api::term::Term;
+
+    use crate::{
+        graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph},
+        models::{ErrorMargin, Observation},
+    };
+
+    #[test]
+    fn test_observation_to_triples() -> anyhow::Result<()> {
+        let observation = Observation {
+            value: 42.0,
+            unit: Unit::DegC,
+            error_margin: Some(ErrorMargin {
+                value: 0.5,
+                unit: Unit::DegC,
+            }),
+        };
+
+        let mut b = GraphBuilder::new();
+        let i = IriRef::new_unchecked("http://test.com/my-obersvation");
+        observation.insert_into(&mut b.graph, i.as_simple())?;
+        println!("Graph\n{}", b.serialize_to_turtle().unwrap());
+
+        Ok(())
     }
 }
