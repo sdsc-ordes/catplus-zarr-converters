@@ -5,7 +5,7 @@ use std::{
     io::{Read, Write},
     path::Path,
 };
-use crate::rdf::convert::json_to_rdf;
+use synth_converter::convert::json_to_rdf;
 
 /// Converts CAT+ Synthesis JSON input into RDF formats.
 ///

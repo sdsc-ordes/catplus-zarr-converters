@@ -1,5 +1,5 @@
-use crate::graph::graph_builder::GraphBuilder;
-use crate::graph::insert_into::InsertIntoGraph;
+use commonlib::graph::graph_builder::GraphBuilder;
+use crate::models::Batch;
 use anyhow::{Context, Result};
 
 /// Parse JSON and serialize the RDF graph to the specified format
@@ -16,11 +16,11 @@ use anyhow::{Context, Result};
 /// A `Result` containing the serialized graph as a string or an error if the process fails.
 pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
     // Parse JSON into a Batch object
-    let tree_data: dyn InsertIntoGraph = serde_json::from_str(input_content).map_err(|e| anyhow::Error::new(e))?;
+    let batch = parse_json(input_content).context("Failed to parse JSON input")?;
 
     // Build the RDF graph
     let mut graph_builder = GraphBuilder::new();
-    graph_builder.insert(&tree_data).context("Failed to build RDF graph")?;
+    graph_builder.insert(&batch).context("Failed to build RDF graph")?;
 
     // Serialize the RDF graph to the specified format
     let serialized_graph = match fmt {
@@ -33,4 +33,15 @@ pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
     };
 
     Ok(serialized_graph)
+}
+
+/// Parses a JSON string into a `Batch` struct
+///
+/// # Arguments
+/// - `json_data`: The JSON data as a string.
+///
+/// # Returns
+/// A `Result` containing the parsed `Batch` struct or an error.
+fn parse_json(json_data: &str) -> Result<Batch> {
+    serde_json::from_str(json_data).map_err(|e| anyhow::Error::new(e))
 }
