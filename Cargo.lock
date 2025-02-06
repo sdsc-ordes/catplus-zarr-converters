@@ -142,6 +142,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "catplus-common"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "lazy_static",
+ "serde",
+ "serde_json",
+ "sophia",
+ "sophia_api",
+ "sophia_isomorphism",
+ "sophia_term",
+ "sophia_turtle",
+ "uuid",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -192,23 +209,6 @@ name = "colorchoice"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b63caa9aa9397e2d9480a9b13673856c78d8ac123288526c37d7839f2a86990"
-
-[[package]]
-name = "commonlib"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "lazy_static",
- "serde",
- "serde_json",
- "sophia",
- "sophia_api",
- "sophia_isomorphism",
- "sophia_term",
- "sophia_turtle",
- "uuid",
-]
 
 [[package]]
 name = "contextual"
@@ -767,9 +767,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "oxilangtag"
@@ -1217,8 +1217,8 @@ name = "synth-converter"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "catplus-common",
  "clap",
- "commonlib",
  "lazy_static",
  "serde",
  "serde_json",
