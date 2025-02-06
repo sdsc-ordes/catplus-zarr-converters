@@ -1,6 +1,6 @@
 use sophia_isomorphism::isomorphic_graphs;
 use synth_converter::convert::json_to_rdf;
-use commonlib::rdf::rdf_parser::parse_turtle_to_graph;
+use catplus_common::rdf::rdf_parser::parse_turtle_to_graph;
 
 #[test]
 fn test_convert_filtrate_action() {

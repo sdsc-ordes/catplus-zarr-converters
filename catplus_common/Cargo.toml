@@ -1,5 +1,5 @@
 [package]
-name = "commonlib"
+name = "catplus_common"
 version = "0.1.0"
 edition = "2021"
 

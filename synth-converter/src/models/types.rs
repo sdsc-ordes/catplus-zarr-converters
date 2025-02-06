@@ -2,7 +2,7 @@
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
-use commonlib::{
+use catplus_common::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
