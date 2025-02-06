@@ -334,7 +334,7 @@ mod tests {
     use sophia::iri::IriRef;
     use sophia_api::term::Term;
 
-    use commonlib::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
+    use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
     use crate::models::{ErrorMargin, Observation};
 
     #[test]
