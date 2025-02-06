@@ -7,17 +7,17 @@ root_dir := `git rev-parse --show-toplevel`
 default:
     just --list
 
-# Build the synth-converter.
+# Build all crates
 build *args:
-    cargo build --manifest-path "{{root_dir}}/synth-converter/Cargo.toml" "$@"
+    cargo build 
 
-# Test the synth-converter.
+# Test all crates
 test *args:
-    cargo test --manifest-path "{{root_dir}}/synth-converter/Cargo.toml" "$@"
+    cargo test 
 
-# Format the synth-converter.
+# Format all crates
 fmt *args:
-    cargo fmt --manifest-path "{{root_dir}}/synth-converter/Cargo.toml" "$@"
+    cargo fmt
 
 # Run the synth-converter.
 run input_file output_file *args:
