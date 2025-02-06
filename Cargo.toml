@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+
+members = [
+  "commonlib",
+  "synth-converter",
+]
+
+
+[workspace.package]
+license = "Apache-2.0"
+edition = "2021"
