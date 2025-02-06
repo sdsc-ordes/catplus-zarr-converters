@@ -4,7 +4,7 @@ use sophia_api::{
     term::{SimpleTerm, Term},
 };
 
-use catplus_common::graph::utils::generate_bnode_term;
+use crate::graph::utils::generate_bnode_term;
 
 /// Used in [InsertIntoGraph::attach_and_insert].
 #[derive(Clone)]
