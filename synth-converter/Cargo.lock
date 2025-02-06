@@ -187,6 +187,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b63caa9aa9397e2d9480a9b13673856c78d8ac123288526c37d7839f2a86990"
 
 [[package]]
+name = "commonlib"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "lazy_static",
+ "serde",
+ "serde_json",
+ "sophia",
+ "sophia_api",
+ "sophia_isomorphism",
+ "sophia_term",
+ "sophia_turtle",
+ "uuid",
+]
+
+[[package]]
 name = "contextual"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1182,6 +1199,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "commonlib",
  "lazy_static",
  "serde",
  "serde_json",
