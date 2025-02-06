@@ -2,7 +2,7 @@
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
-use crate::{
+use catplus_common::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
@@ -334,10 +334,8 @@ mod tests {
     use sophia::iri::IriRef;
     use sophia_api::term::Term;
 
-    use crate::{
-        graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph},
-        models::{ErrorMargin, Observation},
-    };
+    use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
+    use crate::models::{ErrorMargin, Observation};
 
     #[test]
     fn test_observation_to_triples() -> anyhow::Result<()> {

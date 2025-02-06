@@ -1,14 +1,10 @@
 [package]
-name = "synth-converter"
+name = "catplus-common"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 path = "src/lib.rs"
-
-[[bin]]
-name = "synth-converter"
-path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0.215", features = ["derive"] }
