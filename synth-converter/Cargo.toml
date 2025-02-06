@@ -11,7 +11,7 @@ name = "synth-converter"
 path = "src/main.rs"
 
 [dependencies]
-catplus_common = { version="0.1.0", path = "../catplus_common"}
+catplus-common = { version="0.1.0", path = "../catplus-common"}
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.132"
 lazy_static = "1.5.0"
