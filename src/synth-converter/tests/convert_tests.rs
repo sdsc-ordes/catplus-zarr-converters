@@ -99,8 +99,8 @@ fn test_convert_pressure_action() {
         cat:hasBatch [ a cat:Batch;
             schema:name "23"];
         cat:subEquipmentName "MTP_Pressure";
-        alloproc:AFP_0002677 [
-            cat:errorMargin [
+        alloproc:AFP_0002677 [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:Bar;
                 qudt:value "1"^^xsd:double];
             qudt:unit unit:Bar;
@@ -162,46 +162,46 @@ fn test_convert_set_temperature_action() {
         "#;
     let result = json_to_rdf(json_data, "turtle");
     let expected_ttl = r#"
-            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-            PREFIX cat: <http://example.org/cat#>
-            PREFIX schema: <https://schema.org/>
-            PREFIX unit: <https://qudt.org/vocab/unit/>
-            PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-            PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
-            PREFIX qudt: <http://qudt.org/schema/qudt/>
-            PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
-            PREFIX purl: <http://purl.allotrope.org/ontologies/>
-            PREFIX obo: <http://purl.obolibrary.org/obo/>
-            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX cat: <http://example.org/cat#>
+        PREFIX schema: <https://schema.org/>
+        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX purl: <http://purl.allotrope.org/ontologies/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-            [] a cat:SetTemperatureAction;
-            cat:containerBarcode "1";
-            cat:containerID "1";
-            cat:hasBatch [ a cat:Batch;
-                schema:name "23"];
-            cat:speedInRPM [
-                cat:errorMargin [
-                    qudt:unit unit:REV-PER-MIN;
-                    qudt:value "5"^^xsd:double];
+        [] a cat:SetTemperatureAction;
+        cat:containerBarcode "1";
+        cat:containerID "1";
+        cat:hasBatch [ a cat:Batch;
+            schema:name "23"];
+        cat:speedInRPM [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
-                qudt:value "152"^^xsd:double];
-            cat:subEquipmentName "heater";
-            cat:temperatureShakerShape [
-                cat:errorMargin [
-                    qudt:unit unit:DEG-C;
-                    qudt:value "1"^^xsd:double];
+                qudt:value "5"^^xsd:double];
+            qudt:unit unit:REV-PER-MIN;
+            qudt:value "152"^^xsd:double];
+        cat:subEquipmentName "heater";
+        cat:temperatureShakerShape [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
-                qudt:value "25"^^xsd:double];
-            cat:temperatureTumbleStirrerShape [
-                cat:errorMargin [
-                    qudt:unit unit:DEG-C;
-                    qudt:value "2"^^xsd:double];
+                qudt:value "1"^^xsd:double];
+            qudt:unit unit:DEG-C;
+            qudt:value "25"^^xsd:double];
+        cat:temperatureTumbleStirrerShape [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
-                qudt:value "25"^^xsd:double];
-            allores:AFR_0001606 "set_temperature";
-            allores:AFR_0001723 "Chemspeed SWING XL";
-            allores:AFR_0002423 "2024-07-25T12:00:02"^^xsd:dateTime;
-            allores:AFX_0000622 "2024-07-25T12:00:00"^^xsd:dateTime.
+                qudt:value "2"^^xsd:double];
+            qudt:unit unit:DEG-C;
+            qudt:value "25"^^xsd:double];
+        allores:AFR_0001606 "set_temperature";
+        allores:AFR_0001723 "Chemspeed SWING XL";
+        allores:AFR_0002423 "2024-07-25T12:00:02"^^xsd:dateTime;
+        allores:AFX_0000622 "2024-07-25T12:00:00"^^xsd:dateTime.
         "#;
     let expected_graph = parse_turtle_to_graph(&expected_ttl).unwrap();
     let result_ttl = result.as_ref().unwrap().as_str();
@@ -312,91 +312,88 @@ fn test_convert_add_action() {
     "#;
     let result = json_to_rdf(json_data, "turtle");
     let expected_ttl = r#"
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX cat: <http://example.org/cat#>
-    PREFIX schema: <https://schema.org/>
-    PREFIX unit: <https://qudt.org/vocab/unit/>
-    PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
-    PREFIX qudt: <http://qudt.org/schema/qudt/>
-    PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
-    PREFIX purl: <http://purl.allotrope.org/ontologies/>
-    PREFIX obo: <http://purl.obolibrary.org/obo/>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX cat: <http://example.org/cat#>
+        PREFIX schema: <https://schema.org/>
+        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX purl: <http://purl.allotrope.org/ontologies/>
+        PREFIX obo: <http://purl.obolibrary.org/obo/>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    [] a cat:AddAction;
-    cat:dispenseType "volume";
-    cat:hasBatch [ a cat:Batch;
-        schema:name "23"];
-    cat:hasContainerPositionAndQuantity [ a cat:ContainerPositionAndQuantity;
-        cat:containerID "1";
-        allores:AFR_0002240 "B1";
-        qudt:quantity [
-            cat:errorMargin [
+        [] a cat:AddAction;
+        cat:dispenseType "volume";
+        cat:hasBatch [ a cat:Batch;
+            schema:name "23"];
+        cat:hasContainerPositionAndQuantity [ a cat:ContainerPositionAndQuantity;
+            cat:containerID "1";
+            allores:AFR_0002240 "B1";
+            qudt:quantity [ a cat:Observation;
+                cat:errorMargin [ a cat:errorMargin;
+                    qudt:unit unit:MilliGM;
+                    qudt:value "0.002"^^xsd:double];
                 qudt:unit unit:MilliGM;
-                qudt:value "0.002"^^xsd:double];
-            qudt:unit unit:MilliGM;
-            qudt:value "0.034"^^xsd:double]],
-        [ a cat:ContainerPositionAndQuantity;
-        cat:containerID "1";
-        allores:AFR_0002240 "A1";
-        qudt:quantity [
-            cat:errorMargin [
-                qudt:unit unit:MilliGM;
-                qudt:value "0.001"^^xsd:double];
-            qudt:unit unit:MilliGM;
-            qudt:value "0.024"^^xsd:double]];
-    cat:hasSample [ a cat:Sample;
-        cat:containerBarcode "18";
-        cat:containerID "18";
-        cat:expectedDatum [
-            qudt:unit unit:MilliGM;
-            qudt:value "2"^^xsd:double];
-        cat:hasSample [ a cat:Sample;
-            cat:expectedDatum [
-                qudt:unit unit:MilliGM;
-                qudt:value "5"^^xsd:double];
-            cat:has_chemical [ a obo:CHEBI_25367;
-                cat:casNumber "123-11-5";
-                cat:chemicalName "4-methoxybenzaldehyde";
-                purl:identifier "134";
-                allores:AFR_0001952 "C8H8O2";
-                allores:AFR_0002294 "136.15";
-                allores:AFR_0002295 "COC1=CC=C(C=C1)C=O";
-                allores:AFR_0002296 "1S/C8H8O2/c1-10-8-4-2-7(6-9)3-5-8/h2-6H,1H3";
-                obo:PATO_0001019 [
-                    qudt:unit unit:GM-PER-MilliL;
-                    qudt:value "1.119"^^xsd:double]];
-            cat:internalBarCode "2";
-            cat:measuredQuantity [
-                cat:errorMargin [
+                qudt:value "0.034"^^xsd:double]],
+            [ a cat:ContainerPositionAndQuantity;
+            cat:containerID "1";
+            allores:AFR_0002240 "A1";
+            qudt:quantity [ a cat:Observation;
+                cat:errorMargin [ a cat:errorMargin;
                     qudt:unit unit:MilliGM;
                     qudt:value "0.001"^^xsd:double];
                 qudt:unit unit:MilliGM;
-                qudt:value "1"^^xsd:double];
+                qudt:value "0.024"^^xsd:double]];
+        cat:hasSample [ a cat:Sample;
+            cat:containerBarcode "18";
+            cat:containerID "18";
+            cat:expectedDatum [ a cat:Observation;
+                qudt:unit unit:MilliGM;
+                qudt:value "2"^^xsd:double];
+            cat:hasSample [ a cat:Sample;
+                cat:expectedDatum [ a cat:Observation;
+                    qudt:unit unit:MilliGM;
+                    qudt:value "5"^^xsd:double];
+                cat:hasChemical [ a obo:CHEBI_25367;
+                    cat:casNumber "123-11-5";
+                    cat:chemicalName "4-methoxybenzaldehyde";
+                    purl:identifier "134";
+                    allores:AFR_0001952 "C8H8O2";
+                    allores:AFR_0002294 [ a cat:Observation;
+                        qudt:unit unit:GM-PER-MOL;
+                        qudt:value "136.15"^^xsd:double];
+                    allores:AFR_0002295 "COC1=CC=C(C=C1)C=O";
+                    allores:AFR_0002296 "1S/C8H8O2/c1-10-8-4-2-7(6-9)3-5-8/h2-6H,1H3";
+                    obo:PATO_0001019 [ a cat:Observation;
+                        qudt:unit unit:GM-PER-MilliL;
+                        qudt:value "1.119"^^xsd:double]];
+                cat:internalBarCode "2";
+                cat:measuredQuantity [ a cat:Observation;
+                    cat:errorMargin [ a cat:errorMargin;
+                        qudt:unit unit:MilliGM;
+                        qudt:value "0.001"^^xsd:double];
+                    qudt:unit unit:MilliGM;
+                    qudt:value "1"^^xsd:double];
+                cat:role "reagent";
+                purl:identifier "124";
+                alloqual:AFQ_0000111 "Liquid"];
             cat:role "reagent";
-            purl:identifier "124";
-            alloqual:AFQ_0000111 "Liquid";
-            allores:AFR_0002036 [
-                cat:errorMargin [
-                    qudt:unit unit:MOL-PER-L;
-                    qudt:value "0.001"^^xsd:double];
-                qudt:unit unit:MOL-PER-L;
-                qudt:value "1"^^xsd:double]];
-        cat:role "reagent";
-        cat:vialShape "storage vial";
-        allores:AFR_0002464 "17"];
-    cat:speedInRPM [
-        cat:errorMargin [
+            cat:vialShape "storage vial";
+            allores:AFR_0002464 "17"];
+        cat:speedInRPM [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
+                qudt:unit unit:REV-PER-MIN;
+                qudt:value "1"^^xsd:double];
             qudt:unit unit:REV-PER-MIN;
-            qudt:value "1"^^xsd:double];
-        qudt:unit unit:REV-PER-MIN;
-        qudt:value "152"^^xsd:double];
-    cat:subEquipmentName "GDU-V";
-    alloqual:AFQ_0000111 "Liquid";
-    allores:AFR_0001606 "addition";
-    allores:AFR_0001723 "Chemspeed SWING XL";
-    allores:AFR_0002423 "2024-07-25T12:01:35"^^xsd:dateTime;
-    allores:AFX_0000622 "2024-07-25T12:01:29"^^xsd:dateTime.
+            qudt:value "152"^^xsd:double];
+        cat:subEquipmentName "GDU-V";
+        alloqual:AFQ_0000111 "Liquid";
+        allores:AFR_0001606 "addition";
+        allores:AFR_0001723 "Chemspeed SWING XL";
+        allores:AFR_0002423 "2024-07-25T12:01:35"^^xsd:dateTime;
+        allores:AFX_0000622 "2024-07-25T12:01:29"^^xsd:dateTime.
     "#;
     let expected_graph = parse_turtle_to_graph(&expected_ttl).unwrap();
     let result_ttl = result.as_ref().unwrap().as_str();
@@ -467,21 +464,21 @@ fn test_convert_shake_action() {
         cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             schema:name "23"];
-        cat:speedTumbleStirrerShape [
-            cat:errorMargin [
+        cat:speedTumbleStirrerShape [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
                 qudt:value "1"^^xsd:double];
             qudt:unit unit:REV-PER-MIN;
             qudt:value "600"^^xsd:double];
         cat:subEquipmentName "Tumble Stirrer";
-        cat:temperatureShakerShape [
-            cat:errorMargin [
+        cat:temperatureShakerShape [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "2"^^xsd:double];
             qudt:unit unit:DEG-C;
             qudt:value "25"^^xsd:double];
-        cat:temperatureTumbleStirrerShape [
-            cat:errorMargin [
+        cat:temperatureTumbleStirrerShape [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "1"^^xsd:double];
             qudt:unit unit:DEG-C;
