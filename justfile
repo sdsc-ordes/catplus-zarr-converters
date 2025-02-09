@@ -20,9 +20,14 @@ fmt *args:
     cargo fmt
 
 # Run the synth-converter.
-run input_file output_file *args:
+run-synth input_file output_file *args:
     cd "{{root_dir}}/src/synth-converter" && \
     cargo run --bin synth-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
+
+# run hci-converter
+run-hci input_file output_file *args:
+    cd "{{root_dir}}/src/hci-converter" && \
+    cargo run --bin hci-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
 # Enter a Nix development shell.
 nix-develop *args:

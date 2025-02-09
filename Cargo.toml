@@ -2,7 +2,7 @@
 resolver = "2"
 
 members = [
-  "src/catplus-common",
+  "src/catplus-common", "src/hci-converter",
   "src/synth-converter",
 ]
 
