@@ -92,7 +92,6 @@ pub struct Objective {
     #[serde(rename = "Description")]
     pub description: String,
     pub objective_name: String,
-    pub campaign_class: String,
 }
 
 impl InsertIntoGraph for Objective {
@@ -139,7 +138,7 @@ impl InsertIntoGraph for Batch {
         }
 
         // NOTE: for actions, the direction is reversed (action hasbatch batch)
-        for action in &self.actions {
+        while let Some(action) = &self.actions {
             let action_uri = action.get_uri();
             graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
             action.insert_into(graph, action_uri)?;
