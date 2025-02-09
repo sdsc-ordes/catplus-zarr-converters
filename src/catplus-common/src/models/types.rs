@@ -2,7 +2,7 @@
 // The structure follows the input data as descibed in the
 // https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
 // https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
-use catplus_common::{
+use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
@@ -22,11 +22,102 @@ use sophia_api::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Experiment {
+    #[serde(rename = "hasCampaign")]
+    pub has_campaign: Campaign,
+}
+
+impl InsertIntoGraph for Experiment {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in
+            [(rdf::type_, &cat::Experiment.as_simple())]
+        {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Campaign {
+    pub campaign_name: String,
+    #[serde(rename = "Description")]
+    pub description: String,
+    #[serde(rename = "Objective")]
+    pub objective: String,
+    pub campaign_class: String,
+    #[serde(rename = "Type")]
+    pub campaign_type: String,
+    #[serde(rename = "Reference")]
+    pub reference: String,
+    #[serde(rename = "ReactionType")]
+    pub reaction_type: Option<String>,
+    #[serde(rename = "OptimizationType")]
+    pub optimization_type: Option<String>,
+    #[serde(rename = "Link")]
+    pub link: Option<String>,
+    pub has_objective: Objective,
+    pub has_batch: Batch,
+    pub has_chemical: Option<Vec<Chemical>>,
+}
+
+impl InsertIntoGraph for Campaign {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in
+            [(rdf::type_, &cat::Campaign.as_simple()),
+             (schema::name, &self.campaign_name.as_simple())]
+        {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Objective {
+    #[serde(rename = "Condition")]
+    pub condition: String,
+    #[serde(rename = "Criteria")]
+    pub criteria: String,
+    #[serde(rename = "Description")]
+    pub description: String,
+    pub objective_name: String,
+    pub campaign_class: String,
+}
+
+impl InsertIntoGraph for Objective {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in
+            [(rdf::type_, &cat::Objective.as_simple()),
+             (schema::name, &self.objective_name.as_simple())]
+        {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
     pub batch_id: String,
     #[serde(rename = "Actions")]
-    pub actions: Vec<Action>,
+    pub actions: Option<Vec<Action>>,
     pub batch_name: Option<String>,
     #[serde(rename = "ReactionType")]
     pub reaction_type: Option<String>,
@@ -334,7 +425,7 @@ mod tests {
     use sophia::iri::IriRef;
     use sophia_api::term::Term;
 
-    use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
+    use crate::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
     use crate::models::{ErrorMargin, Observation};
 
     #[test]
