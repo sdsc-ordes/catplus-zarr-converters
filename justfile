@@ -9,11 +9,11 @@ default:
 
 # Build all crates
 build *args:
-    cargo build 
+    cargo build
 
 # Test all crates
 test *args:
-    cargo test 
+    cargo test
 
 # Format all crates
 fmt *args:
@@ -21,8 +21,8 @@ fmt *args:
 
 # Run the synth-converter.
 run input_file output_file *args:
-    cd "{{root_dir}}/synth-converter" && \
-    cargo run --bin synth-converter {{root_dir}}/{{input_file}} {{root_dir}}/{{output_file}} {{args}}
+    cd "{{root_dir}}/src/synth-converter" && \
+    cargo run --bin synth-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
 # Enter a Nix development shell.
 nix-develop *args:
