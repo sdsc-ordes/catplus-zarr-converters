@@ -1,5 +1,5 @@
 use catplus_common::graph::graph_builder::GraphBuilder;
-use crate::models::Batch;
+use catplus_common::models::types::Batch;
 use anyhow::{Context, Result};
 
 /// Parse JSON and serialize the RDF graph to the specified format
