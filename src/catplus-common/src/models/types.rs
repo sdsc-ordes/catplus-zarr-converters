@@ -22,92 +22,41 @@ use sophia_api::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Experiment {
-    #[serde(rename = "hasCampaign")]
-    pub has_campaign: Campaign,
-}
-
-impl InsertIntoGraph for Experiment {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &cat::Experiment.as_simple())]
-        {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Campaign {
     pub campaign_name: String,
-    #[serde(rename = "Description")]
     pub description: String,
-    #[serde(rename = "Objective")]
-    pub objective: String,
+    #[serde(rename = "objective")]
+    pub generic_objective: String,
     pub campaign_class: String,
-    #[serde(rename = "Type")]
+    #[serde(rename = "type")]
     pub campaign_type: String,
-    #[serde(rename = "Reference")]
     pub reference: String,
-    #[serde(rename = "ReactionType")]
-    pub reaction_type: Option<String>,
-    #[serde(rename = "OptimizationType")]
-    pub optimization_type: Option<String>,
-    #[serde(rename = "Link")]
-    pub link: Option<String>,
-    pub has_objective: Objective,
-    pub has_batch: Batch,
-    pub has_chemical: Option<Vec<Chemical>>,
 }
 
 impl InsertIntoGraph for Campaign {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in
             [(rdf::type_, &cat::Campaign.as_simple()),
-             (schema::name, &self.campaign_name.as_simple())]
+             (schema::name, &self.campaign_name.as_simple()),
+             (allores::AFR_0002464, &self.reference.as_simple()),
+             (schema::description, &self.description.as_simple()),
+             (cat::genericObjective, &self.generic_objective.as_simple()),
+             (cat::genericObjective, &self.campaign_type.as_simple()),
+            ]
         {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
-
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Objective {
-    #[serde(rename = "Condition")]
-    pub condition: String,
-    #[serde(rename = "Criteria")]
-    pub criteria: String,
-    #[serde(rename = "Description")]
-    pub description: String,
-    pub objective_name: String,
-}
-
-impl InsertIntoGraph for Objective {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &cat::Objective.as_simple()),
-             (schema::name, &self.objective_name.as_simple())]
-        {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
+#[derive(Deserialize)]
+pub struct CampaignWrapper {
+    #[serde(rename = "hasCampaign")]
+    pub has_campaign: Campaign,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
