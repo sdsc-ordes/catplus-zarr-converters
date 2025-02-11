@@ -6,6 +6,7 @@ namespace! {
     AddAction,
     Batch,
     Campaign,
+    campaignClass,
     ContainerPositionAndQuantity,
     Experiment,
     FiltrateAction,

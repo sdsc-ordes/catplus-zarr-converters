@@ -27,7 +27,6 @@ pub struct Campaign {
     pub description: String,
     #[serde(rename = "objective")]
     pub generic_objective: String,
-    pub campaign_class: String,
     #[serde(rename = "type")]
     pub campaign_type: String,
     pub reference: String,
@@ -41,7 +40,6 @@ impl InsertIntoGraph for Campaign {
              (allores::AFR_0002464, &self.reference.as_simple()),
              (schema::description, &self.description.as_simple()),
              (cat::genericObjective, &self.generic_objective.as_simple()),
-             (cat::genericObjective, &self.campaign_type.as_simple()),
             ]
         {
             value.attach_into(
