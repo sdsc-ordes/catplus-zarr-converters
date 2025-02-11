@@ -4,7 +4,8 @@ use sophia_api::namespace;
 namespace! {
     "https://schema.org/",
     name,
-    keywords
+    keywords,
+    description
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();

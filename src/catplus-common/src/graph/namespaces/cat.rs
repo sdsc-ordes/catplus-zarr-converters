@@ -9,6 +9,7 @@ namespace! {
     ContainerPositionAndQuantity,
     Experiment,
     FiltrateAction,
+    genericObjective,
     Observation,
     Sample,
     SetPressureAction,
