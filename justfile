@@ -21,7 +21,7 @@ format *args:
     cargo fmt {{args}}
 
 # Run the synth-converter.
-run input_file output_file *args:
+run-synth input_file output_file *args:
     cd "{{root_dir}}/src/synth-converter" && \
     cargo run --bin synth-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
