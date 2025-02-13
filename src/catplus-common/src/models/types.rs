@@ -22,6 +22,34 @@ use sophia_api::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Campaign {
+    pub campaign_name: String,
+}
+
+impl InsertIntoGraph for Campaign {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in
+            [(rdf::type_, &cat::Campaign.as_simple()),
+             (schema::name, &self.campaign_name.as_simple())]
+        {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Deserialize)]
+pub struct CampaignWrapper {
+    #[serde(rename = "hasCampaign")]
+    pub has_campaign: Campaign,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
     pub batch_id: String,
