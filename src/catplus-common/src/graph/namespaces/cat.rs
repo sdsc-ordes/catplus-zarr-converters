@@ -16,15 +16,20 @@ namespace! {
     SetVacuumAction,
     ShakeAction,
     speedTumbleStirrerShape,
+    campaignClass,
+    genericObjective,
     casNumber,
     chemicalName,
     containerBarcode,
     containerID,
+    criteria,
     dispenseType,
     errorMargin,
     expectedDatum,
     hasBatch,
     hasCampaign,
+    campaignType,
+    hasObjective,
     hasContainerPositionAndQuantity,
     hasSample,
     hasChemical,
@@ -38,7 +43,10 @@ namespace! {
     swissCatNumber,
     temperatureShakerShape,
     temperatureTumbleStirrerShape,
-    vialShape
+    vialShape,
+    reactionType,
+    optimizationType,
+    reactionSubType
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();

@@ -4,7 +4,8 @@ use sophia_api::namespace;
 namespace! {
     "http://purl.obolibrary.org/obo/",
     CHEBI_25367,
-    PATO_0001019
+    PATO_0001019,
+    IAO_0000005
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();

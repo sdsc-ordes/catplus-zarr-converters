@@ -1,3 +1,5 @@
+pub mod allocom;
+pub mod allohdf;
 pub mod alloproc;
 pub mod alloqual;
 pub mod allores;
