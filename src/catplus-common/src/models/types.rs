@@ -125,10 +125,12 @@ impl InsertIntoGraph for Batch {
         }
 
         // NOTE: for actions, the direction is reversed (action hasbatch batch)
-        while let Some(action) = &self.actions {
-            let action_uri = action.get_uri();
-            graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
-            action.insert_into(graph, action_uri)?;
+        if let Some(actions) = &self.actions {
+            for action in actions {
+                let action_uri = action.get_uri();
+                graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
+                action.insert_into(graph, action_uri)?;
+            }
         }
 
         Ok(())
