@@ -1,5 +1,5 @@
 {
-  description = "cat-plus-zarr-converters";
+  description = "catplus-zarr-converters";
 
   nixConfig = {
     extra-substituters = [
