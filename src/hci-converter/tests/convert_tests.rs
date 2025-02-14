@@ -1,6 +1,6 @@
-use sophia_isomorphism::isomorphic_graphs;
-use hci_converter::convert::json_to_rdf;
 use catplus_common::rdf::rdf_parser::parse_turtle_to_graph;
+use hci_converter::convert::json_to_rdf;
+use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
 fn test_convert_campaign() {

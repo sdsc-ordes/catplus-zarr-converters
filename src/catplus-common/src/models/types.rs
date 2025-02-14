@@ -38,19 +38,18 @@ pub struct Campaign {
 
 impl InsertIntoGraph for Campaign {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &cat::Campaign.as_simple() as &dyn InsertIntoGraph),
-             (schema::name, &self.campaign_name.as_simple()),
-             (schema::description, &self.description.as_simple()),
-             (cat::genericObjective, &self.generic_objective.as_simple()),
-             (cat::campaignClass, &self.campaign_class.as_simple()),
-             (cat::campaignType, &self.campaign_type.as_simple()),
-             (allores::AFR_0002764, &self.reference.as_simple()),
-             (cat::hasObjective, &self.has_objective),
-             (cat::hasBatch, &self.has_batch),
-             (cat::hasChemical, &self.has_chemical)
-            ]
-        {
+        for (pred, value) in [
+            (rdf::type_, &cat::Campaign.as_simple() as &dyn InsertIntoGraph),
+            (schema::name, &self.campaign_name.as_simple()),
+            (schema::description, &self.description.as_simple()),
+            (cat::genericObjective, &self.generic_objective.as_simple()),
+            (cat::campaignClass, &self.campaign_class.as_simple()),
+            (cat::campaignType, &self.campaign_type.as_simple()),
+            (allores::AFR_0002764, &self.reference.as_simple()),
+            (cat::hasObjective, &self.has_objective),
+            (cat::hasBatch, &self.has_batch),
+            (cat::hasChemical, &self.has_chemical),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
@@ -66,19 +65,18 @@ pub struct Objective {
     pub criteria: String,
     pub condition: String,
     pub description: String,
-    pub objective_name: String
+    pub objective_name: String,
 }
 
 impl InsertIntoGraph for Objective {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &obo::IAO_0000005.as_simple()),
-             (schema::name, &self.objective_name.as_simple()),
-             (schema::description, &self.description.as_simple()),
-             (cat::criteria, &self.criteria.as_simple()),
-             (allocom::AFC_0000090, &self.condition.as_simple())
-            ]
-        {
+        for (pred, value) in [
+            (rdf::type_, &obo::IAO_0000005.as_simple()),
+            (schema::name, &self.objective_name.as_simple()),
+            (schema::description, &self.description.as_simple()),
+            (cat::criteria, &self.criteria.as_simple()),
+            (allocom::AFC_0000090, &self.condition.as_simple()),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
@@ -110,14 +108,16 @@ pub struct Batch {
 
 impl InsertIntoGraph for Batch {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
-             (schema::name, &self.batch_id.as_simple()),
-             (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
-             (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
-             (cat::optimizationType, &self.optimization_type.as_ref().clone().map(|s| s.as_simple()))
-            ]
-        {
+        for (pred, value) in [
+            (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
+            (schema::name, &self.batch_id.as_simple()),
+            (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
+            (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
+            (
+                cat::optimizationType,
+                &self.optimization_type.as_ref().clone().map(|s| s.as_simple()),
+            ),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },

@@ -1,11 +1,11 @@
 use anyhow::{Context, Result};
 use clap::Parser;
+use hci_converter::convert::json_to_rdf;
 use std::{
     fs::File,
     io::{Read, Write},
     path::Path,
 };
-use hci_converter::convert::json_to_rdf;
 
 /// Converts CAT+ HCI JSON input into RDF formats.
 ///

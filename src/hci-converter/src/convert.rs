@@ -1,6 +1,8 @@
-use catplus_common::graph::graph_builder::GraphBuilder;
-use catplus_common::models::types::{CampaignWrapper,Campaign};
 use anyhow::{Context, Result};
+use catplus_common::{
+    graph::graph_builder::GraphBuilder,
+    models::types::{Campaign, CampaignWrapper},
+};
 
 /// Parse JSON and serialize the RDF graph to the specified format
 ///
