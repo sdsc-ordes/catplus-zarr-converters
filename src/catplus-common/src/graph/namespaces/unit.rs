@@ -9,9 +9,9 @@ namespace! {
     "https://qudt.org/vocab/unit/",
     Bar,
     DegC,
-    MilliGM,
     GMPerMilliL,
     GMPerMol,
+    MilliGM,
     MolPerL,
     RevPerMin
 }
