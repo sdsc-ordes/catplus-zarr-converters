@@ -1,8 +1,5 @@
 use anyhow::{Context, Result};
-use catplus_common::{
-    graph::graph_builder::GraphBuilder,
-    models::types::{Campaign, CampaignWrapper},
-};
+use catplus_common::{graph::graph_builder::GraphBuilder, models::types::CampaignWrapper};
 
 /// Parse JSON and serialize the RDF graph to the specified format
 ///
@@ -18,11 +15,12 @@ use catplus_common::{
 /// A `Result` containing the serialized graph as a string or an error if the process fails.
 pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
     // Parse JSON into a Campaign object
-    let campaign: Campaign = parse_json(input_content).context("Failed to parse JSON input")?;
+    let campaign_wrapper: CampaignWrapper =
+        parse_json(input_content).context("Failed to parse JSON input")?;
 
     // Build the RDF graph
     let mut graph_builder = GraphBuilder::new();
-    graph_builder.insert(&campaign).context("Failed to build RDF graph")?;
+    graph_builder.insert(&campaign_wrapper).context("Failed to build RDF graph")?;
 
     // Serialize the RDF graph to the specified format
     let serialized_graph = match fmt {
@@ -44,7 +42,6 @@ pub fn json_to_rdf(input_content: &str, fmt: &str) -> Result<String> {
 ///
 /// # Returns
 /// A `Result` containing the parsed `Experiment` struct or an error.
-fn parse_json(json_data: &str) -> Result<Campaign> {
-    let wrapper: CampaignWrapper = serde_json::from_str(json_data)?;
-    Ok(wrapper.has_campaign)
+fn parse_json(json_data: &str) -> Result<CampaignWrapper> {
+    serde_json::from_str(json_data).map_err(|e| anyhow::Error::new(e))
 }

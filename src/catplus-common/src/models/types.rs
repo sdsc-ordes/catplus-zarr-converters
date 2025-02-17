@@ -91,6 +91,11 @@ pub struct CampaignWrapper {
     #[serde(rename = "hasCampaign")]
     pub has_campaign: Campaign,
 }
+impl InsertIntoGraph for CampaignWrapper {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        self.has_campaign.insert_into(graph, iri)
+    }
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
