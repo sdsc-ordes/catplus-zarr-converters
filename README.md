@@ -3,7 +3,7 @@
 ## About
 
 This repository contains all the Zarr converters for the different data types in the Cat+ project (Agilent, UV, IR, etc.)
-The data types are all in different formats, their data and metadata colluded together. The goal will be to convert the metadata to [an established ontology](https://github.com/sdsc-ordes/cat-plus-ontology/tree/main), and -as much as data format allow- convert the data in [Zarr array](https://zarr.readthedocs.io/en/stable/index.html).
+The data types are all in different formats, their data and metadata colluded together. The goal will be to convert the metadata to [an established ontology](https://github.com/sdsc-ordes/catplus-ontology/tree/main), and -as much as data format allow- convert the data in [Zarr array](https://zarr.readthedocs.io/en/stable/index.html).
 
 ## Tools
 
@@ -36,7 +36,7 @@ The conversion is done in the public crate `synth-converter/src/convert.rs`
 
 ### Shacl Validation
 
-The rdf graph confirms to the cat+ ontology: https://github.com/sdsc-ordes/cat-plus-ontology. Currently rust offeres no Shacl Validation Library, but once such a library exists, it would make sense to add a Shacl Validation.
+The rdf graph confirms to the cat+ ontology: https://github.com/sdsc-ordes/catplus-ontology. Currently rust offeres no Shacl Validation Library, but once such a library exists, it would make sense to add a Shacl Validation.
 
 TheShacl Validation can be done manually here: https://www.itb.ec.europa.eu/shacl/any/upload
 
@@ -45,8 +45,8 @@ TheShacl Validation can be done manually here: https://www.itb.ec.europa.eu/shac
 The repo is setup with nix.
 
 ```
-git clone git@github.com:sdsc-ordes/cat-plus-zarr-converters.git
-cd cat-plus-zarr-converters
+git clone git@github.com:sdsc-ordes/catplus-zarr-converters.git
+cd catplus-zarr-converters
 cargo build
 ```
 

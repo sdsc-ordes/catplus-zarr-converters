@@ -1,7 +1,7 @@
 #[rustfmt::skip]
 // The structure follows the input data as descibed in the
-// https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
-// https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
+// https://github.com/sdsc-ordes/catplus-ontology see here for the expected Synth input data:
+// https://github.com/sdsc-ordes/catplus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
