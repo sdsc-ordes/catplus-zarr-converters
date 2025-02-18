@@ -217,6 +217,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05ca71f324d19e85a2e976be04b5ecbb193253794a75adfe2e5044c8bef03f6a"
 
 [[package]]
+name = "converter"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "catplus-common",
+ "clap",
+ "lazy_static",
+ "serde",
+ "serde_json",
+ "sophia",
+ "sophia_api",
+ "sophia_isomorphism",
+ "sophia_term",
+ "sophia_turtle",
+ "uuid",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1210,24 +1228,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "synth-converter"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "catplus-common",
- "clap",
- "lazy_static",
- "serde",
- "serde_json",
- "sophia",
- "sophia_api",
- "sophia_isomorphism",
- "sophia_term",
- "sophia_turtle",
- "uuid",
 ]
 
 [[package]]

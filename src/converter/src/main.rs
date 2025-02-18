@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use catplus_common::models::types::{Batch,CampaignWrapper};
+use catplus_common::models::types::{Batch, CampaignWrapper};
 use clap::Parser;
 use serde::Deserialize;
 use std::{
@@ -7,7 +7,7 @@ use std::{
     io::{Read, Write},
     path::Path,
 };
-use synth_converter::convert::json_to_rdf;
+use converter::convert::json_to_rdf;
 
 // Derive Deserialize and ValueEnum
 #[derive(Deserialize, Debug, clap::ValueEnum, Clone)]
@@ -23,7 +23,6 @@ enum InputType {
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-
     /// Type of input data: "Synth" or "HCI".
     #[arg(value_enum)] // Use value_enum for the enum
     input_type: InputType,
