@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set positional-arguments
 set shell := ["bash", "-cue"]
 
@@ -21,14 +22,9 @@ format *args:
     cargo fmt {{args}}
 
 # Run the synth-converter.
-run-synth input_file output_file *args:
+run input_type input_file output_file *args:
     cd "{{root_dir}}/src/synth-converter" && \
-    cargo run --bin synth-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
-
-# run hci-converter
-run-hci input_file output_file *args:
-    cd "{{root_dir}}/src/hci-converter" && \
-    cargo run --bin hci-converter "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
+    cargo run --bin synth-converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
 # Enter a Nix development shell.
 nix-develop *args:

@@ -1,11 +1,20 @@
 use anyhow::{Context, Result};
+use catplus_common::models::types::{Batch,CampaignWrapper};
 use clap::Parser;
+use serde::Deserialize;
 use std::{
     fs::File,
     io::{Read, Write},
     path::Path,
 };
 use synth_converter::convert::json_to_rdf;
+
+// Derive Deserialize and ValueEnum
+#[derive(Deserialize, Debug, clap::ValueEnum, Clone)]
+enum InputType {
+    Synth,
+    HCI,
+}
 
 /// Converts CAT+ Synthesis JSON input into RDF formats.
 ///
@@ -14,7 +23,12 @@ use synth_converter::convert::json_to_rdf;
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-    /// Path to the input JSON file: relative or absolute.
+
+    /// Type of input data: "Synth" or "HCI".
+    #[arg(value_enum)] // Use value_enum for the enum
+    input_type: InputType,
+
+    /// Path to the input JSON file.
     input_file: String,
 
     /// Path to the output RDF file.
@@ -44,9 +58,12 @@ fn main() -> Result<()> {
         .read_to_string(&mut input_content)
         .with_context(|| format!("Failed to read input file '{}'", args.input_file))?;
 
-    // Use unified conversion function
-    let serialized_graph = json_to_rdf(&input_content, &args.format)
-        .with_context(|| format!("Failed to convert JSON to RDF format '{}'", args.format))?;
+    // Unified conversion function with type selection
+    let serialized_graph = match args.input_type {
+        InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
+        InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
+    }
+    .with_context(|| format!("Failed to convert JSON to RDF format '{}'", args.format))?;
 
     println!("Conversion successful!");
 
