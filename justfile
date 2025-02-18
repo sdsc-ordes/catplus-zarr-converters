@@ -24,7 +24,7 @@ format *args:
 # Run the synth-converter.
 run input_type input_file output_file *args:
     cd "{{root_dir}}/src/synth-converter" && \
-    cargo run --bin synth-converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
+    cargo run --bin converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
 # Enter a Nix development shell.
 nix-develop *args:
