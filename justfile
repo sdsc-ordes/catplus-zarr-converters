@@ -15,8 +15,9 @@ build *args:
 test *args:
     cargo test
 
+alias fmt := format
 # Format all crates
-fmt *args:
+format *args:
     cargo fmt
 
 # Run the synth-converter.
