@@ -21,6 +21,6 @@ jobs:
       - name: run 
         run: |
           nix develop \
-            /tools/nix#default \
+            ./tools/nix#default \
             --accept-flake-config \
             --command bash -c "just fmt --check"
