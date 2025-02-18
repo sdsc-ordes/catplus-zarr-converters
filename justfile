@@ -21,7 +21,7 @@ alias fmt := format
 format *args:
     cargo fmt {{args}}
 
-# Run the synth-converter.
+# Run the converter.
 run input_type input_file output_file *args:
     cd "{{root_dir}}/src/converter" && \
     cargo run --bin converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
