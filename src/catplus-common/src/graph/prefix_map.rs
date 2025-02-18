@@ -37,9 +37,14 @@ pub fn generate_prefix_map() -> Vec<(Prefix<Box<str>>, Iri<Box<str>>)> {
     let msg = "Namespace URI should always be valid";
     ns_entries_direct!(msg, rdf, xsd) // Correct call for rdf and xsd
         .into_iter()
-        .chain(ns_entries_module!( // Correct call for the other modules
-            msg, cat, schema, unit, allores, alloproc, allocom, allohdf, qudt, alloqual, purl, obo
-        ).into_iter())
+        .chain(
+            ns_entries_module!(
+                // Correct call for the other modules
+                msg, cat, schema, unit, allores, alloproc, allocom, allohdf, qudt, alloqual, purl,
+                obo
+            )
+            .into_iter(),
+        )
         .map(|(prefix, iri)| {
             (
                 Prefix::new(prefix.to_string().into_boxed_str()).expect("Invalid prefix"),

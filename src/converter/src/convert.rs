@@ -1,6 +1,5 @@
 use anyhow::{Context, Result};
-use catplus_common::graph::insert_into::InsertIntoGraph;
-use catplus_common::graph::graph_builder::GraphBuilder;
+use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
 use serde::de::DeserializeOwned; // Import DeserializeOwned
 
 /// Parses JSON and serializes the RDF graph to the specified format.
@@ -23,12 +22,10 @@ where
     graph_builder.insert(&data).context("Failed to build RDF graph")?;
 
     let serialized_graph = match fmt {
-        "jsonld" => graph_builder
-            .serialize_to_jsonld()
-            .context("Failed to serialize to JSON-LD")?,
-        _ => graph_builder
-            .serialize_to_turtle()
-            .context("Failed to serialize to Turtle")?,
+        "jsonld" => {
+            graph_builder.serialize_to_jsonld().context("Failed to serialize to JSON-LD")?
+        }
+        _ => graph_builder.serialize_to_turtle().context("Failed to serialize to Turtle")?,
     };
 
     Ok(serialized_graph)
