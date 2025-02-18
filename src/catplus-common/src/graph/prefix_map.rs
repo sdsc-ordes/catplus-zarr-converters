@@ -13,28 +13,38 @@ lazy_static! {
         Namespace::new("http://www.w3.org/2001/XMLSchema#").unwrap();
 }
 
+macro_rules! ns_entries_direct {  // For rdf and xsd
+    ($msg:expr, $($ns:ident),*) => {
+        vec![
+            $(
+                (stringify!($ns), $ns.get("").expect(&$msg)),
+            )*
+        ]
+    };
+}
+
+macro_rules! ns_entries_module { // For the other modules
+    ($msg:expr, $($module:ident),*) => {
+        vec![
+            $(
+                (stringify!($module), $module::ns.get("").expect(&$msg)),
+            )*
+        ]
+    };
+}
+
 pub fn generate_prefix_map() -> Vec<(Prefix<Box<str>>, Iri<Box<str>>)> {
-    vec![
-        ("rdf", rdf.get("").expect("Namespace URI should always be valid")),
-        ("cat", cat::ns.get("").expect("Namespace URI should always be valid")),
-        ("schema", schema::ns.get("").expect("Namespace URI should always be valid")),
-        ("unit", unit::ns.get("").expect("Namespace URI should always be valid")),
-        ("allores", allores::ns.get("").expect("Namespace URI should always be valid")),
-        ("alloproc", alloproc::ns.get("").expect("Namespace URI should always be valid")),
-        ("allocom", allocom::ns.get("").expect("Namespace URI should always be valid")),
-        ("allohdf", allohdf::ns.get("").expect("Namespace URI should always be valid")),
-        ("qudt", qudt::ns.get("").expect("Namespace URI should always be valid")),
-        ("alloqual", alloqual::ns.get("").expect("Namespace URI should always be valid")),
-        ("purl", purl::ns.get("").expect("Namespace URI should always be valid")),
-        ("obo", obo::ns.get("").expect("Namespace URI should always be valid")),
-        ("xsd", xsd.get("").expect("Namespace URI should always be valid")),
-    ]
-    .into_iter()
-    .map(|(prefix, iri)| {
-        (
-            Prefix::new(prefix.to_string().into_boxed_str()).expect("Invalid prefix"),
-            Iri::new(iri.to_string().into_boxed_str()).expect("Invalid IRI"),
-        )
-    })
-    .collect()
+    let msg = "Namespace URI should always be valid";
+    ns_entries_direct!(msg, rdf, xsd) // Correct call for rdf and xsd
+        .into_iter()
+        .chain(ns_entries_module!( // Correct call for the other modules
+            msg, cat, schema, unit, allores, alloproc, allocom, allohdf, qudt, alloqual, purl, obo
+        ).into_iter())
+        .map(|(prefix, iri)| {
+            (
+                Prefix::new(prefix.to_string().into_boxed_str()).expect("Invalid prefix"),
+                Iri::new(iri.to_string().into_boxed_str()).expect("Invalid IRI"),
+            )
+        })
+        .collect()
 }
