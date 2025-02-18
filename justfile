@@ -18,7 +18,7 @@ test *args:
 alias fmt := format
 # Format all crates
 format *args:
-    cargo fmt
+    cargo fmt {{args}}
 
 # Run the synth-converter.
 run input_file output_file *args:
