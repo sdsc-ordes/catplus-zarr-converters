@@ -15,9 +15,10 @@ build *args:
 test *args:
     cargo test
 
+alias fmt := format
 # Format all crates
-fmt *args:
-    cargo fmt
+format *args:
+    cargo fmt {{args}}
 
 # Run the synth-converter.
 run input_file output_file *args:

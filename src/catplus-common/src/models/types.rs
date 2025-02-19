@@ -334,8 +334,10 @@ mod tests {
     use sophia::iri::IriRef;
     use sophia_api::term::Term;
 
-    use crate::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
-    use crate::models::{ErrorMargin, Observation};
+    use crate::{
+        graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph},
+        models::{ErrorMargin, Observation},
+    };
 
     #[test]
     fn test_observation_to_triples() -> anyhow::Result<()> {
