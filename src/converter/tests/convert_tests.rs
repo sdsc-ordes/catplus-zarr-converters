@@ -2,8 +2,8 @@ use catplus_common::{
     models::types::{Batch, CampaignWrapper},
     rdf::rdf_parser::parse_turtle_to_graph,
 };
-use sophia_isomorphism::isomorphic_graphs;
 use converter::convert::json_to_rdf;
+use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
 fn test_convert_filtrate_action() {

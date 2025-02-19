@@ -1,13 +1,13 @@
 use anyhow::{Context, Result};
 use catplus_common::models::types::{Batch, CampaignWrapper};
 use clap::Parser;
+use converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
 use std::{
     fs::File,
     io::{Read, Write},
     path::Path,
 };
-use converter::convert::json_to_rdf;
 
 // Derive Deserialize and ValueEnum
 #[derive(Deserialize, Debug, clap::ValueEnum, Clone)]
@@ -16,15 +16,15 @@ enum InputType {
     HCI,
 }
 
-/// Converts CAT+ Synthesis JSON input into RDF formats.
+/// Converts CAT+ JSON input into RDF formats.
 ///
-/// This tool expects Synthesis data similar to example/1-Synth.json
-/// of a batch with actions. This data is then transformed to RDF and
+/// This tool expects data similar to examples/1-Synth.json or examples/0-HCI.json
+/// This data is then transformed to RDF and
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
     /// Type of input data: "Synth" or "HCI".
-    #[arg(value_enum)] // Use value_enum for the enum
+    #[arg(value_enum)]
     input_type: InputType,
 
     /// Path to the input JSON file.
@@ -33,9 +33,9 @@ struct Args {
     /// Path to the output RDF file.
     output_file: String,
 
-    /// Output format: "ttl" (Turtle) or "jsonld" (JSON-LD)
-    #[arg(short, long, default_value = "ttl")]
-    format: String,
+    /// Type of input data: "Turtle" or "Jsonld".
+    #[arg(value_enum)]
+    format: RdfFormat,
 }
 
 fn main() -> Result<()> {
@@ -62,7 +62,7 @@ fn main() -> Result<()> {
         InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
         InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
     }
-    .with_context(|| format!("Failed to convert JSON to RDF format '{}'", args.format))?;
+    .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
 
     println!("Conversion successful!");
 
