@@ -25,10 +25,7 @@ fn test_convert_filtrate_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<Batch>(
-        json_data,
-        &output_format
-    );
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
