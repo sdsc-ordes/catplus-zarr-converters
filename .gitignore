@@ -11,4 +11,3 @@ debug
 #Folders
 data/**
 *.ttl
-*.json
