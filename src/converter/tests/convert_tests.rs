@@ -2,11 +2,12 @@ use catplus_common::{
     models::types::{Batch, CampaignWrapper},
     rdf::rdf_parser::parse_turtle_to_graph,
 };
-use converter::convert::json_to_rdf;
+use converter::convert::{json_to_rdf, RdfFormat};
 use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
 fn test_convert_filtrate_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "batchID": "23",
@@ -24,7 +25,10 @@ fn test_convert_filtrate_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(
+        json_data,
+        &output_format
+    );
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -57,6 +61,7 @@ fn test_convert_filtrate_action() {
 
 #[test]
 fn test_convert_pressure_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "batchID": "23",
@@ -82,7 +87,7 @@ fn test_convert_pressure_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -122,6 +127,7 @@ fn test_convert_pressure_action() {
 
 #[test]
 fn test_convert_set_temperature_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "batchID": "23",
@@ -163,7 +169,7 @@ fn test_convert_set_temperature_action() {
                 ]
             }
         "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -215,6 +221,7 @@ fn test_convert_set_temperature_action() {
 
 #[test]
 fn test_convert_add_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
     {
         "batchID": "23",
@@ -313,7 +320,7 @@ fn test_convert_add_action() {
         ]
     }
     "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -407,6 +414,7 @@ fn test_convert_add_action() {
 
 #[test]
 fn test_convert_shake_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "batchID": "23",
@@ -448,7 +456,7 @@ fn test_convert_shake_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -500,6 +508,7 @@ fn test_convert_shake_action() {
 
 #[test]
 fn test_convert_set_vacuum_action() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "batchID": "23",
@@ -525,7 +534,7 @@ fn test_convert_set_vacuum_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<Batch>(json_data, "turtle");
+    let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
@@ -557,6 +566,7 @@ fn test_convert_set_vacuum_action() {
 
 #[test]
 fn test_convert_campaign() {
+    let output_format = RdfFormat::Turtle;
     let json_data = r#"
         {
             "hasCampaign": {
@@ -657,7 +667,7 @@ fn test_convert_campaign() {
             }
         }
     "#;
-    let result = json_to_rdf::<CampaignWrapper>(json_data, "turtle");
+    let result = json_to_rdf::<CampaignWrapper>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX cat: <http://example.org/cat#>
