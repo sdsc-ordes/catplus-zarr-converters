@@ -1,11 +1,11 @@
 #[rustfmt::skip]
 // The structure follows the input data as descibed in the
-// https://github.com/sdsc-ordes/cat-plus-ontology see here for the expected Synth input data:
-// https://github.com/sdsc-ordes/cat-plus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
-use catplus_common::{
+// https://github.com/sdsc-ordes/catplus-ontology see here for the expected Synth input data:
+// https://github.com/sdsc-ordes/catplus-ontology/tree/96091fd2e75e03de8a4c4d66ad502b2db27998bd/json-file/1-Synth
+use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{alloproc, alloqual, allores, cat, obo, purl, qudt, schema},
+        namespaces::{alloproc, allocom, allohdf, alloqual, allores, cat, obo, purl, qudt, schema},
     },
     models::enums::{ActionName, Unit},
 };
@@ -22,25 +22,107 @@ use sophia_api::{
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Campaign {
+    pub campaign_name: String,
+    pub description: String,
+    #[serde(rename = "objective")]
+    pub generic_objective: String,
+    pub campaign_class: String,
+    #[serde(rename = "type")]
+    pub campaign_type: String,
+    pub reference: String,
+    pub has_objective: Option<Objective>,
+    pub has_batch: Batch,
+    pub has_chemical: Option<Vec<Chemical>>,
+}
+
+impl InsertIntoGraph for Campaign {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Campaign.as_simple() as &dyn InsertIntoGraph),
+            (schema::name, &self.campaign_name.as_simple()),
+            (schema::description, &self.description.as_simple()),
+            (cat::genericObjective, &self.generic_objective.as_simple()),
+            (cat::campaignClass, &self.campaign_class.as_simple()),
+            (cat::campaignType, &self.campaign_type.as_simple()),
+            (allores::AFR_0002764, &self.reference.as_simple()),
+            (cat::hasObjective, &self.has_objective),
+            (cat::hasBatch, &self.has_batch),
+            (cat::hasChemical, &self.has_chemical),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Objective {
+    pub criteria: String,
+    pub condition: String,
+    pub description: String,
+    pub objective_name: String,
+}
+
+impl InsertIntoGraph for Objective {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &obo::IAO_0000005.as_simple()),
+            (schema::name, &self.objective_name.as_simple()),
+            (schema::description, &self.description.as_simple()),
+            (cat::criteria, &self.criteria.as_simple()),
+            (allocom::AFC_0000090, &self.condition.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Deserialize)]
+pub struct CampaignWrapper {
+    #[serde(rename = "hasCampaign")]
+    pub has_campaign: Campaign,
+}
+impl InsertIntoGraph for CampaignWrapper {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        self.has_campaign.insert_into(graph, iri)
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
     pub batch_id: String,
     #[serde(rename = "Actions")]
-    pub actions: Vec<Action>,
+    pub actions: Option<Vec<Action>>,
     pub batch_name: Option<String>,
-    #[serde(rename = "ReactionType")]
     pub reaction_type: Option<String>,
-    #[serde(rename = "OptimizationType")]
+    pub reaction_name: Option<String>,
     pub optimization_type: Option<String>,
-    #[serde(rename = "Link")]
     pub link: Option<String>,
 }
 
 impl InsertIntoGraph for Batch {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in
-            [(rdf::type_, &cat::Batch.as_simple()), (schema::name, &self.batch_id.as_simple())]
-        {
+        for (pred, value) in [
+            (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
+            (schema::name, &self.batch_id.as_simple()),
+            (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
+            (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
+            (
+                cat::optimizationType,
+                &self.optimization_type.as_ref().clone().map(|s| s.as_simple()),
+            ),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
@@ -48,10 +130,12 @@ impl InsertIntoGraph for Batch {
         }
 
         // NOTE: for actions, the direction is reversed (action hasbatch batch)
-        for action in &self.actions {
-            let action_uri = action.get_uri();
-            graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
-            action.insert_into(graph, action_uri)?;
+        if let Some(actions) = &self.actions {
+            for action in actions {
+                let action_uri = action.get_uri();
+                graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
+                action.insert_into(graph, action_uri)?;
+            }
         }
 
         Ok(())
@@ -334,8 +418,10 @@ mod tests {
     use sophia::iri::IriRef;
     use sophia_api::term::Term;
 
-    use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
-    use crate::models::{ErrorMargin, Observation};
+    use crate::{
+        graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph},
+        models::{ErrorMargin, Observation},
+    };
 
     #[test]
     fn test_observation_to_triples() -> anyhow::Result<()> {
