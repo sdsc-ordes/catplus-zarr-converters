@@ -412,6 +412,89 @@ impl InsertIntoGraph for ContainerPositionQuantityItem {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakList {
+    pub peak : Vec<Peak>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename = "AFR_0000413")]
+pub struct Peak{
+    #[serde(rename = "http://purl.allotrope.org/ontologies/datacube-hdf-map#Index")]
+    pub index: Integer,
+    #[serde(rename = "AFR_0001073")]
+    pub peak_area: PeakArea,
+    #[serde(rename = "AFR_0001089")]
+    pub retention_time: RetentionTime,
+    #[serde(rename = "AFR_0001164")]
+    pub peak_identifier: String,
+    #[serde(rename = "AFR_0001178")]
+    pub peak_start: PeakStart,
+    #[serde(rename = "AFR_0001180")]
+    pub peak_end: PeakEnd,
+    #[serde(rename = "AFR_0000948")]
+    pub peak_height: PeakHeight,
+    #[serde(rename = "AFR_0000949")]
+    pub relative_peak_height: RelativePeakHeight,
+    #[serde(rename = "AFR_0001179")]
+    pub peak_value_at_start: PeakValueAtStart,
+    #[serde(rename = "AFR_0001181")]
+    pub peak_value_at_end: PeakValueAtEnd,
+    #[serde(rename = "AFR_0001165")]
+    pub relative_peak_area: RelativePeakArea,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Measurement{
+    pub value: f64,
+    pub unit: Unit,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakArea {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RetentionTime {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakStart {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakEnd {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RelativePeakHeight {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakHeight {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RelativePeakArea {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakValueAtStart {
+    pub measurement: Measurement,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakValueAtEnd {
+    pub measurement: Measurement,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -439,3 +522,4 @@ mod tests {
         Ok(())
     }
 }
+
