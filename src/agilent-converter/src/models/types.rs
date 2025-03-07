@@ -11,40 +11,76 @@ use sophia_api::{
 use catplus_common::models::types::{PeakList};
 use catplus_common::models::enums::{Unit};
 
+
+// if Optional: .as_ref().clone().map(|s| s.as_simple())
+// else: .as_simple()
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename = "AFR_0002525")]
 pub struct LiquidChromatographyDocument {
-    #[serde(rename = "AFR_0001116")]
     pub analyst: String,
-    #[serde(rename = "AFR_0002374")]
+    #[serde(rename = "AFR_0002375")]
     pub measurement_document: MeasurementDocument,
-    #[serde(rename = "AFR_0002526")]
+    #[serde(rename = "DeviceSystemDocument")]
     pub device_system_document: DeviceSystemDocument,
 }
 
+impl InsertIntoGraph for LiquidChromatographyDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::LiquidChromatographyDocument.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001116, &self.analyst.as_simple()),
+            (allores::AFR_0002374, &self.measurement_document),
+            (allores::AFR_0002526, &self.device_system_document),
+            ,
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename = "AFR_0002375")]
 pub struct MeasurementDocument {
-    #[serde(rename = "AFR_0001121")]
     pub measurement_identifier: String,
-    #[serde(rename = "AFR_0002607")]
-    pub chromatography_column_document: ChromatographyColumnDocument,
-    #[serde(rename = "AFR_0002722")]
+    #[serde(rename = "ChromatographyColumnDocument")]
+    pub chromatography_column_document: Optional<String>,
+    #[serde(rename = "AFR_0002567")]
     pub device_control_document: DeviceDocument,
-    #[serde(rename = "AFR_0002083")]
     pub sample_document: SampleDocument,
-    #[serde(rename = "AFR_0002529")]
     pub injection_document: InjectionDocument,
-    #[serde(rename = "AFR_0002534")]
     pub detection_type: String,
-    #[serde(rename = "AFR_0002550")]
     pub chromatogram_data_cube: ChromatogramDataCube,
-    #[serde(rename = "AFR_0002551")]
     pub three_dimensional_ultraviolet_spectrum_data_cube: ThreeDimensionalUltravioletSpectrumDataCube,
-    #[serde(rename = "AFR_0002878")]
     pub three_three_dimensional_mass_spectrum_data_cube: ThreeDimensionalMassSpectrumDataCube,
-    #[serde(rename = "hasProcessedDataDocument")]
     pub processed_data_document: ProcessedDataDocument,
+}
+
+impl InsertIntoGraph for MeasurementDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::MeasurementDocument.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001121, &self.measurement_identifier.iri().as_simple()),
+            (allores::AFR_0002607, &self.chromatography_column_document.as_ref().clone().map(|s| s.as_simple())),
+            (allores::AFR_0002722, &self.device_system_document),
+            (allores::AFR_0002083, &self.sample_document),
+            (allores::AFR_0002529, &self.injection_document),
+            (allores::AFR_0002534, &self.detection_type.as_simple()),
+            (allores::AFR_0002550, &self.chromatogram_data_cube),
+            (allores::AFR_0002551, &self.three_dimensional_ultraviolet_spectrum_data_cube),
+            (allores::AFR_0002878, &self.three_three_dimensional_mass_spectrum_data_cube),
+            (allores::AFR_0002659, &self.processed_data_document),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -56,7 +92,6 @@ pub struct DeviceSystemDocument{
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename = "AFR_0002567")]
 pub struct DeviceDocument{
     #[serde(rename = "AFR_0002018")]
     pub device_identifier: String,
