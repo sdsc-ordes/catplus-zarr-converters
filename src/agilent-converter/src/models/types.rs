@@ -85,30 +85,59 @@ impl InsertIntoGraph for MeasurementDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceSystemDocument{
-    #[serde(rename = "AFR_0002722")]
-    pub device_document: List[DeviceDocument],
-    #[serde(rename ="AFR_0001976")]
-    pub asset_management_identifier: String,
+    #[serde(rename = "")]
+    pub device_document: Vec<DeviceDocument>,
+    pub asset_management_identifier: Optional<String>,
+}
+
+impl InsertIntoGraph for DeviceSystemDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::DeviceSystemDocument.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0002722, &self.device_document),
+            (allores::AFR_0001976, &self.chromatography_column_document.as_ref().clone().map(|s| s.as_simple())),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceDocument{
-    #[serde(rename = "AFR_0002018")]
     pub device_identifier: String,
-    #[serde(rename = "AFR_0002568")]
     pub device_type: String,
-    #[serde(rename = "AFR_0001258")]
     pub product_manufacturer: String,
-    #[serde(rename = "AFR_0001119")]
     pub equipment_serial_number: String,
-    #[serde(rename = "IAO_0000017")] //obo
     pub model_number: String,
-    #[serde(rename = "AFR_0001259")]
     pub firmware_version: String,
-    #[serde(rename = "AFR_0002534")]
     pub detection_type: String,
-    #[serde(rename = "http://purl.allotrope.org/ontologies/datacube-hdf-map#Index")]
-    pub index: Integer,
+    pub index: Optional<Integer>,
+}
+
+impl InsertIntoGraph for DeviceDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::DeviceDocument.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0002018, &self.device_identifier.iri().as_simple()),
+            (allores::AFR_0002568, &self.device_type.as_simple()),
+            (allores::AFR_0001258, &self.product_manufacturer.as_simple()),
+            (allores::AFR_0001119, &self.equipment_serial_number.as_simple()),
+            (obo::IAO_0000017, &self.model_number.as_simple()),
+            (allores::AFR_0001259, &self.firmware_version.as_simple()),
+            (allores::AFR_0002534, &self.detection_type.as_simple()),
+            ( "http://purl.allotrope.org/ontologies/datacube-hdf-map#Index", &self.index.as_ref().clone().map(|s| s.as_simple()))
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
