@@ -1,11 +1,15 @@
 pub mod allocom;
+pub mod allodc;
 pub mod allohdf;
+pub mod allohdfcube;
 pub mod alloproc;
 pub mod alloqual;
+pub mod allorole;
 pub mod allores;
 pub mod cat;
 pub mod obo;
 pub mod purl;
+pub mod qb;
 pub mod qudt;
 pub mod schema;
 pub mod unit;

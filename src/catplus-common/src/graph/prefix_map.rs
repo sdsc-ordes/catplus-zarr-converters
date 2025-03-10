@@ -1,5 +1,7 @@
 use crate::graph::namespaces::{
-    allocom, allohdf, alloproc, alloqual, allores, cat, obo, purl, qudt, schema, unit,
+    allocom, allodc, allohdf,allohdfcube,  alloproc, 
+    alloqual, allorole, allores, 
+    cat, obo, purl, qb, qudt, schema, unit,
 };
 use sophia_api::{prefix::Prefix, prelude::Iri};
 
@@ -40,7 +42,7 @@ pub fn generate_prefix_map() -> Vec<(Prefix<Box<str>>, Iri<Box<str>>)> {
         .chain(
             ns_entries_module!(
                 // Correct call for the other modules
-                msg, cat, schema, unit, allores, alloproc, allocom, allohdf, qudt, alloqual, purl,
+                msg, cat, schema, unit, allores, allorole, alloproc, allocom, allohdf, allohdfcube, qb, qudt, alloqual, allodc, purl,
                 obo
             )
             .into_iter(),
