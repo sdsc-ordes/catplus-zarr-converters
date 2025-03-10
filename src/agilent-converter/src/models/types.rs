@@ -16,7 +16,6 @@ use catplus_common::models::enums::{Unit};
 // else: .as_simple()
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename = "AFR_0002525")]
 pub struct LiquidChromatographyDocument {
     pub analyst: String,
     #[serde(rename = "AFR_0002375")]
@@ -28,7 +27,7 @@ pub struct LiquidChromatographyDocument {
 impl InsertIntoGraph for LiquidChromatographyDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &cat::LiquidChromatographyDocument.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002525.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001116, &self.analyst.as_simple()),
             (allores::AFR_0002374, &self.measurement_document),
             (allores::AFR_0002526, &self.device_system_document),
@@ -62,10 +61,10 @@ pub struct MeasurementDocument {
 impl InsertIntoGraph for MeasurementDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &cat::MeasurementDocument.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002374.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001121, &self.measurement_identifier.iri().as_simple()),
             (allores::AFR_0002607, &self.chromatography_column_document.as_ref().clone().map(|s| s.as_simple())),
-            (allores::AFR_0002722, &self.device_system_document),
+            (allores::AFR_0002722, &self.device_document),
             (allores::AFR_0002083, &self.sample_document),
             (allores::AFR_0002529, &self.injection_document),
             (allores::AFR_0002534, &self.detection_type.as_simple()),
@@ -93,7 +92,7 @@ pub struct DeviceSystemDocument{
 impl InsertIntoGraph for DeviceSystemDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &cat::DeviceSystemDocument.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002526.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0002722, &self.device_document),
             (allores::AFR_0001976, &self.chromatography_column_document.as_ref().clone().map(|s| s.as_simple())),
         ] {
@@ -121,7 +120,7 @@ pub struct DeviceDocument{
 impl InsertIntoGraph for DeviceDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &cat::DeviceDocument.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002722.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0002018, &self.device_identifier.iri().as_simple()),
             (allores::AFR_0002568, &self.device_type.as_simple()),
             (allores::AFR_0001258, &self.product_manufacturer.as_simple()),
@@ -142,62 +141,155 @@ impl InsertIntoGraph for DeviceDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProcessedDataDocument{
-    #[serde(rename = "AFR_0000432")]
+    #[serde(rename = "PeakList")]
     pub peak_list: PeakList,
 } 
 
+impl InsertIntoGraph for ProcessedDataDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &allores::AFR_0002659.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0000432, &self.peak_list),
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SampleDocument {
-    #[serde(rename = "AFR_0001118")] //allo-res
     pub sample_identifier: String,
-    #[serde(rename = "IAO_0000590")] //obo
     pub written_name: String,
+}
+
+impl InsertIntoGraph for SampleDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &allores::AFR_0002083.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001118, &self.sample_identifier.iri().as_simple()),
+            (obo::IAO_0000590, &self.written_name.as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InjectionDocument {
-    #[serde(rename = "AFR_0001267")]
+    #[serde(rename = "AutosamplerInjectionVolumeSetting")]
     pub autosampler_injection: AutosamplerInjectionVolumeSetting,
-    #[serde(rename = "AFR_0002535")]
     pub injection_identifier: String,
-    #[serde(rename = "AFR_0002536")]
     pub injection_time: dateTime,
+}
+
+impl InsertIntoGraph for InjectionDocument {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::InjectionDocument.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001267, &self.autosampler_injection),
+            (allores::AFR_0002535, &self.injection_identifier.iri().as_simple()),
+            (allores::AFR_0002536, &(self.injection_time.as_str() * xsd::dateTime).as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ChromatogramDataCube {
-    #[serde(rename = "IAO_0000009")] //obo
     pub label: String,
-    #[serde(rename = "DataSet")] //qb
+    #[serde(rename = "CubeStructure")] 
     pub cube_structure: CubeStructure,
-    #[serde(rename = "Dataset")] //allo-hdf
+    #[serde(rename = "Dataframe")]
     pub data: Dataframe,
-    #[serde(rename = "AFR_0000917")] //allo-hdf
     pub identifier: String
+}
+
+impl InsertIntoGraph for ChromatogramDataCube {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::ChromatogramDataCube.as_simple() as &dyn InsertIntoGraph),
+            (obo::IAO_0000009, &self.label.as_simple()),
+            (qb::DataSet, &self.cube_structure),
+            (allohdf::Dataset, &self.data),
+            (allores::AFR_0000917, &self.identifier.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ThreeDimensionalUltravioletSpectrumDataCube {
-    #[serde(rename = "IAO_0000009")] //obo
     pub label: String,
-    #[serde(rename = "DataSet")] //qb
+    #[serde(rename = "CubeStructure")] 
     pub cube-structure: CubeStructure,
-    #[serde(rename = "Dataset")] //allo-hdf
+    #[serde(rename = "Dataframe")] 
     pub data: Dataframe,
-    #[serde(rename = "AFR_0000917")] //allo-hdf
+    #[serde(rename = "AFR_0000917")]
     pub identifier: String
+}
+
+impl InsertIntoGraph for ThreeDimensionalUltravioletSpectrumDataCube {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::ThreeDimensionalUltravioletSpectrumDataCube.as_simple() as &dyn InsertIntoGraph),
+            (obo::IAO_0000009, &self.label.as_simple()),
+            (qb::DataSet, &self.cube_structure),
+            (allohdf::Dataset, &self.data),
+            (allores::AFR_0000917, &self.identifier.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ThreeDimensionalMassSpectrumDataCube {
-    #[serde(rename = "IAO_0000009")] //obo
     pub label: String,
-    #[serde(rename = "DataSet")] //qb
+    #[serde(rename = "CubeStructure")] 
     pub cube-structure: CubeStructure,
-    #[serde(rename = "Dataset")] //allo-hdf
+    #[serde(rename = "Dataframe")] 
     pub data: Dataframe,
-    #[serde(rename = "AFR_0000917")] //allo-hdf
     pub identifier: String,
+}
+
+impl InsertIntoGraph for ThreeDimensionalMassSpectrumDataCube {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::ThreeDimensionalMassSpectrumDataCube.as_simple() as &dyn InsertIntoGraph),
+            (obo::IAO_0000009, &self.label.as_simple()),
+            (qb::DataSet, &self.cube_structure),
+            (allohdf::Dataset, &self.data),
+            (allores::AFR_0000917, &self.identifier.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -206,37 +298,114 @@ pub struct AutosamplerInjectionVolumeSetting {
     pub unit: Unit,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct CubeStructure {
-    #[serde(rename = "measure")]
-    pub measures: Measure,
-    #[serde(rename = "dimension")]
-    pub dimensions: Dimension,
+impl InsertIntoGraph for AutosamplerInjectionVolumeSetting {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::AutosamplerInjectionVolumeSetting.as_simple() as &dyn InsertIntoGraph),
+            (qudt::value, &self.value.as_simple()),
+            (qudt::unit, &self.unit.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename = "AFRL_0000157")]
+pub struct CubeStructure {
+    #[serde(rename = "AFRL_0000157")]
+    pub measures: Measure,
+    #[serde(rename = "Dimension")]
+    pub dimensions: Dimension,
+}
+
+impl InsertIntoGraph for CubeStructure {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::CubeStructure.as_simple() as &dyn InsertIntoGraph),
+            (cat::measure, &self.measures),
+            (cat::dimension, &self.dimensions)
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Measure {
-    #[serde(rename = "componentDataType")]
-    pub component_data_type : X, // Waiting check from Robin
-    #[serde(rename = "label")]
+    pub component_data_type : String, //subject to change 
     pub concept: String,
     pub unit: Unit,
+}
+
+impl InsertIntoGraph for Measure {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &allorole::AFRL_0000157.as_simple() as &dyn InsertIntoGraph),
+            (allodc::componentDataType,  &self.component_data_type.as_simple()),
+            (rdfs:label, &self.concept.as_simple()),
+            (qudt::unit, &self.unit.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Dimension {
-    #[serde(rename = "componentDataType")]
-    pub component_data_type : X, // Waiting check from Robin
-    #[serde(rename = "label")]
+    pub component_data_type : String, //subject to change 
     pub concept: String,
     pub unit: Unit,
 }
 
+impl InsertIntoGraph for Dimension {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Dimension.as_simple() as &dyn InsertIntoGraph),
+            (allodc::componentDataType,  &self.component_data_type.as_simple()),
+            (rdfs:label, &self.concept.as_simple()),
+            (qudt::unit, &self.unit.iri().as_simple())
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Dataframe {
-    #[serde(rename = "measure")]
+    #[serde(rename = "AFRL_0000157")]
     pub measures: Measure,
-    #[serde(rename = "dimension")]
+    #[serde(rename = "Dimension")]
     pub dimensions: Dimension,
+}
+
+impl InsertIntoGraph for Dataframe {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Dataframe.as_simple() as &dyn InsertIntoGraph),
+            (cat::measure, &self.measures),
+            (cat::dimension, &self.dimensions)
+            ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
 }
