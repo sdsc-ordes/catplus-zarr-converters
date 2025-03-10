@@ -26,6 +26,12 @@ run input_type input_file output_file *args:
     cd "{{root_dir}}/src/converter" && \
     cargo run --bin converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
 
+# Run the converter.
+run-agilent input_type input_file output_file *args:
+    cd "{{root_dir}}/src/agilent-converter" && \
+    cargo run --bin agilent-converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
+
+
 # Enter a Nix development shell.
 nix-develop *args:
     echo "Starting nix developer shell in './tools/nix/flake.nix'."

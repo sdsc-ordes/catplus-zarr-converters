@@ -6,14 +6,14 @@ use serde::Deserialize;
 use std::{
     fs::File,
     io::{Read, Write},
-    path::Path,
+    path::Path
 };
 
 // Derive Deserialize and ValueEnum
 #[derive(Deserialize, Debug, clap::ValueEnum, Clone)]
 enum InputType {
     Synth,
-    HCI,
+    HCI
 }
 
 /// Converts CAT+ JSON input into RDF formats.
@@ -35,7 +35,7 @@ struct Args {
 
     /// Type of input data: "Turtle" or "Jsonld".
     #[arg(value_enum)]
-    format: RdfFormat,
+    format: RdfFormat
 }
 
 fn main() -> Result<()> {
