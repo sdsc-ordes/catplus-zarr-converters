@@ -18,6 +18,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
+name = "agilent-converter"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "catplus-common",
+ "clap",
+ "lazy_static",
+ "serde",
+ "serde_json",
+ "sophia",
+ "sophia_api",
+ "sophia_isomorphism",
+ "sophia_term",
+ "sophia_turtle",
+ "uuid",
+]
+
+[[package]]
 name = "ahash"
 version = "0.7.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"

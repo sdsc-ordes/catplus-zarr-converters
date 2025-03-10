@@ -422,7 +422,7 @@ impl InsertIntoGraph for PeakList {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::PeakList.as_simple() as &dyn InsertIntoGraph),
-            (cat::peak, &self.peak)
+            (cat::Peak, &self.peak)
             ] {
             value.attach_into(
                 graph,
@@ -436,7 +436,7 @@ impl InsertIntoGraph for PeakList {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Peak{
     #[serde(rename = "http://purl.allotrope.org/ontologies/datacube-hdf-map#Index")]
-    pub index: Integer,
+    pub index: i64,
     #[serde(rename = "PeakArea")]
     pub peak_area: PeakArea,
     #[serde(rename = "RetentionTime")]
@@ -464,7 +464,7 @@ impl InsertIntoGraph for Peak {
             (rdf::type_, &allores::AFR_0000413.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001073, &self.peak_area),
             (allores::AFR_0001089, &self.retention_time),
-            (allores::AFR_0001164, &self.peak_identifier.iri().as_simple()),
+            //(allores::AFR_0001164, &self.peak_identifier),
             (allores::AFR_0001178, &self.peak_start),
             (allores::AFR_0001180, &self.peak_end),
             (allores::AFR_0000948, &self.peak_height),

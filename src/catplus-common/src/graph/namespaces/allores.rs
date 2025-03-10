@@ -3,6 +3,18 @@ use sophia::api::ns::Namespace;
 use sophia_api::namespace;
 namespace! {
     "http://purl.allotrope.org/ontologies/result#",
+    AFR_0000413,
+    AFR_0000948,
+    AFR_0000949,
+    
+    AFR_0001073,
+    AFR_0001089,
+    AFR_0001164,
+    AFR_0001165,
+    AFR_0001178,
+    AFR_0001179,
+    AFR_0001180,
+    AFR_0001181,
     AFR_0001606,
     AFR_0001723,
     AFR_0001952,
