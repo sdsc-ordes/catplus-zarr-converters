@@ -14,20 +14,29 @@ use sophia::{
 };
 use sophia_api::{
     graph::MutableGraph,
-    term::{SimpleTerm, Term},
+    term::{SimpleTerm, Term}
 };
 
+#[derive(Deserialize)]
+pub struct LiquidChromatographyDocumentWrapper {
+    #[serde(rename = "liquid chromatography document")]
+    pub lcd: LiquidChromatographyDocument
+}
 
-// if Option: .as_ref().clone().map(|s| s.as_simple())
-// else: .as_simple()
+impl InsertIntoGraph for LiquidChromatographyDocumentWrapper {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        self.lcd.insert_into(graph, iri)
+    }
+}
+
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LiquidChromatographyDocument {
     pub analyst: String,
-    #[serde(rename = "AFR_0002375")]
-    pub measurement_document: MeasurementDocument,
-    #[serde(rename = "DeviceSystemDocument")]
-    pub device_system_document: DeviceSystemDocument,
+    #[serde(rename= "measurement document")]
+    pub measurement_document: Vec<MeasurementDocument>,
+    #[serde(rename = "device system document")]
+    pub device_system_document: Vec<DeviceSystemDocument>,
 }
 
 impl InsertIntoGraph for LiquidChromatographyDocument {
@@ -49,18 +58,26 @@ impl InsertIntoGraph for LiquidChromatographyDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MeasurementDocument {
+    #[serde(rename = "measurement identifier")]
     pub measurement_identifier: String,
-    #[serde(rename = "ChromatographyColumnDocument")]
+    #[serde(rename = "chromatography column document")]
     pub chromatography_column_document: Option<String>,
-    #[serde(rename = "AFR_0002567")]
+    #[serde(rename = "device control document")]
     pub device_control_document: DeviceDocument,
+    #[serde(rename = "sample document")]
     pub sample_document: SampleDocument,
+    #[serde(rename = "injection document")]
     pub injection_document: InjectionDocument,
+    #[serde(rename = "detection type")]
     pub detection_type: String,
+    #[serde(rename = "chromatogram data cube")]
     pub chromatogram_data_cube: ChromatogramDataCube,
+    #[serde(rename = "three-dimensional ultraviolet spectrum data cube")]
     pub three_dimensional_ultraviolet_spectrum_data_cube: ThreeDimensionalUltravioletSpectrumDataCube,
+    #[serde(rename = "three-dimensional mass spectrum data cube")]
     pub three_three_dimensional_mass_spectrum_data_cube: ThreeDimensionalMassSpectrumDataCube,
-    pub processed_data_document: ProcessedDataDocument,
+    #[serde(rename = "processed data document")]
+    pub processed_data_document: ProcessedDataDocument
 }
 
 impl InsertIntoGraph for MeasurementDocument {
@@ -89,8 +106,9 @@ impl InsertIntoGraph for MeasurementDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceSystemDocument{
-    #[serde(rename = "")]
+    #[serde(rename = "device document")]
     pub device_document: Vec<DeviceDocument>,
+    #[serde(rename = "asset management identifier")]
     pub asset_management_identifier: Option<String>,
 }
 
@@ -146,7 +164,7 @@ impl InsertIntoGraph for DeviceDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProcessedDataDocument{
-    #[serde(rename = "PeakList")]
+    #[serde(rename = "peak list")]
     pub peak_list: PeakList,
 } 
 
@@ -189,7 +207,7 @@ impl InsertIntoGraph for SampleDocument {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InjectionDocument {
-    #[serde(rename = "AutosamplerInjectionVolumeSetting")]
+    #[serde(rename = "autosampler injection")]
     pub autosampler_injection: AutosamplerInjectionVolumeSetting,
     pub injection_identifier: String,
     pub injection_time: String
@@ -215,9 +233,8 @@ impl InsertIntoGraph for InjectionDocument {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ChromatogramDataCube {
     pub label: String,
-    #[serde(rename = "CubeStructure")] 
+    #[serde(rename = "cube structure")] 
     pub cube_structure: CubeStructure,
-    #[serde(rename = "Dataframe")]
     pub data: Dataframe,
     pub identifier: String
 }
@@ -243,11 +260,9 @@ impl InsertIntoGraph for ChromatogramDataCube {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ThreeDimensionalUltravioletSpectrumDataCube {
     pub label: String,
-    #[serde(rename = "CubeStructure")] 
+    #[serde(rename = "cube structure")] 
     pub cube_structure: CubeStructure,
-    #[serde(rename = "Dataframe")] 
     pub data: Dataframe,
-    #[serde(rename = "AFR_0000917")]
     pub identifier: String
 }
 
@@ -272,9 +287,8 @@ impl InsertIntoGraph for ThreeDimensionalUltravioletSpectrumDataCube {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ThreeDimensionalMassSpectrumDataCube {
     pub label: String,
-    #[serde(rename = "CubeStructure")] 
+    #[serde(rename = "cube structure")] 
     pub cube_structure: CubeStructure,
-    #[serde(rename = "Dataframe")] 
     pub data: Dataframe,
     pub identifier: String,
 }
@@ -321,9 +335,7 @@ impl InsertIntoGraph for AutosamplerInjectionVolumeSetting {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CubeStructure {
-    #[serde(rename = "AFRL_0000157")]
     pub measures: Measure,
-    #[serde(rename = "Dimension")]
     pub dimensions: Dimension,
 }
 
@@ -393,9 +405,7 @@ impl InsertIntoGraph for Dimension {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Dataframe {
-    #[serde(rename = "AFRL_0000157")]
     pub measures: Measure,
-    #[serde(rename = "Dimension")]
     pub dimensions: Dimension,
 }
 

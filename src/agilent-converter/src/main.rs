@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use catplus_common::models::types::{Batch, CampaignWrapper};
-use agilent_converter::models::types::LiquidChromatographyDocument;
+use agilent_converter::models::types::LiquidChromatographyDocumentWrapper;
 use clap::Parser;
 use agilent_converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
@@ -59,11 +59,25 @@ fn main() -> Result<()> {
         .read_to_string(&mut input_content)
         .with_context(|| format!("Failed to read input file '{}'", args.input_file))?;
 
+    // let &mut new_input_content =  match args.input_type {
+    //         InputType::Agilent => {
+    //             let json_value: Value = serde_json::from_str(&input_content)
+    //                 .with_context(|| "Failed to parse JSON input")?;
+    
+    //             if let Some(sub_json) = json_value.get("liquid chromatography aggregate document") {
+    //                 sub_json.to_string()
+    //             } else {
+    //                 anyhow::bail!("Missing 'liquid chromatography aggregate document' field in JSON.");
+    //             }
+    //         }
+    //         _ => input_content.clone(), // For Synth and HCI, just use the original content
+    //     };
+
     // Unified conversion function with type selection
     let serialized_graph = match args.input_type {
         InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
         InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
-        InputType::Agilent => json_to_rdf::<LiquidChromatographyDocument>(&input_content, &args.format),
+        InputType::Agilent => json_to_rdf::<LiquidChromatographyDocumentWrapper>(&input_content, &args.format),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
 

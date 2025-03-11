@@ -414,7 +414,6 @@ impl InsertIntoGraph for ContainerPositionQuantityItem {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PeakList {
-    #[serde(rename = "Peak")]
     pub peak : Vec<Peak>,
 }
 
@@ -435,26 +434,26 @@ impl InsertIntoGraph for PeakList {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Peak{
-    #[serde(rename = "http://purl.allotrope.org/ontologies/datacube-hdf-map#Index")]
     pub index: i64,
-    #[serde(rename = "PeakArea")]
+    #[serde(rename = "peak area")]
     pub peak_area: PeakArea,
-    #[serde(rename = "RetentionTime")]
+    #[serde(rename = "retention time")]
     pub retention_time: RetentionTime,
+    #[serde(rename = "peak identifier")]
     pub peak_identifier: String,
-    #[serde(rename = "PeakStart")]
+    #[serde(rename = "peak start")]
     pub peak_start: PeakStart,
-    #[serde(rename = "PeakEnd")]
+    #[serde(rename = "peak end")]
     pub peak_end: PeakEnd,
-    #[serde(rename = "PeakHeight")]
+    #[serde(rename = "peak height")]
     pub peak_height: PeakHeight,
-    #[serde(rename = "RelativePeakHeight")]
+    #[serde(rename = "relative peak height")]
     pub relative_peak_height: RelativePeakHeight,
-    #[serde(rename = "PeakValueAtStart")]
+    #[serde(rename = "peak value at start")]
     pub peak_value_at_start: PeakValueAtStart,
-    #[serde(rename = "PeakValueAtEnd")]
+    #[serde(rename = "peak value at end")]
     pub peak_value_at_end: PeakValueAtEnd,
-    #[serde(rename = "RelativePeakArea")]
+    #[serde(rename = "relative peak area")]
     pub relative_peak_area: RelativePeakArea,
 }
 
