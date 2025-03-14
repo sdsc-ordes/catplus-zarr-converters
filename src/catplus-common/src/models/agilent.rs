@@ -1,4 +1,4 @@
-use catplus_common::{
+use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{allodc, allohdf, allohdfcube, allorole, allores, cat, obo, qb, qudt, qudtext},
@@ -18,12 +18,12 @@ use sophia_api::{
 };
 
 #[derive(Deserialize)]
-pub struct LiquidChromatographyDocumentWrapper {
+pub struct LiquidChromatographyAggregateDocumentWrapper {
     #[serde(rename = "liquid chromatography aggregate document")]
     pub liquid_chromatography_aggregate_document: LiquidChromatographyAggregateDocument
 }
 
-impl InsertIntoGraph for LiquidChromatographyDocumentWrapper {
+impl InsertIntoGraph for LiquidChromatographyAggregateDocumentWrapper {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         self.liquid_chromatography_aggregate_document.insert_into(graph, iri)
     }
