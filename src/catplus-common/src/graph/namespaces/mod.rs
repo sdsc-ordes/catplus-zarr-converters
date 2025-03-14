@@ -11,5 +11,6 @@ pub mod obo;
 pub mod purl;
 pub mod qb;
 pub mod qudt;
+pub mod qudtext;
 pub mod schema;
 pub mod unit;

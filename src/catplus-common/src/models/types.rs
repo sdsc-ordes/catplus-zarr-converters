@@ -462,9 +462,9 @@ impl InsertIntoGraph for Peak {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &allores::AFR_0000413.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001164, &self.peak_identifier.as_simple()),
             (allores::AFR_0001073, &self.peak_area),
             (allores::AFR_0001089, &self.retention_time),
-            //(allores::AFR_0001164, &self.peak_identifier),
             (allores::AFR_0001178, &self.peak_start),
             (allores::AFR_0001180, &self.peak_end),
             (allores::AFR_0000948, &self.peak_height),

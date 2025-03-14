@@ -1,7 +1,7 @@
 use catplus_common::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{allodc, allohdf, allohdfcube, allorole, allores, cat, obo, qb, qudt},
+        namespaces::{allodc, allohdf, allohdfcube, allorole, allores, cat, obo, qb, qudt, qudtext},
     },
     models::enums::{Unit},
     models::types::{PeakList}

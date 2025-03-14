@@ -1,7 +1,8 @@
-use crate::graph::namespaces::{cat, unit};
+use crate::graph::namespaces::{cat, qudt, qudtext};
 use serde::{Deserialize, Serialize};
 use sophia_api::ns::NsTerm;
 use std::fmt;
+use sophia::api::ns::Namespace;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[allow(non_snake_case, non_camel_case_types)]
@@ -42,6 +43,7 @@ pub enum Unit {
 }
 
 impl Unit {
+
     pub fn display_name(&self) -> &'static str {
         match self {
             Unit::Bar => "Bar",
@@ -58,12 +60,38 @@ impl Unit {
             Unit::PERCENT => "PERCENT",
             Unit::CountsPerSec => "NUM-PER-SEC",
             Unit::NanoM => "NanoM",
-            Unit::mAU => "SEC", // need to fix this with the correct unit
-            Unit::mAUs => "SEC" // need to fix this with the correct unit
+            Unit::mAU => "MilliAbsorbanceUnit",
+            Unit::mAUs => "MilliAbsorbanceUnitTimesSecond"
         }
     }
-    pub fn iri(&self) -> NsTerm<'_> {
-        unit::ns.get(self.display_name()).expect("Term not found")
+
+    /// Determines whether the unit belongs to qudt or allotrope qudt-ext.
+    fn namespace(&self) -> &Namespace<&'static str> {
+        match self {
+            // Standard QUDT units
+            Unit::Bar 
+            | Unit::DegC 
+            | Unit::MilliGM 
+            | Unit::GMPerMilliL 
+            | Unit::GMPerMol 
+            | Unit::MolPerL 
+            | Unit::RevPerMin 
+            | Unit::MilliM3 
+            | Unit::SEC 
+            | Unit::MIN 
+            | Unit::PERCENT 
+            | Unit::NanoM 
+            | Unit::UNITLESS 
+            | Unit::CountsPerSec => &qudt::ns,
+
+            // QUDT-EXT units
+            Unit::mAU 
+            | Unit::mAUs 
+            | Unit::mAUs => &qudtext::ns
+        }
+    }
+    pub fn iri(&self) -> String {
+        self.namespace().get(self.display_name()).unwrap().to_string()
     }
 }
 
