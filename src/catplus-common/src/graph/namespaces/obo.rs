@@ -5,6 +5,9 @@ namespace! {
     "http://purl.obolibrary.org/obo/",
     CHEBI_25367,
     IAO_0000005,
+    IAO_0000009,
+    IAO_0000017,
+    IAO_0000590,
     PATO_0001019
 }
 lazy_static! {
