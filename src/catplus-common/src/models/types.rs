@@ -414,15 +414,15 @@ impl InsertIntoGraph for ContainerPositionQuantityItem {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PeakList {
-    pub peak : Vec<Peak>,
+    pub peak: Vec<Peak>,
 }
 
 impl InsertIntoGraph for PeakList {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::PeakList.as_simple() as &dyn InsertIntoGraph),
-            (cat::Peak, &self.peak)
-            ] {
+            (cat::Peak, &self.peak),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
@@ -433,8 +433,8 @@ impl InsertIntoGraph for PeakList {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Peak{
-    #[serde(rename="@index")]
+pub struct Peak {
+    #[serde(rename = "@index")]
     pub index: i64,
     #[serde(rename = "peak area")]
     pub peak_area: Measurement,
@@ -471,8 +471,8 @@ impl InsertIntoGraph for Peak {
             (allores::AFR_0000949, &self.relative_peak_height),
             (allores::AFR_0001179, &self.peak_value_at_start),
             (allores::AFR_0001181, &self.peak_value_at_end),
-            (allores::AFR_0001165, &self.relative_peak_area)
-            ] {
+            (allores::AFR_0001165, &self.relative_peak_area),
+        ] {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
@@ -483,7 +483,7 @@ impl InsertIntoGraph for Peak {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Measurement{
+pub struct Measurement {
     pub value: f64,
     pub unit: Unit,
 }
@@ -493,7 +493,7 @@ impl InsertIntoGraph for Measurement {
         for (prop, value) in [
             (rdf::type_, &cat::Measurement.as_simple() as &dyn InsertIntoGraph),
             (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
-            (qudt::value, &self.value.as_simple())
+            (qudt::value, &self.value.as_simple()),
         ] {
             value.attach_into(
                 graph,
@@ -702,4 +702,3 @@ mod tests {
         Ok(())
     }
 }
-

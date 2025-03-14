@@ -38,7 +38,7 @@ namespace! {
     internalBarCode,
     measure,
     measuredQuantity,
-    Measurement, 
+    Measurement,
     Objective,
     Observation,
     optimizationType,

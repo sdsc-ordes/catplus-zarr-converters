@@ -1,8 +1,8 @@
 use crate::graph::namespaces::{cat, qudt, qudtext};
 use serde::{Deserialize, Serialize};
+use sophia::api::ns::Namespace;
 use sophia_api::ns::NsTerm;
 use std::fmt;
-use sophia::api::ns::Namespace;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[allow(non_snake_case, non_camel_case_types)]
@@ -23,7 +23,7 @@ pub enum Unit {
     RevPerMin,
     #[serde(rename = "mm^3")]
     MilliM3,
-    #[serde(rename="nM")]
+    #[serde(rename = "nM")]
     NanoM,
     #[serde(rename = "s")]
     SEC,
@@ -39,11 +39,9 @@ pub enum Unit {
     mAU,
     #[serde(rename = "mAU.s")]
     mAUs,
-
 }
 
 impl Unit {
-
     pub fn display_name(&self) -> &'static str {
         match self {
             Unit::Bar => "Bar",
@@ -61,7 +59,7 @@ impl Unit {
             Unit::CountsPerSec => "NUM-PER-SEC",
             Unit::NanoM => "NanoM",
             Unit::mAU => "MilliAbsorbanceUnit",
-            Unit::mAUs => "MilliAbsorbanceUnitTimesSecond"
+            Unit::mAUs => "MilliAbsorbanceUnitTimesSecond",
         }
     }
 
@@ -69,25 +67,23 @@ impl Unit {
     fn namespace(&self) -> &Namespace<&'static str> {
         match self {
             // Standard QUDT units
-            Unit::Bar 
-            | Unit::DegC 
-            | Unit::MilliGM 
-            | Unit::GMPerMilliL 
-            | Unit::GMPerMol 
-            | Unit::MolPerL 
-            | Unit::RevPerMin 
-            | Unit::MilliM3 
-            | Unit::SEC 
-            | Unit::MIN 
-            | Unit::PERCENT 
-            | Unit::NanoM 
-            | Unit::UNITLESS 
+            Unit::Bar
+            | Unit::DegC
+            | Unit::MilliGM
+            | Unit::GMPerMilliL
+            | Unit::GMPerMol
+            | Unit::MolPerL
+            | Unit::RevPerMin
+            | Unit::MilliM3
+            | Unit::SEC
+            | Unit::MIN
+            | Unit::PERCENT
+            | Unit::NanoM
+            | Unit::UNITLESS
             | Unit::CountsPerSec => &qudt::ns,
 
             // QUDT-EXT units
-            Unit::mAU 
-            | Unit::mAUs 
-            | Unit::mAUs => &qudtext::ns
+            Unit::mAU | Unit::mAUs | Unit::mAUs => &qudtext::ns,
         }
     }
     pub fn iri(&self) -> String {
@@ -109,7 +105,7 @@ pub enum ActionName {
     filtrateAction,
     shakeAction,
     setVacuumAction,
-    setPressureAction
+    setPressureAction,
 }
 
 impl fmt::Display for ActionName {
