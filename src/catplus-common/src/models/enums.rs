@@ -20,6 +20,25 @@ pub enum Unit {
     MolPerL,
     #[serde(rename = "rpm")]
     RevPerMin,
+    #[serde(rename = "mm^3")]
+    MilliM3,
+    #[serde(rename="nM")]
+    NanoM,
+    #[serde(rename = "s")]
+    SEC,
+    #[serde(rename = "min")]
+    MIN,
+    #[serde(rename = "%")]
+    PERCENT,
+    #[serde(alias = "unitless", alias = "(unitless)")]
+    UNITLESS,
+    #[serde(rename = "Counts.s")]
+    CountsPerSec,
+    #[serde(rename = "mAU")]
+    mAU,
+    #[serde(rename = "mAU.s")]
+    mAUs,
+
 }
 
 impl Unit {
@@ -32,6 +51,15 @@ impl Unit {
             Unit::GMPerMol => "GM-PER-MOL",
             Unit::MolPerL => "MOL-PER-L",
             Unit::RevPerMin => "REV-PER-MIN",
+            Unit::MilliM3 => "MilliM3",
+            Unit::SEC => "SEC",
+            Unit::MIN => "MIN",
+            Unit::UNITLESS => "UNITLESS",
+            Unit::PERCENT => "PERCENT",
+            Unit::CountsPerSec => "NUM-PER-SEC",
+            Unit::NanoM => "NanoM",
+            Unit::mAU => "SEC", // need to fix this with the correct unit
+            Unit::mAUs => "SEC" // need to fix this with the correct unit
         }
     }
     pub fn iri(&self) -> NsTerm<'_> {
@@ -53,7 +81,7 @@ pub enum ActionName {
     filtrateAction,
     shakeAction,
     setVacuumAction,
-    setPressureAction,
+    setPressureAction
 }
 
 impl fmt::Display for ActionName {

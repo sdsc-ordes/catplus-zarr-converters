@@ -434,27 +434,28 @@ impl InsertIntoGraph for PeakList {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Peak{
+    #[serde(rename="@index")]
     pub index: i64,
     #[serde(rename = "peak area")]
-    pub peak_area: PeakArea,
+    pub peak_area: Measurement,
     #[serde(rename = "retention time")]
-    pub retention_time: RetentionTime,
-    #[serde(rename = "peak identifier")]
+    pub retention_time: Measurement,
+    #[serde(rename = "peakIdentifier")]
     pub peak_identifier: String,
     #[serde(rename = "peak start")]
-    pub peak_start: PeakStart,
+    pub peak_start: Measurement,
     #[serde(rename = "peak end")]
-    pub peak_end: PeakEnd,
+    pub peak_end: Measurement,
     #[serde(rename = "peak height")]
-    pub peak_height: PeakHeight,
+    pub peak_height: Measurement,
     #[serde(rename = "relative peak height")]
-    pub relative_peak_height: RelativePeakHeight,
+    pub relative_peak_height: Measurement,
     #[serde(rename = "peak value at start")]
-    pub peak_value_at_start: PeakValueAtStart,
+    pub peak_value_at_start: Measurement,
     #[serde(rename = "peak value at end")]
-    pub peak_value_at_end: PeakValueAtEnd,
+    pub peak_value_at_end: Measurement,
     #[serde(rename = "relative peak area")]
-    pub relative_peak_area: RelativePeakArea,
+    pub relative_peak_area: Measurement,
 }
 
 impl InsertIntoGraph for Peak {
@@ -503,176 +504,176 @@ impl InsertIntoGraph for Measurement {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakArea {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakArea {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakArea.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakArea {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakArea {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakArea.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct RetentionTime {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for RetentionTime {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::RetentionTime.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct RetentionTime {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for RetentionTime {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::RetentionTime.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakStart {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakStart {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakStart.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakStart {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakStart {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakStart.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakEnd {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakEnd {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakEnd.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakEnd {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakEnd {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakEnd.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct RelativePeakHeight {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for RelativePeakHeight {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::RelativePeakHeight.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct RelativePeakHeight {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for RelativePeakHeight {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::RelativePeakHeight.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakHeight {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakHeight {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakHeight.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakHeight {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakHeight {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakHeight.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct RelativePeakArea {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for RelativePeakArea {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::RelativePeakArea.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct RelativePeakArea {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for RelativePeakArea {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::RelativePeakArea.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakValueAtStart {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakValueAtStart {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakValueAtStart.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakValueAtStart {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakValueAtStart {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakValueAtStart.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct PeakValueAtEnd {
-    pub measurement: Measurement,
-}
-impl InsertIntoGraph for PeakValueAtEnd {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::PeakValueAtEnd.as_simple() as &dyn InsertIntoGraph),
-            (cat::Measurement, &self.measurement)
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
+// #[derive(Clone, Debug, Serialize, Deserialize)]
+// pub struct PeakValueAtEnd {
+//     pub measurement: Measurement,
+// }
+// impl InsertIntoGraph for PeakValueAtEnd {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         for (prop, value) in [
+//             (rdf::type_, &cat::PeakValueAtEnd.as_simple() as &dyn InsertIntoGraph),
+//             (cat::Measurement, &self.measurement)
+//         ] {
+//             value.attach_into(
+//                 graph,
+//                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+//             )?;
+//         }
+//         Ok(())
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

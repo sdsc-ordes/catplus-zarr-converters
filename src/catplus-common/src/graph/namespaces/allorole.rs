@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use sophia::api::ns::Namespace;
 use sophia_api::namespace;
 namespace! {
-    "http://purl.allotrope.org/ontologies/role##",
+    "http://purl.allotrope.org/ontologies/role#",
     AFRL_0000157
 }
 lazy_static! {
