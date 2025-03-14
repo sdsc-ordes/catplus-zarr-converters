@@ -114,7 +114,7 @@ pub struct MeasurementDocument {
     // #[serde(rename = "chromatography column document")]
     // pub chromatography_column_document: ChromatographyColumnDocument,
     #[serde(rename = "device control aggregate document")]
-    pub device_control_document: DeviceSystemDocument,
+    pub device_control_aggregate_document: DeviceSystemDocument,
     #[serde(rename = "sample document")]
     pub sample_document: SampleDocument,
     #[serde(rename = "injection document")]
@@ -138,7 +138,7 @@ impl InsertIntoGraph for MeasurementDocument {
             (allores::AFR_0001121, &self.measurement_identifier.as_simple()),
             // TO-DO: needs further definition to be integrated
             // (allores::AFR_0002607, &self.chromatography_column_document),
-            (allores::AFR_0002722, &self.device_control_document),
+            (allores::AFR_0002526, &self.device_control_aggregate_document),
             (allores::AFR_0002083, &self.sample_document),
             (allores::AFR_0002529, &self.injection_document),
             (allores::AFR_0002534, &self.detection_type.as_simple()),
