@@ -116,7 +116,7 @@ impl InsertIntoGraph for Batch {
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
             (purl::identifier, &self.batch_id.as_simple()),
-            (schema::name, &self.link.as_ref().clone().map(|s| s.as_simple())),
+            (schema::name, &self.batch_name.as_ref().clone().map(|s| s.as_simple())),
             (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
             (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
             (cat::reactionName, &self.reaction_name.as_ref().clone().map(|s| s.as_simple())),
