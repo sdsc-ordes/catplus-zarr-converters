@@ -599,6 +599,7 @@ fn test_convert_campaign() {
                             "unit": "g/mol"
                         },
                         "smiles": "C[O-].[Na+]",
+                        "swissCatNumber": "SwissCAT-10942334",
                         "keywords": "optional only in HCI file",
                         "Inchi": "InChI=1S/CH3O.Na/c1-2;/h1H3;/q-1;+1",
                         "molecularFormula": "CH3NaO",
@@ -610,6 +611,7 @@ fn test_convert_campaign() {
                     {
                         "chemicalID": "36",
                         "chemicalName": "theobromine",
+                        "CASNumber": "83-67-0",
                         "molecularMass": {
                             "value": 180.160,
                             "unit": "g/mol"
@@ -633,6 +635,7 @@ fn test_convert_campaign() {
                             "unit": "g/mol"
                         },
                         "smiles": "CI",
+                        "swissCatNumber": "SwissCAT-6328",
                         "keywords": "optional only in HCI file",
                         "Inchi": "InChI=1S/CH3I/c1-2/h1H3",
                         "molecularFormula": "CH3I",
@@ -644,6 +647,7 @@ fn test_convert_campaign() {
                     {
                         "chemicalID": "79",
                         "chemicalName": "methanol",
+                        "CASNumber": "67-56-1",
                         "molecularMass": {
                             "value": 32.042,
                             "unit": "g/mol"
@@ -690,34 +694,7 @@ fn test_convert_campaign() {
             purl:identifier "23";
             schema:name "https://www.sciencedirect.com/science/article/pii/S0187893X15720926"];
         cat:hasChemical [ a obo:CHEBI_25367;
-            cat:casNumber "74-88-4";
-            purl:identifier "25";
-            allores:AFR_0001952 "CH3I";
-            allores:AFR_0002292 "methyl iodide";
-            allores:AFR_0002294 [ a cat:Observation;
-                qudt:unit unit:GM-PER-MOL;
-                qudt:value "141.939"^^xsd:double];
-            allores:AFR_0002295 "CI";
-            allores:AFR_0002296 "InChI=1S/CH3I/c1-2/h1H3";
-            obo:PATO_0001019 [ a cat:Observation;
-                qudt:unit unit:GM-PER-MilliL;
-                qudt:value "2.28"^^xsd:double];
-            schema:keywords "optional only in HCI file"],
-            [ a obo:CHEBI_25367;
-            cat:casNumber "124-41-4";
-            purl:identifier "19";
-            allores:AFR_0001952 "CH3NaO";
-            allores:AFR_0002292 "Sodium methoxide";
-            allores:AFR_0002294 [ a cat:Observation;
-                qudt:unit unit:GM-PER-MOL;
-                qudt:value "54.024"^^xsd:double];
-            allores:AFR_0002295 "C[O-].[Na+]";
-            allores:AFR_0002296 "InChI=1S/CH3O.Na/c1-2;/h1H3;/q-1;+1";
-            obo:PATO_0001019 [ a cat:Observation;
-                qudt:unit unit:GM-PER-MilliL;
-                qudt:value "1.3"^^xsd:double];
-            schema:keywords "optional only in HCI file"],
-            [ a obo:CHEBI_25367;
+            cat:casNumber "67-56-1";
             cat:swissCatNumber "SwissCAT-887";
             purl:identifier "79";
             allores:AFR_0001952 "CH4O";
@@ -732,6 +709,22 @@ fn test_convert_campaign() {
                 qudt:value "0.79"^^xsd:double];
             schema:keywords "optional only in HCI file"],
             [ a obo:CHEBI_25367;
+            cat:casNumber "124-41-4";
+            cat:swissCatNumber "SwissCAT-10942334";
+            purl:identifier "19";
+            allores:AFR_0001952 "CH3NaO";
+            allores:AFR_0002292 "Sodium methoxide";
+            allores:AFR_0002294 [ a cat:Observation;
+                qudt:unit unit:GM-PER-MOL;
+                qudt:value "54.024"^^xsd:double];
+            allores:AFR_0002295 "C[O-].[Na+]";
+            allores:AFR_0002296 "InChI=1S/CH3O.Na/c1-2;/h1H3;/q-1;+1";
+            obo:PATO_0001019 [ a cat:Observation;
+                qudt:unit unit:GM-PER-MilliL;
+                qudt:value "1.3"^^xsd:double];
+            schema:keywords "optional only in HCI file"],
+            [ a obo:CHEBI_25367;
+            cat:casNumber "83-67-0";
             cat:swissCatNumber "SwissCAT-5429";
             purl:identifier "36";
             allores:AFR_0001952 "C7H8N4O2";
@@ -744,6 +737,21 @@ fn test_convert_campaign() {
             obo:PATO_0001019 [ a cat:Observation;
                 qudt:unit unit:GM-PER-MilliL;
                 qudt:value "1.522"^^xsd:double];
+            schema:keywords "optional only in HCI file"],
+            [ a obo:CHEBI_25367;
+            cat:casNumber "74-88-4";
+            cat:swissCatNumber "SwissCAT-6328";
+            purl:identifier "25";
+            allores:AFR_0001952 "CH3I";
+            allores:AFR_0002292 "methyl iodide";
+            allores:AFR_0002294 [ a cat:Observation;
+                qudt:unit unit:GM-PER-MOL;
+                qudt:value "141.939"^^xsd:double];
+            allores:AFR_0002295 "CI";
+            allores:AFR_0002296 "InChI=1S/CH3I/c1-2/h1H3";
+            obo:PATO_0001019 [ a cat:Observation;
+                qudt:unit unit:GM-PER-MilliL;
+                qudt:value "2.28"^^xsd:double];
             schema:keywords "optional only in HCI file"];
         cat:hasObjective [ a obo:IAO_0000005;
             cat:criteria "Yield ≥ 90%";
