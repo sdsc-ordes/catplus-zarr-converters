@@ -692,7 +692,7 @@ fn test_convert_campaign() {
             cat:reactionType "N-methylation";
             allohdf:HardLink "https://www.sciencedirect.com/science/article/pii/S0187893X15720926";
             purl:identifier "23";
-            schema:name "https://www.sciencedirect.com/science/article/pii/S0187893X15720926"];
+            schema:name "20240516"];
         cat:hasChemical [ a obo:CHEBI_25367;
             cat:casNumber "67-56-1";
             cat:swissCatNumber "SwissCAT-887";
