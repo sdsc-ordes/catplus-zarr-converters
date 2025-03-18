@@ -46,6 +46,7 @@ namespace! {
     swissCatNumber,
     temperatureShakerShape,
     temperatureTumbleStirrerShape,
+    vacuum,
     vialShape
 }
 lazy_static! {

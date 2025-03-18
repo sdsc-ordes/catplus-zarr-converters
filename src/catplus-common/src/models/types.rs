@@ -164,6 +164,7 @@ pub struct Action {
     pub temperature_tumble_stirrer: Option<Observation>,
     pub temperature_shaker: Option<Observation>,
     pub pressure_measurement: Option<Observation>,
+    pub vacuum: Option<Observation>,
 }
 
 impl InsertIntoGraph for Action {
@@ -178,6 +179,7 @@ impl InsertIntoGraph for Action {
             (cat::speedInRPM, &self.speed_shaker),
             (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
             (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
+            (cat::vacuum, &self.vacuum),
             (cat::temperatureShakerShape, &self.temperature_shaker),
             (alloproc::AFP_0002677, &self.pressure_measurement),
             (cat::hasSample, &self.has_sample),

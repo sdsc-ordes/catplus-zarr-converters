@@ -536,14 +536,18 @@ fn test_convert_set_vacuum_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
+        PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:SetVacuumAction;
         cat:containerBarcode "1";
@@ -551,6 +555,12 @@ fn test_convert_set_vacuum_action() {
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
         cat:subEquipmentName "vacuum";
+        cat:vacuum [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
+                qudt:unit unit:Bar;
+                qudt:value "0.5"^^xsd:double];
+            qudt:unit unit:Bar;
+            qudt:value "20"^^xsd:double];
         allores:AFR_0001606 "set_vacuum";
         allores:AFR_0001723 "Chemspeed SWING XL";
         allores:AFR_0002423 "2024-07-25T12:03:50"^^xsd:dateTime;
