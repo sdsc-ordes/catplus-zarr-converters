@@ -115,9 +115,11 @@ impl InsertIntoGraph for Batch {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
-            (schema::name, &self.batch_id.as_simple()),
+            (purl::identifier, &self.batch_id.as_simple()),
+            (schema::name, &self.batch_name.as_ref().clone().map(|s| s.as_simple())),
             (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
             (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
+            (cat::reactionName, &self.reaction_name.as_ref().clone().map(|s| s.as_simple())),
             (
                 cat::optimizationType,
                 &self.optimization_type.as_ref().clone().map(|s| s.as_simple()),
@@ -366,7 +368,7 @@ impl InsertIntoGraph for Chemical {
         for (prop, value) in [
             (rdf::type_, &obo::CHEBI_25367.as_simple() as &dyn InsertIntoGraph),
             (purl::identifier, &self.chemical_id.as_simple()),
-            (cat::chemicalName, &self.chemical_name.as_simple()),
+            (allores::AFR_0002292, &self.chemical_name.as_simple()),
             (allores::AFR_0001952, &self.molecular_formula.as_simple()),
             (allores::AFR_0002295, &self.smiles.as_simple()),
             (allores::AFR_0002294, &self.molecular_mass),

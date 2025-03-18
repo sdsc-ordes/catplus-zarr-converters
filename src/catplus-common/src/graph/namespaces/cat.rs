@@ -33,6 +33,7 @@ namespace! {
     optimizationType,
     reactionSubType,
     reactionType,
+    reactionName,
     role,
     Sample,
     SetPressureAction,
