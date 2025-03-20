@@ -209,8 +209,9 @@ pub struct Plate {
 impl InsertIntoGraph for Plate {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
-            (&cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
-            (&cat::containerBarcode, &self.container_barcode.as_ref().clone().map(|s| s.as_simple())),
+            (rdf::type_, &cat::Plate.as_simple() as &dyn InsertIntoGraph),
+            (cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
+            (cat::containerBarcode, &self.container_barcode.as_ref().clone().map(|s| s.as_simple())),
         ] {
             value.attach_into(
                 graph,
@@ -276,7 +277,7 @@ impl InsertIntoGraph for ErrorMargin {
 #[serde(rename_all = "camelCase")]
 pub struct Sample {
     #[serde(flatten)]
-    pub container: Plate,
+    pub has_plate: Plate,
     #[serde(rename = "vialID")]
     pub vial_id: String,
     pub vial_type: String,
@@ -289,6 +290,7 @@ impl InsertIntoGraph for Sample {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
+            (cat::hasPlate, &self.has_plate),
             (cat::role, &self.role.as_simple()),
             (cat::vialShape, &self.vial_type.as_simple()),
             (allores::AFR_0002464, &self.vial_id.as_simple()),
@@ -300,9 +302,6 @@ impl InsertIntoGraph for Sample {
                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
             )?;
         }
-
-        // NOTE: for container_info, we attach triples directly to the sample
-        let _ = &self.container.insert_into(graph, iri.clone())?;
 
         Ok(())
     }
