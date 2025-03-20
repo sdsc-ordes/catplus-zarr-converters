@@ -211,7 +211,10 @@ impl InsertIntoGraph for Plate {
         for (prop, value) in [
             (rdf::type_, &cat::Plate.as_simple() as &dyn InsertIntoGraph),
             (cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
-            (cat::containerBarcode, &self.container_barcode.as_ref().clone().map(|s| s.as_simple())),
+            (
+                cat::containerBarcode,
+                &self.container_barcode.as_ref().clone().map(|s| s.as_simple()),
+            ),
         ] {
             value.attach_into(
                 graph,
