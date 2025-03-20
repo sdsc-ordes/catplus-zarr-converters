@@ -203,14 +203,14 @@ impl InsertIntoGraph for Action {
 pub struct Plate {
     #[serde(rename = "containerID")]
     pub container_id: String,
-    pub container_barcode: String,
+    pub container_barcode: Option<String>,
 }
 
 impl InsertIntoGraph for Plate {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (&cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
-            (&cat::containerBarcode, &self.container_barcode.as_simple()),
+            (&cat::containerBarcode, &self.container_barcode.as_ref().clone().map(|s| s.as_simple())),
         ] {
             value.attach_into(
                 graph,
