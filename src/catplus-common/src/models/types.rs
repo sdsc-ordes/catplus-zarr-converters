@@ -390,8 +390,8 @@ impl InsertIntoGraph for Chemical {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Well {
-    #[serde(rename = "containerID")]
-    pub container_id: String,
+    #[serde(flatten)]
+    pub has_plate: Plate,
     pub position: String,
     pub quantity: Observation,
 }
@@ -400,7 +400,7 @@ impl InsertIntoGraph for Well {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
-            (cat::containerID, &self.container_id.as_simple()),
+            (cat::hasPlate, &self.has_plate),
             (allores::AFR_0002240, &self.position.as_simple()),
             (qudt::quantity, &self.quantity),
         ] {
