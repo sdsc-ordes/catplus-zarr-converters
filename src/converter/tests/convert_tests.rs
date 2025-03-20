@@ -28,21 +28,25 @@ fn test_convert_filtrate_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:FiltrateAction;
-        cat:containerBarcode "1";
-        cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
+        cat:hasPlate [ a cat:Plate;
+            cat:containerBarcode "1";
+            cat:containerID "1"];
         cat:subEquipmentName "Filtration unit";
         allores:AFR_0001606 "filtrate";
         allores:AFR_0001723 "Chemspeed SWING XL";
@@ -87,22 +91,25 @@ fn test_convert_pressure_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:SetPressureAction;
-        cat:containerBarcode "1";
-        cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
+        cat:hasPlate [ a cat:Plate;
+            cat:containerBarcode "1";
+            cat:containerID "1"];
         cat:subEquipmentName "MTP_Pressure";
         alloproc:AFP_0002677 [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
@@ -169,22 +176,25 @@ fn test_convert_set_temperature_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:SetTemperatureAction;
-        cat:containerBarcode "1";
-        cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
+        cat:hasPlate [ a cat:Plate;
+            cat:containerBarcode "1";
+            cat:containerID "1"];
         cat:speedInRPM [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
@@ -235,7 +245,7 @@ fn test_convert_add_action() {
                 },
                 "equipmentName": "Chemspeed SWING XL",
                 "subEquipmentName": "GDU-V",
-                "hasContainerPositionAndQuantity": [
+                "hasWell": [
                     {
                         "position": "A1",
                         "containerID": "1",
@@ -337,30 +347,13 @@ fn test_convert_add_action() {
         cat:dispenseType "volume";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
-        cat:hasContainerPositionAndQuantity [ a cat:ContainerPositionAndQuantity;
-            cat:containerID "1";
-            allores:AFR_0002240 "B1";
-            qudt:quantity [ a cat:Observation;
-                cat:errorMargin [ a cat:errorMargin;
-                    qudt:unit unit:MilliGM;
-                    qudt:value "0.002"^^xsd:double];
-                qudt:unit unit:MilliGM;
-                qudt:value "0.034"^^xsd:double]],
-            [ a cat:ContainerPositionAndQuantity;
-            cat:containerID "1";
-            allores:AFR_0002240 "A1";
-            qudt:quantity [ a cat:Observation;
-                cat:errorMargin [ a cat:errorMargin;
-                    qudt:unit unit:MilliGM;
-                    qudt:value "0.001"^^xsd:double];
-                qudt:unit unit:MilliGM;
-                qudt:value "0.024"^^xsd:double]];
         cat:hasSample [ a cat:Sample;
-            cat:containerBarcode "18";
-            cat:containerID "18";
             cat:expectedDatum [ a cat:Observation;
                 qudt:unit unit:MilliGM;
                 qudt:value "2"^^xsd:double];
+            cat:hasPlate [ a cat:Plate;
+                cat:containerBarcode "18";
+                cat:containerID "18"];
             cat:hasSample [ a cat:Sample;
                 cat:expectedDatum [ a cat:Observation;
                     qudt:unit unit:MilliGM;
@@ -391,6 +384,26 @@ fn test_convert_add_action() {
             cat:role "reagent";
             cat:vialShape "storage vial";
             allores:AFR_0002464 "17"];
+        cat:hasWell [ a cat:Well;
+            cat:hasPlate [ a cat:Plate;
+                cat:containerID "1"];
+            allores:AFR_0002240 "B1";
+            qudt:quantity [ a cat:Observation;
+                cat:errorMargin [ a cat:errorMargin;
+                    qudt:unit unit:MilliGM;
+                    qudt:value "0.002"^^xsd:double];
+                qudt:unit unit:MilliGM;
+                qudt:value "0.034"^^xsd:double]],
+            [ a cat:Well;
+            cat:hasPlate [ a cat:Plate;
+                cat:containerID "1"];
+            allores:AFR_0002240 "A1";
+            qudt:quantity [ a cat:Observation;
+                cat:errorMargin [ a cat:errorMargin;
+                    qudt:unit unit:MilliGM;
+                    qudt:value "0.001"^^xsd:double];
+                qudt:unit unit:MilliGM;
+                qudt:value "0.024"^^xsd:double]];
         cat:speedInRPM [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
@@ -402,7 +415,7 @@ fn test_convert_add_action() {
         allores:AFR_0001606 "addition";
         allores:AFR_0001723 "Chemspeed SWING XL";
         allores:AFR_0002423 "2024-07-25T12:01:35"^^xsd:dateTime;
-        allores:AFX_0000622 "2024-07-25T12:01:29"^^xsd:dateTime.
+  allores:AFX_0000622 "2024-07-25T12:01:29"^^xsd:dateTime.
     "#;
     let expected_graph = parse_turtle_to_graph(&expected_ttl).unwrap();
     let result_ttl = result.as_ref().unwrap().as_str();
@@ -458,22 +471,25 @@ fn test_convert_shake_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
         PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:ShakeAction;
-        cat:containerBarcode "1";
-        cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
+        cat:hasPlate [ a cat:Plate;
+            cat:containerBarcode "1";
+            cat:containerID "1"];
         cat:speedTumbleStirrerShape [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
@@ -536,21 +552,32 @@ fn test_convert_set_vacuum_action() {
     let result = json_to_rdf::<Batch>(json_data, &output_format);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
+        PREFIX unit: <https://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
+        PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
-        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
         [] a cat:SetVacuumAction;
-        cat:containerBarcode "1";
-        cat:containerID "1";
         cat:hasBatch [ a cat:Batch;
             purl:identifier "23"];
+        cat:hasPlate [ a cat:Plate;
+            cat:containerBarcode "1";
+            cat:containerID "1"];
         cat:subEquipmentName "vacuum";
+        cat:vacuum [ a cat:Observation;
+            cat:errorMargin [ a cat:errorMargin;
+                qudt:unit unit:Bar;
+                qudt:value "0.5"^^xsd:double];
+            qudt:unit unit:Bar;
+            qudt:value "20"^^xsd:double];
         allores:AFR_0001606 "set_vacuum";
         allores:AFR_0001723 "Chemspeed SWING XL";
         allores:AFR_0002423 "2024-07-25T12:03:50"^^xsd:dateTime;
