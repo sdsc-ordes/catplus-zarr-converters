@@ -154,9 +154,9 @@ pub struct Action {
     pub equipment_name: String,
     pub sub_equipment_name: String,
     #[serde(flatten)]
-    pub container_info: Option<ContainerInfo>,
+    pub has_plate: Option<Plate>,
     pub speed_shaker: Option<Observation>,
-    pub has_container_position_and_quantity: Option<Vec<ContainerPositionQuantityItem>>,
+    pub has_well: Option<Vec<Well>>,
     pub dispense_state: Option<String>,
     pub dispense_type: Option<String>,
     pub has_sample: Option<Sample>,
@@ -183,7 +183,8 @@ impl InsertIntoGraph for Action {
             (cat::temperatureShakerShape, &self.temperature_shaker),
             (alloproc::AFP_0002677, &self.pressure_measurement),
             (cat::hasSample, &self.has_sample),
-            (cat::hasContainerPositionAndQuantity, &self.has_container_position_and_quantity),
+            (cat::hasWell, &self.has_well),
+            (cat::hasPlate, &self.has_plate),
             (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
             (cat::dispenseType, &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
         ] {
@@ -193,22 +194,19 @@ impl InsertIntoGraph for Action {
             )?;
         }
 
-        // NOTE: for container_info, we attach triples directly to the action
-        let _ = &self.container_info.insert_into(graph, iri.clone())?;
-
         Ok(())
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ContainerInfo {
+pub struct Plate {
     #[serde(rename = "containerID")]
     pub container_id: String,
     pub container_barcode: String,
 }
 
-impl InsertIntoGraph for ContainerInfo {
+impl InsertIntoGraph for Plate {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (&cat::containerID, &self.container_id.as_simple() as &dyn InsertIntoGraph),
@@ -278,7 +276,7 @@ impl InsertIntoGraph for ErrorMargin {
 #[serde(rename_all = "camelCase")]
 pub struct Sample {
     #[serde(flatten)]
-    pub container: ContainerInfo,
+    pub container: Plate,
     #[serde(rename = "vialID")]
     pub vial_id: String,
     pub vial_type: String,
@@ -391,17 +389,17 @@ impl InsertIntoGraph for Chemical {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ContainerPositionQuantityItem {
+pub struct Well {
     #[serde(rename = "containerID")]
     pub container_id: String,
     pub position: String,
     pub quantity: Observation,
 }
 
-impl InsertIntoGraph for ContainerPositionQuantityItem {
+impl InsertIntoGraph for Well {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &cat::ContainerPositionAndQuantity.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
             (cat::containerID, &self.container_id.as_simple()),
             (allores::AFR_0002240, &self.position.as_simple()),
             (qudt::quantity, &self.quantity),
