@@ -101,7 +101,7 @@ impl InsertIntoGraph for CampaignWrapper {
 #[serde(rename_all = "camelCase")]
 pub struct Batch {
     #[serde(rename = "batchID")]
-    pub batch_id: String,
+    pub batch_id: Option<String>,
     #[serde(rename = "Actions")]
     pub actions: Option<Vec<Action>>,
     pub batch_name: Option<String>,
@@ -115,7 +115,7 @@ impl InsertIntoGraph for Batch {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
-            (purl::identifier, &self.batch_id.as_simple()),
+            (purl::identifier, &self.batch_id.as_ref().clone().map(|s| s.as_simple())),
             (schema::name, &self.batch_name.as_ref().clone().map(|s| s.as_simple())),
             (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
             (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
@@ -150,7 +150,7 @@ pub struct Action {
     pub action_name: ActionName,
     pub start_time: String,
     pub ending_time: String,
-    pub method_name: String,
+    pub method_name: Option<String>,
     pub equipment_name: String,
     pub sub_equipment_name: String,
     #[serde(flatten)]
@@ -173,7 +173,7 @@ impl InsertIntoGraph for Action {
             (rdf::type_, &self.action_name.iri().as_simple() as &dyn InsertIntoGraph),
             (allores::AFX_0000622, &(self.start_time.as_str() * xsd::dateTime).as_simple()),
             (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
-            (allores::AFR_0001606, &self.method_name.as_simple()),
+            (allores::AFR_0001606, &self.method_name.as_ref().clone().map(|s| s.as_simple())),
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
             (cat::subEquipmentName, &self.sub_equipment_name.as_simple()),
             (cat::speedInRPM, &self.speed_shaker),
@@ -282,11 +282,11 @@ pub struct Sample {
     #[serde(flatten)]
     pub has_plate: Plate,
     #[serde(rename = "vialID")]
-    pub vial_id: String,
-    pub vial_type: String,
-    pub role: String,
-    pub expected_datum: Observation,
-    pub has_sample: Vec<SampleItem>,
+    pub vial_id: Option<String>,
+    pub vial_type: Option<String>,
+    pub role: Option<String>,
+    pub expected_datum: Option<Observation>,
+    pub has_sample: Option<Vec<SampleItem>>,
 }
 
 impl InsertIntoGraph for Sample {
@@ -294,9 +294,9 @@ impl InsertIntoGraph for Sample {
         for (prop, value) in [
             (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
             (cat::hasPlate, &self.has_plate),
-            (cat::role, &self.role.as_simple()),
-            (cat::vialShape, &self.vial_type.as_simple()),
-            (allores::AFR_0002464, &self.vial_id.as_simple()),
+            (cat::role, &self.role.as_ref().clone().map(|s| s.as_simple())),
+            (cat::vialShape, &self.vial_type.as_ref().clone().map(|s| s.as_simple())),
+            (allores::AFR_0002464, &self.vial_id.as_ref().clone().map(|s| s.as_simple())),
             (cat::expectedDatum, &self.expected_datum),
             (cat::hasSample, &self.has_sample),
         ] {
