@@ -1,7 +1,8 @@
 use anyhow::{Context, Result};
 use catplus_common::models::types::{Batch, CampaignWrapper};
+use catplus_common::models::ir::OpusDataFile;
 use clap::Parser;
-use converter::convert::{json_to_rdf, RdfFormat};
+use converter::convert::{json_to_rdf, xml_to_rdf, RdfFormat};
 use serde::Deserialize;
 use std::{
     fs::File,
@@ -14,6 +15,7 @@ use std::{
 enum InputType {
     Synth,
     HCI,
+    IR,
 }
 
 /// Converts CAT+ JSON input into RDF formats.
@@ -23,7 +25,7 @@ enum InputType {
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-    /// Type of input data: "Synth" or "HCI".
+    /// Type of input data: "Synth" or "HCI" or "IR".
     #[arg(value_enum)]
     input_type: InputType,
 
@@ -61,6 +63,7 @@ fn main() -> Result<()> {
     let serialized_graph = match args.input_type {
         InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
         InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
+        InputType::IR => xml_to_rdf::<OpusDataFile>(&input_content, &args.format),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
 
