@@ -2,7 +2,7 @@ use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{
-            allodc, allohdf, allohdfcube, allores, allorole, cat, obo, qb, qudt, qudtext,
+            allodc, allores, allorole, cat, obo, qb, qudt,
         },
     },
     models::{enums::Unit, types::PeakList},
@@ -170,7 +170,7 @@ pub struct DeviceSystemDocument {
 impl InsertIntoGraph for DeviceSystemDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &allores::AFR_0002526.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &cat::DeviceSystemDocument.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0002722, &self.device_document),
             (
                 allores::AFR_0001976,
@@ -209,7 +209,7 @@ pub struct DeviceDocument {
 impl InsertIntoGraph for DeviceDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &allores::AFR_0002722.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002567.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0002018, &self.device_identifier.as_simple()),
             (allores::AFR_0002568, &self.device_type.as_simple()),
             (allores::AFR_0001258, &self.product_manufacturer.as_simple()),
@@ -238,7 +238,7 @@ pub struct ProcessedDataDocument {
 impl InsertIntoGraph for ProcessedDataDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &allores::AFR_0002659.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &cat::ProcessedDataDocument.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0000432, &self.peak_list),
         ] {
             value.attach_into(
@@ -261,7 +261,7 @@ pub struct SampleDocument {
 impl InsertIntoGraph for SampleDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &allores::AFR_0002083.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &cat::SampleDocument.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001118, &self.sample_identifier.as_simple()),
             (obo::IAO_0000590, &self.written_name.as_simple()),
         ] {
@@ -482,25 +482,3 @@ impl InsertIntoGraph for Dimension {
         Ok(())
     }
 }
-
-// #[derive(Clone, Debug, Serialize, Deserialize)]
-// pub struct Dataframe {
-//     pub measures: Measure,
-//     pub dimensions: Dimension,
-// }
-
-// impl InsertIntoGraph for Dataframe {
-//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-//         for (pred, value) in [
-//             (rdf::type_, &cat::Dataframe.as_simple() as &dyn InsertIntoGraph),
-//             (cat::measure, &self.measures),
-//             (cat::dimension, &self.dimensions)
-//             ] {
-//             value.attach_into(
-//                 graph,
-//                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-//             )?;
-//         }
-//         Ok(())
-//     }
-// }

@@ -27,7 +27,7 @@ enum InputType {
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-    /// Type of input data: "Synth" or "HCI". or "Agilent" (test)
+    /// Type of input data: "Synth" or "HCI". or "Agilent"
     #[arg(value_enum)]
     input_type: InputType,
 
