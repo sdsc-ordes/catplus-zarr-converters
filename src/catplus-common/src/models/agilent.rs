@@ -137,7 +137,7 @@ pub struct MeasurementDocument {
 impl InsertIntoGraph for MeasurementDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
-            (rdf::type_, &allores::AFR_0002374.as_simple() as &dyn InsertIntoGraph),
+            (rdf::type_, &allores::AFR_0002375.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001121, &self.measurement_identifier.as_simple()),
             // TO-DO: needs further definition to be integrated
             // (allores::AFR_0002607, &self.chromatography_column_document),
@@ -345,7 +345,6 @@ impl InsertIntoGraph for ThreeDimensionalUltravioletSpectrumDataCube {
             ),
             (obo::IAO_0000009, &self.label.as_simple()),
             (qb::DataSet, &self.cube_structure),
-            //(allohdf::Dataset, &self.data),
             (allores::AFR_0000917, &self.identifier.as_simple()),
         ] {
             value.attach_into(
@@ -374,7 +373,6 @@ impl InsertIntoGraph for ThreeDimensionalMassSpectrumDataCube {
             ),
             (obo::IAO_0000009, &self.label.as_simple()),
             (qb::DataSet, &self.cube_structure),
-            //(allohdf::Dataset, &self.data),
             (allores::AFR_0000917, &self.identifier.as_simple()),
         ] {
             value.attach_into(

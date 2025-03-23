@@ -252,7 +252,6 @@ pub struct ErrorMargin {
     pub unit: Unit,
 }
 
-/// Implementation for concrete [Observation].
 impl InsertIntoGraph for ErrorMargin {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
