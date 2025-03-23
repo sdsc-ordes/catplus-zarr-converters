@@ -134,6 +134,51 @@ pub struct MeasurementDocument {
     pub processed_data_document: Option<ProcessedDataDocument>,
 }
 
+// use crate::graph::utils::generate_bnode_term;
+// impl InsertIntoGraph for MeasurementDocument {
+//     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+//         // Ensure each measurement document has its own unique node
+//         let measurement_iri = generate_bnode_term();
+
+//         graph.insert(&measurement_iri, &rdf::type_, &allores::AFR_0002375.as_simple())?;
+//         graph.insert(&measurement_iri, &allores::AFR_0001121, &self.measurement_identifier.as_simple())?;
+
+//         // Ensure sample, device, and injection documents are not duplicated
+//         let sample_iri = self.sample_document.get_uri();
+//         let device_iri = self.device_control_aggregate_document.get_uri();
+//         let injection_iri = self.injection_document.get_uri();
+
+//         self.sample_document.attach_into(
+//             graph,
+//             Link {
+//                 source_iri: measurement_iri.clone(),
+//                 pred: allores::AFR_0002083.as_simple(),
+//                 target_iri: Some(sample_iri),
+//             },
+//         )?;
+
+//         self.device_control_aggregate_document.attach_into(
+//             graph,
+//             Link {
+//                 source_iri: measurement_iri.clone(),
+//                 pred: allores::AFR_0002526.as_simple(),
+//                 target_iri: Some(device_iri),
+//             },
+//         )?;
+
+//         self.injection_document.attach_into(
+//             graph,
+//             Link {
+//                 source_iri: measurement_iri.clone(),
+//                 pred: allores::AFR_0002529.as_simple(),
+//                 target_iri: Some(injection_iri),
+//             },
+//         )?;
+
+//         Ok(())
+//     }
+// }
+
 impl InsertIntoGraph for MeasurementDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
