@@ -23,14 +23,16 @@ namespace! {
     hasBatch,
     hasCampaign,
     hasChemical,
-    hasContainerPositionAndQuantity,
     hasObjective,
+    hasPlate,
     hasSample,
+    hasWell,
     internalBarCode,
     measuredQuantity,
     Objective,
     Observation,
     optimizationType,
+    Plate,
     reactionSubType,
     reactionType,
     reactionName,
@@ -46,7 +48,9 @@ namespace! {
     swissCatNumber,
     temperatureShakerShape,
     temperatureTumbleStirrerShape,
-    vialShape
+    vacuum,
+    vialShape,
+    Well
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();
