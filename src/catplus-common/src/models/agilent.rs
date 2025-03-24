@@ -80,12 +80,19 @@ impl InsertIntoGraph for LiquidChromatographyDocument {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MeasurementAggregateDocument {
     #[serde(rename = "measurement document")]
-    pub measurement_document: Vec<MeasurementDocument>,
+    pub measurement_documents: Vec<MeasurementDocument>
 }
 
 impl InsertIntoGraph for MeasurementAggregateDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        let _ = &self.measurement_document.insert_into(graph, iri)?;
+        let _ = &self.measurement_documents.insert_into(graph, iri)?;
+
+        for doc in &self.measurement_documents {
+            let doc_uri = doc.get_uri();
+            println!("doc_uri: {:?}", doc_uri);
+            graph.insert(&doc_uri, allores::AFR_0002374.as_simple(), &doc_uri)?;
+            doc.insert_into(graph, doc_uri)?;
+        }
         Ok(())
     }
 }
