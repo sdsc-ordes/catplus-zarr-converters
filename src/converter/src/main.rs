@@ -14,6 +14,7 @@ use std::{
 enum InputType {
     Synth,
     HCI,
+    Bravo,
 }
 
 /// Converts CAT+ JSON input into RDF formats.
@@ -61,6 +62,7 @@ fn main() -> Result<()> {
     let serialized_graph = match args.input_type {
         InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
         InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
+        InputType::Bravo => json_to_rdf::<Batch>(&input_content, &args.format),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
 

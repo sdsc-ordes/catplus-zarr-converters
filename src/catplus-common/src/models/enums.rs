@@ -54,6 +54,8 @@ pub enum ActionName {
     shakeAction,
     setVacuumAction,
     setPressureAction,
+    solventChange,
+    EvaporationAction,
 }
 
 impl fmt::Display for ActionName {
@@ -71,6 +73,8 @@ impl ActionName {
             Self::shakeAction => cat::ShakeAction,
             Self::setVacuumAction => cat::SetVacuumAction,
             Self::filtrateAction => cat::FiltrateAction,
+            Self::EvaporationAction => cat::EvaporationAction,
+            Self::solventChange => cat::SolventChangeAction,
         }
     }
 }
