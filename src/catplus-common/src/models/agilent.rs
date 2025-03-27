@@ -33,9 +33,9 @@ impl InsertIntoGraph for LiquidChromatographyAggregateDocumentWrapper {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LiquidChromatographyAggregateDocument {
     #[serde(rename = "liquid chromatography document")]
-    pub liquid_chromatography_document: Vec<LiquidChromatographyDocument>,
+    pub liquid_chromatography_document: Option<Vec<LiquidChromatographyDocument>>,
     #[serde(rename = "device system document")]
-    pub device_system_document: DeviceSystemDocument,
+    pub device_system_document: Option<DeviceSystemDocument>,
 }
 
 impl InsertIntoGraph for LiquidChromatographyAggregateDocument {
