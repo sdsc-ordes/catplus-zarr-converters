@@ -1,5 +1,5 @@
 use catplus_common::{
-    models::{types::{Batch, CampaignWrapper}, LiquidChromatographyAggregateDocumentWrapper, LiquidChromatographyDocument, MeasurementAggregateDocument},
+    models::agilent::LiquidChromatographyAggregateDocumentWrapper,
     rdf::rdf_parser::parse_turtle_to_graph,
 };
 use converter::convert::{json_to_rdf, RdfFormat};
