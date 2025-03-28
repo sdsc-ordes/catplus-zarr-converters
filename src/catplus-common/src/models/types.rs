@@ -152,19 +152,29 @@ pub struct Action {
     pub ending_time: String,
     pub method_name: Option<String>,
     pub equipment_name: String,
-    pub sub_equipment_name: String,
+    pub sub_equipment_name: Option<String>,
     #[serde(flatten)]
     pub has_plate: Option<Plate>,
     pub speed_shaker: Option<Observation>,
     pub has_well: Option<Vec<Well>>,
+    pub at_well: Option<Well>,
     pub dispense_state: Option<String>,
     pub dispense_type: Option<String>,
     pub has_sample: Option<Sample>,
     pub speed_tumble_stirrer: Option<Observation>,
     pub temperature_tumble_stirrer: Option<Observation>,
     pub temperature_shaker: Option<Observation>,
+    pub temperature: Option<Observation>,
     pub pressure_measurement: Option<Observation>,
     pub vacuum: Option<Observation>,
+    pub volume_evaporation_final: Option<Observation>,
+    pub has_solvent: Option<Solvent>,
+    #[serde(rename = "SPMEprocess")]
+    pub spme_process: Option<bool>,
+    pub has_cartridge: Option<Cartridge>,
+    pub start_duration: Option<Observation>,
+    pub ending_duration: Option<Observation>,
+    pub order: Option<String>,
 }
 
 impl InsertIntoGraph for Action {
@@ -175,15 +185,21 @@ impl InsertIntoGraph for Action {
             (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
             (allores::AFR_0001606, &self.method_name.as_ref().clone().map(|s| s.as_simple())),
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
-            (cat::subEquipmentName, &self.sub_equipment_name.as_simple()),
+            (cat::subEquipmentName, &self.sub_equipment_name.as_ref().clone().map(|s| s.as_simple())),
             (cat::speedInRPM, &self.speed_shaker),
+            (cat::volumeEvaporationFinal, &self.volume_evaporation_final),
             (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
             (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
             (cat::vacuum, &self.vacuum),
             (cat::temperatureShakerShape, &self.temperature_shaker),
+            (cat::temperatureInDegC, &self.temperature),
             (alloproc::AFP_0002677, &self.pressure_measurement),
             (cat::hasSample, &self.has_sample),
+            (cat::hasSolvent, &self.has_solvent),
             (cat::hasWell, &self.has_well),
+            (cat::hasWell, &self.at_well),
+            (cat::hasCartridge, &self.has_cartridge),
+            (cat::order, &self.order.as_ref().clone().map(|s| s.as_simple())),
             (cat::hasPlate, &self.has_plate),
             (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
             (cat::dispenseType, &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
@@ -194,6 +210,29 @@ impl InsertIntoGraph for Action {
             )?;
         }
 
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Cartridge {
+    pub cartridge_name: String,
+    pub cartridge_composition: String,
+}
+
+impl InsertIntoGraph for Cartridge {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            (rdf::type_, &cat::Cartridge.as_simple() as &dyn InsertIntoGraph),
+            (cat::cartridgeName, &self.cartridge_name.as_simple()),
+            (cat::cartridgeComposition, &self.cartridge_composition.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+            )?;
+        }
         Ok(())
     }
 }
@@ -349,6 +388,30 @@ impl InsertIntoGraph for SampleItem {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Solvent {
+    pub has_chemical: Chemical,
+    pub volume: Observation,
+}
+
+impl InsertIntoGraph for Solvent {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            (rdf::type_, &cat::Solvent.as_simple() as &dyn InsertIntoGraph),
+            (cat::hasChemical, &self.has_chemical),
+            (cat::volume, &self.volume),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Chemical {
     #[serde(rename = "chemicalID")]
     pub chemical_id: String,
@@ -395,7 +458,7 @@ pub struct Well {
     #[serde(flatten)]
     pub has_plate: Plate,
     pub position: String,
-    pub quantity: Observation,
+    pub quantity: Option<Observation>,
 }
 
 impl InsertIntoGraph for Well {
