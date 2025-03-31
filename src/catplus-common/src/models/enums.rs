@@ -64,7 +64,7 @@ impl Unit {
     }
 
     /// Determines whether the unit belongs to qudt or allotrope qudt-ext.
-    fn namespace(&self) -> &Namespace<&'static str> {
+    fn namespace(&self) -> String {
         match self {
             // Standard QUDT units
             Unit::Bar
@@ -80,14 +80,14 @@ impl Unit {
             | Unit::PERCENT
             | Unit::NanoM
             | Unit::UNITLESS
-            | Unit::CountsPerSec => &qudt::ns,
+            | Unit::CountsPerSec => qudt::ns_vocab.to_string(),
 
             // QUDT-EXT units
-            Unit::mAU | Unit::mAUs | Unit::mAUs => &qudtext::ns,
+            Unit::mAU | Unit::mAUs | Unit::mAUs => qudtext::ns.to_string(),
         }
     }
     pub fn iri(&self) -> String {
-        self.namespace().get(self.display_name()).unwrap().to_string()
+        self.namespace() + self.display_name()
     }
 }
 

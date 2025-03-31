@@ -9,4 +9,5 @@ namespace! {
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();
+    pub static ref ns_vocab: Namespace<&'static str> = Namespace::new("http://qudt.org/vocab/unit/").unwrap();
 }
