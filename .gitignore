@@ -1,5 +1,6 @@
 # Direnv
 .direnv
+.output
 
 # Rust Build
 target

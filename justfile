@@ -24,7 +24,31 @@ format *args:
 # Run the converter.
 run input_type input_file output_file *args:
     cd "{{root_dir}}/src/converter" && \
-    cargo run --bin converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
+    cargo run --bin converter \
+        "{{input_type}}" \
+        "{{root_dir}}/{{input_file}}" \
+        "{{root_dir}}/{{output_file}}" {{args}}
+
+# Upload converter image.
+upload-image:
+   skopeo login ghcr.io
+   skopeo copy \
+    "docker-archive:.output/package/catplus-converter-image" \
+    "docker://ghcr.io/sdsc-ordes/catplus-converter:latest"
+
+# Build the catplus-converter Nix package.
+nix-package *args:
+    nix build ./tools/nix#catplus-converter \
+        --out-link .output/build/bin/catplus-converter
+
+# Build the catplus-converter-image Nix Docker image.
+nix-image *args:
+    nix build ./tools/nix#catplus-converter-image \
+        --out-link .output/package/catplus-converter-image
+
+# Enter a nix interpreter with loaded flake.
+nix-repl:
+    nix repl ./tools/nix
 
 # Enter a Nix development shell.
 nix-develop *args:
