@@ -39,7 +39,7 @@ mod test {
         runners::SyncRunner,
         GenericImage,
         ImageExt,
-    }
+    };
 
     #[test]
     fn test_shacl_api_endpoint() {
