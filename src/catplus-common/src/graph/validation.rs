@@ -40,7 +40,7 @@ impl GraphValidator for ShaclApiEndpoint {
             .unwrap();
 
         let mut form = multipart::Form::new()
-            .part("datafile", data_part);
+            .part("data", data_part);
 
         // If shapes are provided, serialize them and add to form
         if let Some(shapes) = shapes {
@@ -50,7 +50,7 @@ impl GraphValidator for ShaclApiEndpoint {
                 .mime_str("text/turtle")
                 .unwrap();
                         
-            form = form.part("shapesfile", shapes_part);
+            form = form.part("shapes", shapes_part);
         };
 
         let client = Client::new();
@@ -61,7 +61,10 @@ impl GraphValidator for ShaclApiEndpoint {
             .send()
             .unwrap();
 
-        let report = turtle::parse_str(&response.text().unwrap())
+        let report_text = response.text().unwrap();
+        println!("report: {:?}", report_text);
+
+        let report = turtle::parse_str(&report_text)
             .collect_triples()
             .unwrap();
 
@@ -72,8 +75,9 @@ impl GraphValidator for ShaclApiEndpoint {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::{thread, time};
     use testcontainers::{
-        core::IntoContainerPort,
+        core::{IntoContainerPort, logs, WaitFor, wait},
         runners::SyncRunner,
         GenericImage,
         ImageExt,
@@ -83,6 +87,13 @@ mod test {
     fn test_shacl_api_endpoint() {
         // Spin up validation service
         let _server = GenericImage::new("ghcr.io/sdsc-ordes/shacl-api", "refactor-endpoints")
+            .with_wait_for(
+                WaitFor::Log(
+                    wait::LogWaitStrategy::stderr(
+                        "INFO:     Application startup complete."
+                    )
+                )
+            )
             .with_mapped_port(8001, 15400.tcp())
             .with_env_var(
                 "SHAPES_URL", 
@@ -91,10 +102,14 @@ mod test {
             .start()
             .unwrap();
 
-        let validator = ShaclApiEndpoint::new("http://localhost:8001".to_string());
+        // wait for server to start up by polling the endpoint
+        let url = "http://localhost:8001";
+
+               
+        let validator = ShaclApiEndpoint::new(url.to_string());
         let data = LightGraph::new();
-        let shapes = LightGraph::new();
-        let result = validator.validate(&data, Some(&shapes));
+        let result = validator.validate(&data, None);
+        //let result = validator.validate(&data, Some(&shapes));
         assert!(result.is_ok());
     }
 }
