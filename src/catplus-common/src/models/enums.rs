@@ -1,4 +1,4 @@
-use crate::graph::namespaces::{cat, qudt, qudtext};
+use crate::graph::namespaces::{cat, unit, qudt, qudtext};
 use serde::{Deserialize, Serialize};
 use sophia::api::ns::Namespace;
 use sophia_api::ns::NsTerm;
@@ -64,7 +64,7 @@ impl Unit {
     }
 
     /// Determines whether the unit belongs to qudt or allotrope qudt-ext.
-    fn namespace(&self) -> String {
+    fn namespace(&self) -> &Namespace<&'static str> {
         match self {
             // Standard QUDT units
             Unit::Bar
@@ -80,14 +80,14 @@ impl Unit {
             | Unit::PERCENT
             | Unit::NanoM
             | Unit::UNITLESS
-            | Unit::CountsPerSec => qudt::ns_vocab.to_string(),
+            | Unit::CountsPerSec => &unit::ns,
 
             // QUDT-EXT units
-            Unit::mAU | Unit::mAUs | Unit::mAUs => qudtext::ns.to_string(),
+            Unit::mAU | Unit::mAUs => &qudtext::ns,
         }
     }
-    pub fn iri(&self) -> String {
-        self.namespace() + self.display_name()
+    pub fn iri(&self) -> NsTerm {
+        self.namespace().get(self.display_name()).expect("Term not found")
     }
 }
 
