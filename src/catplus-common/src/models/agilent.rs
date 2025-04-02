@@ -323,8 +323,7 @@ impl InsertIntoGraph for ChromatogramDataCube {
         for (pred, value) in [
             (rdf::type_, &cat::ChromatogramDataCube.as_simple() as &dyn InsertIntoGraph),
             (obo::IAO_0000009, &self.label.as_ref().clone().map(|s| s.as_simple())),
-            (qb::DataSet, &self.cube_structure),
-            //(allohdf::Dataset, &self.data),
+            (qb::structure, &self.cube_structure),
             (allores::AFR_0000917, &self.identifier.as_ref().clone().map(|s| s.as_simple())),
         ] {
             value.attach_into(
@@ -353,7 +352,7 @@ impl InsertIntoGraph for ThreeDimensionalUltravioletSpectrumDataCube {
                     as &dyn InsertIntoGraph,
             ),
             (obo::IAO_0000009, &self.label.as_simple()),
-            (qb::DataSet, &self.cube_structure),
+            (qb::structure, &self.cube_structure),
             (allores::AFR_0000917, &self.identifier.as_simple()),
         ] {
             value.attach_into(
@@ -381,7 +380,7 @@ impl InsertIntoGraph for ThreeDimensionalMassSpectrumDataCube {
                 &cat::ThreeDimensionalMassSpectrumDataCube.as_simple() as &dyn InsertIntoGraph,
             ),
             (obo::IAO_0000009, &self.label.as_simple()),
-            (qb::DataSet, &self.cube_structure),
+            (qb::structure, &self.cube_structure),
             (allores::AFR_0000917, &self.identifier.as_simple()),
         ] {
             value.attach_into(
