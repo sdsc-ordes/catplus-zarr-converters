@@ -2,18 +2,30 @@
 
 use sophia::inmem::graph::LightGraph;
 use sophia::turtle::parser::turtle;
+use std::error::Error;
 use reqwest::blocking::{Client, multipart};
 use sophia_api::source::TripleSource;
 
 use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
 
-pub trait GraphValidator {
-    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, GraphValidationError>;
-
+pub struct ValidationReport {
+    pub conforms: bool,
+    pub graph: LightGraph,
 }
 
-pub struct GraphValidationError {
-    pub message: String,
+impl ValidationReport {
+    pub fn new(conforms: bool, graph: LightGraph) -> Self {
+        ValidationReport { conforms, graph }
+    }
+
+    pub fn from_graph(graph: LightGraph) -> Self {
+        ValidationReport { conforms: true, graph }
+    }
+}
+
+pub trait GraphValidator {
+    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, Box<dyn Error>>;
+
 }
 
 pub struct ShaclApiEndpoint {
@@ -27,7 +39,7 @@ impl ShaclApiEndpoint {
 }
 
 impl GraphValidator for ShaclApiEndpoint {
-    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, GraphValidationError> {
+    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, Box<dyn Error>> {
         // serialize graphs to ttl
         let url = format!("{}/validate", self.url);
         let accept_header = "text/turtle";
@@ -36,8 +48,7 @@ impl GraphValidator for ShaclApiEndpoint {
         let data_bytes = serialize_graph_to_turtle(&data).unwrap().into_bytes();
         let data_part = multipart::Part::bytes(data_bytes)
             .file_name("data.ttl")
-            .mime_str("text/turtle")
-            .unwrap();
+            .mime_str("text/turtle")?;
 
         let mut form = multipart::Form::new()
             .part("data", data_part);
@@ -47,8 +58,7 @@ impl GraphValidator for ShaclApiEndpoint {
             let shapes_bytes = serialize_graph_to_turtle(shapes).unwrap().into_bytes();
             let shapes_part = multipart::Part::bytes(shapes_bytes)
                 .file_name("shapes.ttl")
-                .mime_str("text/turtle")
-                .unwrap();
+                .mime_str("text/turtle")?;
                         
             form = form.part("shapes", shapes_part);
         };
@@ -58,19 +68,18 @@ impl GraphValidator for ShaclApiEndpoint {
             .post(url)
             .header("Accept", accept_header)
             .multipart(form)
-            .send()
-            .unwrap();
+            .send()?;
 
-        let report_text = response.text().unwrap();
+        let report_text = response.text()?;
         println!("report: {:?}", report_text);
 
         let report = turtle::parse_str(&report_text)
-            .collect_triples()
-            .unwrap();
+            .collect_triples()?;
 
         Ok(report)
     }
 }
+
 
 #[cfg(test)]
 mod test {
@@ -104,12 +113,11 @@ mod test {
 
         // wait for server to start up by polling the endpoint
         let url = "http://localhost:8001";
-
                
         let validator = ShaclApiEndpoint::new(url.to_string());
         let data = LightGraph::new();
         let result = validator.validate(&data, None);
-        //let result = validator.validate(&data, Some(&shapes));
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "validation did not complete");
+        let report = result.unwrap();
     }
 }
