@@ -186,6 +186,7 @@ impl InsertIntoGraph for Action {
             (allores::AFR_0001606, &self.method_name.as_ref().clone().map(|s| s.as_simple())),
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
             (cat::subEquipmentName, &self.sub_equipment_name.as_ref().clone().map(|s| s.as_simple())),
+            // TODO: serialize to xsd::boolean and not string
             (cat::isSpmeProcess, &self.spme_process.as_ref().clone().as_ref().map(|s| s.to_string()).as_ref().map(|s| s.as_str().as_simple())),
             (cat::speedInRPM, &self.speed_shaker),
             (cat::volumeEvaporationFinal, &self.volume_evaporation_final),
