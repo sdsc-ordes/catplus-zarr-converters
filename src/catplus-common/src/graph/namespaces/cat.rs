@@ -34,7 +34,9 @@ namespace! {
     hasContainerPositionAndQuantity,
     hasLiquidChromatography,
     hasObjective,
+    hasPlate,
     hasSample,
+    hasWell,
     InjectionDocument,
     internalBarCode,
     measure,
@@ -45,9 +47,11 @@ namespace! {
     optimizationType,
     Peak,
     PeakList,
+    Plate,
     ProcessedDataDocument,
     reactionSubType,
     reactionType,
+    reactionName,
     role,
     Sample,
     SampleDocument,
@@ -63,7 +67,9 @@ namespace! {
     temperatureTumbleStirrerShape,
     ThreeDimensionalMassSpectrumDataCube,
     ThreeDimensionalUltravioletSpectrumDataCube,
-    vialShape
+    vacuum,
+    vialShape,
+    Well
 }
 lazy_static! {
     pub static ref ns: Namespace<&'static str> = Namespace::new(PREFIX.as_str()).unwrap();
