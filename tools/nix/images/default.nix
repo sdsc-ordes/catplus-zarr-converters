@@ -3,7 +3,7 @@
   catplus-converter,
 }:
 pkgs.dockerTools.buildLayeredImage {
-  name = "ghcr.io/sdsc-ordes/catplus-converter";
+  name = "ghcr.io/sdsc-ordes/catplus-converters";
   tag = catplus-converter.version;
 
   contents = [ catplus-converter ];
