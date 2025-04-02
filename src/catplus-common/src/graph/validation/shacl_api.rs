@@ -92,10 +92,7 @@ mod test {
             .start()
             .unwrap();
 
-        // wait for server to start up by polling the endpoint
-        let url = "http://localhost:8001";
-
-        let validator = ShaclApiEndpoint::new(url.to_string());
+        let validator = ShaclApiEndpoint::new("http://localhost:8001".to_string());
         assert!(validator.is_available(), "SHACL API endpoint is not available");
 
         let data = LightGraph::new();

@@ -20,7 +20,7 @@ impl ValidationReport {
     }
 
     pub fn from_graph(graph: LightGraph) -> Self {
-        // NOTE: Only looks at value of the first sh:Conforms triple
+        // NOTE: Only looks at value of the first sh:conforms triple
         // not found -> not conform
         let conforms = graph
             .triples_matching(Any, ["http://www.w3.org/ns/shacl#conforms".as_simple()], Any)
