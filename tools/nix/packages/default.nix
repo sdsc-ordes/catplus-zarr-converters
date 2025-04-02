@@ -37,8 +37,8 @@ rustPlatform.buildRustPackage {
   };
 
   meta = {
-    description = "The catplus converter.";
-    homepage = "https://github.com/sdsc-ordes/catplus-converter";
+    description = "File converters for the cat+ system.";
+    homepage = "https://github.com/sdsc-ordes/catplus-converters";
     license = lib.licenses.mit;
     maintainers = [
       "vancauwe"
