@@ -1,14 +1,14 @@
 /// The shacl-api implementation of a SHACL validation engine.
 /// See: https://github.com/sdsc-ordes/shacl-api
-
-use reqwest::blocking::{Client, multipart};
+use reqwest::blocking::{multipart, Client};
+use sophia::{inmem::graph::LightGraph, turtle::parser::turtle};
 use sophia_api::prelude::*;
-use sophia::inmem::graph::LightGraph;
-use sophia::turtle::parser::turtle;
 use std::error::Error;
 
-use crate::graph::validation::{ShaclEngine, ValidationReport};
-use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
+use crate::{
+    graph::validation::{ShaclEngine, ValidationReport},
+    rdf::rdf_serializers::serialize_graph_to_turtle,
+};
 
 pub struct ShaclApiEndpoint {
     url: String,
@@ -21,29 +21,29 @@ impl ShaclApiEndpoint {
 }
 
 impl ShaclEngine for ShaclApiEndpoint {
-
     fn is_available(&self) -> bool {
         let url = format!("{}/", self.url);
         let client = Client::new();
         let response = client.get(url).send();
 
         return response.is_ok();
-            
     }
 
-    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<ValidationReport, Box<dyn Error>> {
+    fn validate(
+        &self,
+        data: &LightGraph,
+        shapes: Option<&LightGraph>,
+    ) -> Result<ValidationReport, Box<dyn Error>> {
         // serialize graphs to ttl
         let url = format!("{}/validate", self.url);
         let accept_header = "text/turtle";
 
         // Serialize data graph and add to multipart form
         let data_bytes = serialize_graph_to_turtle(&data).unwrap().into_bytes();
-        let data_part = multipart::Part::bytes(data_bytes)
-            .file_name("data.ttl")
-            .mime_str("text/turtle")?;
+        let data_part =
+            multipart::Part::bytes(data_bytes).file_name("data.ttl").mime_str("text/turtle")?;
 
-        let mut form = multipart::Form::new()
-            .part("data", data_part);
+        let mut form = multipart::Form::new().part("data", data_part);
 
         // If shapes are provided, serialize them and add to form
         if let Some(shapes) = shapes {
@@ -51,36 +51,29 @@ impl ShaclEngine for ShaclApiEndpoint {
             let shapes_part = multipart::Part::bytes(shapes_bytes)
                 .file_name("shapes.ttl")
                 .mime_str("text/turtle")?;
-                        
+
             form = form.part("shapes", shapes_part);
         };
 
         let client = Client::new();
-        let response = client
-            .post(url)
-            .header("Accept", accept_header)
-            .multipart(form)
-            .send()?;
+        let response = client.post(url).header("Accept", accept_header).multipart(form).send()?;
 
         let report_text = response.text()?;
         println!("report: {:?}", report_text);
 
-        let report_graph = turtle::parse_str(&report_text)
-            .collect_triples()?;
+        let report_graph = turtle::parse_str(&report_text).collect_triples()?;
 
         Ok(ValidationReport::from_graph(report_graph))
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;
     use testcontainers::{
-        core::{IntoContainerPort, WaitFor, wait},
+        core::{wait, IntoContainerPort, WaitFor},
         runners::SyncRunner,
-        GenericImage,
-        ImageExt,
+        GenericImage, ImageExt,
     };
 
     #[test]
@@ -104,7 +97,7 @@ mod test {
 
         // wait for server to start up by polling the endpoint
         let url = "http://localhost:8001";
-               
+
         let validator = ShaclApiEndpoint::new(url.to_string());
         assert!(validator.is_available(), "SHACL API endpoint is not available");
 
