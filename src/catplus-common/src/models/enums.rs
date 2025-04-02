@@ -20,6 +20,12 @@ pub enum Unit {
     MolPerL,
     #[serde(rename = "rpm")]
     RevPerMin,
+    #[serde(rename = "%")]
+    PERCENT,
+    #[serde(rename = "mL")]
+    MilliL,
+    #[serde(rename = "min")]
+    MIN,
 }
 
 impl Unit {
@@ -32,6 +38,9 @@ impl Unit {
             Unit::GMPerMol => "GM-PER-MOL",
             Unit::MolPerL => "MOL-PER-L",
             Unit::RevPerMin => "REV-PER-MIN",
+            Unit::PERCENT => "PERCENT",
+            Unit::MilliL => "MilliL",
+            Unit::MIN => "MIN",
         }
     }
     pub fn iri(&self) -> NsTerm<'_> {
@@ -54,6 +63,8 @@ pub enum ActionName {
     shakeAction,
     setVacuumAction,
     setPressureAction,
+    solventChangeAction,
+    EvaporationAction,
 }
 
 impl fmt::Display for ActionName {
@@ -71,6 +82,8 @@ impl ActionName {
             Self::shakeAction => cat::ShakeAction,
             Self::setVacuumAction => cat::SetVacuumAction,
             Self::filtrateAction => cat::FiltrateAction,
+            Self::EvaporationAction => cat::EvaporationAction,
+            Self::solventChangeAction => cat::SolventChangeAction,
         }
     }
 }
