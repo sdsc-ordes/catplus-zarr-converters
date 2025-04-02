@@ -1,32 +1,14 @@
-/// Interface for validating an RDF graph.
+/// The shacl-api implementation of a SHACL validation engine.
+/// See: https://github.com/sdsc-ordes/shacl-api
 
+use reqwest::blocking::{Client, multipart};
+use sophia_api::prelude::*;
 use sophia::inmem::graph::LightGraph;
 use sophia::turtle::parser::turtle;
 use std::error::Error;
-use reqwest::blocking::{Client, multipart};
-use sophia_api::source::TripleSource;
 
+use crate::graph::validation::{ShaclEngine, ValidationReport};
 use crate::rdf::rdf_serializers::serialize_graph_to_turtle;
-
-pub struct ValidationReport {
-    pub conforms: bool,
-    pub graph: LightGraph,
-}
-
-impl ValidationReport {
-    pub fn new(conforms: bool, graph: LightGraph) -> Self {
-        ValidationReport { conforms, graph }
-    }
-
-    pub fn from_graph(graph: LightGraph) -> Self {
-        ValidationReport { conforms: true, graph }
-    }
-}
-
-pub trait GraphValidator {
-    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, Box<dyn Error>>;
-
-}
 
 pub struct ShaclApiEndpoint {
     url: String,
@@ -38,8 +20,18 @@ impl ShaclApiEndpoint {
     }
 }
 
-impl GraphValidator for ShaclApiEndpoint {
-    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<LightGraph, Box<dyn Error>> {
+impl ShaclEngine for ShaclApiEndpoint {
+
+    fn is_available(&self) -> bool {
+        let url = format!("{}/", self.url);
+        let client = Client::new();
+        let response = client.get(url).send();
+
+        return response.is_ok();
+            
+    }
+
+    fn validate(&self, data: &LightGraph, shapes: Option<&LightGraph>) -> Result<ValidationReport, Box<dyn Error>> {
         // serialize graphs to ttl
         let url = format!("{}/validate", self.url);
         let accept_header = "text/turtle";
@@ -73,10 +65,10 @@ impl GraphValidator for ShaclApiEndpoint {
         let report_text = response.text()?;
         println!("report: {:?}", report_text);
 
-        let report = turtle::parse_str(&report_text)
+        let report_graph = turtle::parse_str(&report_text)
             .collect_triples()?;
 
-        Ok(report)
+        Ok(ValidationReport::from_graph(report_graph))
     }
 }
 
@@ -84,9 +76,8 @@ impl GraphValidator for ShaclApiEndpoint {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::{thread, time};
     use testcontainers::{
-        core::{IntoContainerPort, logs, WaitFor, wait},
+        core::{IntoContainerPort, WaitFor, wait},
         runners::SyncRunner,
         GenericImage,
         ImageExt,
@@ -115,9 +106,13 @@ mod test {
         let url = "http://localhost:8001";
                
         let validator = ShaclApiEndpoint::new(url.to_string());
+        assert!(validator.is_available(), "SHACL API endpoint is not available");
+
         let data = LightGraph::new();
         let result = validator.validate(&data, None);
         assert!(result.is_ok(), "validation did not complete");
+
         let report = result.unwrap();
+        assert!(!report.conforms, "empty data does not pass validation")
     }
 }
