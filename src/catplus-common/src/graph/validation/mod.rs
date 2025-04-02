@@ -34,7 +34,11 @@ impl ValidationReport {
 
 /// Interface for a SHACL validation engine.
 pub trait ShaclEngine {
+    /// Check if the engine can be used.
     fn is_available(&self) -> bool;
+
+    /// Validate an RDF graph against SHACL shapes.
+    /// If `shapes` is `None`, the engine should use some default shapes.
     fn validate(
         &self,
         data: &LightGraph,

@@ -34,8 +34,8 @@ impl ShaclEngine for ShaclApiEndpoint {
         data: &LightGraph,
         shapes: Option<&LightGraph>,
     ) -> Result<ValidationReport, Box<dyn Error>> {
-        // serialize graphs to ttl
         let url = format!("{}/validate", self.url);
+        // Request report in turtle format
         let accept_header = "text/turtle";
 
         // Serialize data graph and add to multipart form
@@ -58,10 +58,7 @@ impl ShaclEngine for ShaclApiEndpoint {
         let client = Client::new();
         let response = client.post(url).header("Accept", accept_header).multipart(form).send()?;
 
-        let report_text = response.text()?;
-        println!("report: {:?}", report_text);
-
-        let report_graph = turtle::parse_str(&report_text).collect_triples()?;
+        let report_graph = turtle::parse_str(&response.text()?).collect_triples()?;
 
         Ok(ValidationReport::from_graph(report_graph))
     }
