@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use catplus_common::models::types::{Batch, CampaignWrapper};
+use catplus_common::models::{hci::CampaignWrapper, synth::SynthBatch};
 use clap::Parser;
 use converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
@@ -59,7 +59,7 @@ fn main() -> Result<()> {
 
     // Unified conversion function with type selection
     let serialized_graph = match args.input_type {
-        InputType::Synth => json_to_rdf::<Batch>(&input_content, &args.format),
+        InputType::Synth => json_to_rdf::<SynthBatch>(&input_content, &args.format),
         InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
