@@ -58,9 +58,9 @@ impl<T> InsertIntoGraph for Vec<T>
 where
     T: InsertIntoGraph,
 {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, graph: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
         for item in self {
-            item.insert_into(graph, iri.clone())?;
+            item.insert_into(graph, item.get_uri())?;
         }
         Ok(())
     }
