@@ -14,7 +14,7 @@ build *args:
 
 # Test all crates
 test *args:
-    cargo test
+    cargo test {{args}}
 
 alias fmt := format
 # Format all crates
