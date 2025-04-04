@@ -68,7 +68,7 @@ impl ShaclEngine for ShaclApiEndpoint {
 mod test {
     use super::*;
     use testcontainers::{
-        core::{wait, IntoContainerPort, WaitFor},
+        core::{logs, wait, IntoContainerPort, WaitFor},
         runners::SyncRunner,
         GenericImage, ImageExt,
     };
@@ -76,7 +76,7 @@ mod test {
     #[test]
     fn test_shacl_api_endpoint() {
         // Spin up validation service
-        let _server = GenericImage::new("ghcr.io/sdsc-ordes/shacl-api", "refactor-endpoints")
+        let _server = GenericImage::new("ghcr.io/sdsc-ordes/shacl-api", "develop")
             .with_wait_for(
                 WaitFor::Log(
                     wait::LogWaitStrategy::stderr(
@@ -84,15 +84,19 @@ mod test {
                     )
                 )
             )
-            .with_mapped_port(8001, 15400.tcp())
+            .with_mapped_port(15400, 15400.tcp())
+            .with_env_var("UVICORN_PORT", "15400")
             .with_env_var(
                 "SHAPES_URL", 
                 "https://github.com/sdsc-ordes/catplus-ontology/releases/download/v0.1.0/catplus_ontology.ttl"
             )
+            .with_log_consumer(move |frame: &logs::LogFrame| {
+                println!("{}", String::from_utf8_lossy(frame.bytes()));
+            })
             .start()
             .unwrap();
 
-        let validator = ShaclApiEndpoint::new("http://localhost:8001".to_string());
+        let validator = ShaclApiEndpoint::new("http://localhost:15400".to_string());
         assert!(validator.is_available(), "SHACL API endpoint is not available");
 
         let data = LightGraph::new();
