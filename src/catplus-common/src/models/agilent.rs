@@ -1,6 +1,6 @@
 use crate::{
     graph::{
-        graph_builder::{GraphBuilder, OutputNodeStrategy},
+        graph_builder::GraphBuilder,
         insert_into::{InsertIntoGraph, Link},
         namespaces::{allodc, allores, allorole, cat, obo, qb, qudt},
     },
@@ -8,9 +8,7 @@ use crate::{
 };
 
 use serde::{Deserialize, Serialize};
-use sophia::{
-    api::ns::{rdf, rdfs, xsd},
-};
+use sophia::api::ns::{rdf, rdfs, xsd};
 use sophia_api::term::{SimpleTerm, Term};
 
 #[derive(Deserialize)]
@@ -20,8 +18,8 @@ pub struct LiquidChromatographyAggregateDocumentWrapper {
 }
 
 impl InsertIntoGraph for LiquidChromatographyAggregateDocumentWrapper {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        self.liquid_chromatography_aggregate_document.insert_into(graph, iri)
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
+        self.liquid_chromatography_aggregate_document.insert_into(builder, iri)
     }
 }
 

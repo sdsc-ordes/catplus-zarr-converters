@@ -1,8 +1,11 @@
 use anyhow::{Context, Result};
-use catplus_common::models::{
-    agilent::LiquidChromatographyAggregateDocumentWrapper, hci::CampaignWrapper, synth::SynthBatch,
+use catplus_common::{
+    graph::graph_builder::OutputNodeStrategy,
+    models::{
+        agilent::LiquidChromatographyAggregateDocumentWrapper, hci::CampaignWrapper,
+        synth::SynthBatch,
+    },
 };
-use catplus_common::graph::graph_builder::OutputNodeStrategy;
 use clap::Parser;
 use converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
@@ -96,7 +99,7 @@ fn main() -> Result<()> {
         InputType::Agilent => json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
             &input_content,
             &args.format,
-            &output_node_strategy
+            &output_node_strategy,
         ),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;

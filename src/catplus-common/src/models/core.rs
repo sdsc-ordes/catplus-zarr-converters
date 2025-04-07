@@ -238,13 +238,13 @@ pub struct PeakList {
 }
 
 impl InsertIntoGraph for PeakList {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::PeakList.as_simple() as &dyn InsertIntoGraph),
             (cat::Peak, &self.peak),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
@@ -279,7 +279,7 @@ pub struct Peak {
 }
 
 impl InsertIntoGraph for Peak {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &allores::AFR_0000413.as_simple() as &dyn InsertIntoGraph),
             (allores::AFR_0001164, &self.peak_identifier.as_simple()),
@@ -294,7 +294,7 @@ impl InsertIntoGraph for Peak {
             (allores::AFR_0001181, &self.peak_value_at_end),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
@@ -309,14 +309,14 @@ pub struct Measurement {
 }
 
 impl InsertIntoGraph for Measurement {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
             (rdf::type_, &cat::Measurement.as_simple() as &dyn InsertIntoGraph),
             (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
             (qudt::value, &self.value.as_simple()),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
             )?;
         }
