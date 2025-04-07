@@ -1,6 +1,6 @@
 use crate::graph::namespaces::{
-    allocom, allodc, allohdf, allohdfcube, alloproc, alloprop, alloqual, allores, allorole, cat, obo, purl,
-    qb, qudt, qudtext, schema, unit,
+    allocom, allodc, allohdf, allohdfcube, alloproc, alloprop, alloqual, allores, allorole, cat,
+    obo, purl, qb, qudt, qudtext, schema, unit,
 };
 use sophia_api::{prefix::Prefix, prelude::Iri};
 
