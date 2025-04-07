@@ -1,5 +1,6 @@
-use crate::graph::namespaces::{cat, unit};
+use crate::graph::namespaces::{cat, qudt, qudtext, unit};
 use serde::{Deserialize, Serialize};
+use sophia::api::ns::Namespace;
 use sophia_api::ns::NsTerm;
 use std::fmt;
 
@@ -20,6 +21,24 @@ pub enum Unit {
     MolPerL,
     #[serde(rename = "rpm")]
     RevPerMin,
+    #[serde(rename = "mm^3")]
+    MilliM3,
+    #[serde(rename = "nM")]
+    NanoM,
+    #[serde(rename = "s")]
+    SEC,
+    #[serde(rename = "min")]
+    MIN,
+    #[serde(rename = "%")]
+    PERCENT,
+    #[serde(alias = "unitless", alias = "(unitless)")]
+    UNITLESS,
+    #[serde(rename = "Counts.s")]
+    CountsPerSec,
+    #[serde(rename = "mAU")]
+    mAU,
+    #[serde(rename = "mAU.s")]
+    mAUs,
 }
 
 impl Unit {
@@ -32,10 +51,43 @@ impl Unit {
             Unit::GMPerMol => "GM-PER-MOL",
             Unit::MolPerL => "MOL-PER-L",
             Unit::RevPerMin => "REV-PER-MIN",
+            Unit::MilliM3 => "MilliM3",
+            Unit::SEC => "SEC",
+            Unit::MIN => "MIN",
+            Unit::UNITLESS => "UNITLESS",
+            Unit::PERCENT => "PERCENT",
+            Unit::CountsPerSec => "NUM-PER-SEC",
+            Unit::NanoM => "NanoM",
+            Unit::mAU => "MilliAbsorbanceUnit",
+            Unit::mAUs => "MilliAbsorbanceUnitTimesSecond",
         }
     }
-    pub fn iri(&self) -> NsTerm<'_> {
-        unit::ns.get(self.display_name()).expect("Term not found")
+
+    /// Determines whether the unit belongs to qudt or allotrope qudt-ext.
+    fn namespace(&self) -> &Namespace<&'static str> {
+        match self {
+            // Standard QUDT units
+            Unit::Bar
+            | Unit::DegC
+            | Unit::MilliGM
+            | Unit::GMPerMilliL
+            | Unit::GMPerMol
+            | Unit::MolPerL
+            | Unit::RevPerMin
+            | Unit::MilliM3
+            | Unit::SEC
+            | Unit::MIN
+            | Unit::PERCENT
+            | Unit::NanoM
+            | Unit::UNITLESS
+            | Unit::CountsPerSec => &unit::ns,
+
+            // QUDT-EXT units
+            Unit::mAU | Unit::mAUs => &qudtext::ns,
+        }
+    }
+    pub fn iri(&self) -> NsTerm {
+        self.namespace().get(self.display_name()).expect("Term not found")
     }
 }
 
