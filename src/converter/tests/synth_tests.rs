@@ -28,13 +28,18 @@ fn test_convert_filtrate_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
@@ -91,13 +96,18 @@ fn test_convert_pressure_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
@@ -176,13 +186,18 @@ fn test_convert_set_temperature_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
@@ -330,13 +345,18 @@ fn test_convert_add_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
@@ -471,13 +491,18 @@ fn test_convert_shake_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
@@ -552,13 +577,18 @@ fn test_convert_set_vacuum_action() {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX cat: <http://example.org/cat#>
         PREFIX schema: <https://schema.org/>
-        PREFIX unit: <https://qudt.org/vocab/unit/>
+        PREFIX unit: <http://qudt.org/vocab/unit/>
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
+        PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
+        PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
+        PREFIX qb: <http://purl.org/linked-data/cube#>
         PREFIX qudt: <http://qudt.org/schema/qudt/>
+        PREFIX qudtext: <http://purl.allotrope.org/ontology/qudt-ext/unit#>
         PREFIX alloqual: <http://purl.allotrope.org/ontologies/quality#>
+        PREFIX allodc: <http://purl.allotrope.org/ontologies/datacube#>
         PREFIX purl: <http://purl.allotrope.org/ontologies/>
         PREFIX obo: <http://purl.obolibrary.org/obo/>
 
