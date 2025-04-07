@@ -1,9 +1,7 @@
 use anyhow::{Context, Result};
 use catplus_common::models::{
-    agilent::LiquidChromatographyAggregateDocumentWrapper,
-    types::{Batch, CampaignWrapper},
+    agilent::LiquidChromatographyAggregateDocumentWrapper, hci::CampaignWrapper, synth::SynthBatch,
 };
-use catplus_common::models::{hci::CampaignWrapper, synth::SynthBatch};
 use clap::Parser;
 use converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
