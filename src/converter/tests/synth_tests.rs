@@ -517,7 +517,7 @@ fn test_convert_shake_action() {
         cat:hasPlate [ a cat:Plate;
             cat:containerBarcode "1";
             cat:containerID "1"];
-        cat:speedTumbleStirrer [ a cat:Observation;
+        alloprop:AFX_0000211 [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
                 qudt:value "1"^^xsd:double];
