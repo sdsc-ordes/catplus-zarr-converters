@@ -1,4 +1,4 @@
-use crate::graph::namespaces::{cat, qudt, qudtext, unit};
+use crate::graph::namespaces::{cat, qudtext, unit};
 use serde::{Deserialize, Serialize};
 use sophia::api::ns::Namespace;
 use sophia_api::ns::NsTerm;

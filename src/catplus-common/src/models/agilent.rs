@@ -3,7 +3,7 @@ use crate::{
         insert_into::{InsertIntoGraph, Link},
         namespaces::{allodc, allores, allorole, cat, obo, qb, qudt},
     },
-    models::{enums::Unit, types::PeakList},
+    models::{core::PeakList, enums::Unit},
 };
 
 use serde::{Deserialize, Serialize};
@@ -11,10 +11,7 @@ use sophia::{
     api::ns::{rdf, rdfs, xsd},
     inmem::graph::LightGraph,
 };
-use sophia_api::{
-    graph::MutableGraph,
-    term::{SimpleTerm, Term},
-};
+use sophia_api::term::{SimpleTerm, Term};
 
 #[derive(Deserialize)]
 pub struct LiquidChromatographyAggregateDocumentWrapper {
