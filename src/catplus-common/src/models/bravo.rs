@@ -26,7 +26,6 @@ pub struct BravoBatch {
 
 impl InsertIntoGraph for BravoBatch {
     fn insert_into(&self, graph: &mut LightGraph, _iri: SimpleTerm) -> anyhow::Result<()> {
-
         if let Some(actions) = &self.actions {
             for action in actions {
                 let action_uri = action.get_uri();
@@ -186,7 +185,7 @@ impl InsertIntoGraph for BravoWell {
 #[serde(rename_all = "camelCase")]
 pub struct BravoSample {
     #[serde(flatten)]
-    pub has_well: Well
+    pub has_well: Well,
 }
 
 impl InsertIntoGraph for BravoSample {

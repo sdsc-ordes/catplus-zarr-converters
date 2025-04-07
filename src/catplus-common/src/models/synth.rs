@@ -4,7 +4,7 @@ use crate::{
         namespaces::{alloproc, alloprop, alloqual, allores, cat, purl, qudt},
     },
     models::{
-        core::{Observation, Plate, Chemical},
+        core::{Chemical, Observation, Plate},
         enums::ActionName,
     },
 };
