@@ -7,6 +7,14 @@ use super::insert_into::InsertIntoGraph;
 /// An RDF Graph
 pub struct GraphBuilder {
     pub graph: LightGraph,
+    pub node_strategy: OutputNodeStrategy,
+}
+
+// Node Output Strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OutputNodeStrategy {
+    BNode,
+    Iri,
 }
 
 /// Builds an RDF graph of Synthesis data for the cat+ ontology.
@@ -17,13 +25,17 @@ pub struct GraphBuilder {
 /// * insert:  starts the process of building the graph from the input structure
 /// * serialize_to_turtle: serializes the graph to a turtle output
 impl GraphBuilder {
-    pub fn new() -> Self {
-        Self { graph: LightGraph::new() }
+    pub fn new(strategy: OutputNodeStrategy) -> Self {
+        Self { graph: LightGraph::new(), node_strategy: strategy }
     }
 
     /// Inserts a new object into the graph as a collection of triples.
     pub fn insert(&mut self, other: &dyn InsertIntoGraph) -> Result<()> {
-        other.insert_into(&mut self.graph, other.get_uri())?;
+        let subj_node = match self.node_strategy {
+            OutputNodeStrategy::Iri => other.get_uri(), // Use the object's suggested IRI
+            OutputNodeStrategy::BNode => other.get_bnode(), // Generate a fresh blank node
+        };
+        other.insert_into(self, subj_node)?;
 
         Ok(())
     }
