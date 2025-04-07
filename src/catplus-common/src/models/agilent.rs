@@ -1,9 +1,7 @@
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{
-            allodc, allores, allorole, cat, obo, qb, qudt,
-        },
+        namespaces::{allodc, allores, allorole, cat, obo, qb, qudt},
     },
     models::{enums::Unit, types::PeakList},
 };
@@ -72,7 +70,7 @@ impl InsertIntoGraph for LiquidChromatographyDocument {
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
-        // NOTE: measurement_aggregate_document is not materliazed in the ontology -> we will attach measurement_document directly to LiquidChromatigraphyDocument 
+        // NOTE: measurement_aggregate_document is not materliazed in the ontology -> we will attach measurement_document directly to LiquidChromatigraphyDocument
         let _ = &self.measurement_aggregate_document.insert_into(graph, iri)?;
         Ok(())
     }
@@ -81,18 +79,20 @@ impl InsertIntoGraph for LiquidChromatographyDocument {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MeasurementAggregateDocument {
     #[serde(rename = "measurement document")]
-    pub measurement_documents: Vec<MeasurementDocument>
+    pub measurement_documents: Vec<MeasurementDocument>,
 }
 
 impl InsertIntoGraph for MeasurementAggregateDocument {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         // NOTE: measurement_aggregate_document is not materliazed in the ontology -> we will attach measurement_document directly to LiquidChromatigraphyDocument
         let _ = &self.measurement_documents.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), 
-                    pred: allores::AFR_0002374.as_simple(), 
-                    target_iri: None },
-            )?;
+            graph,
+            Link {
+                source_iri: iri.clone(),
+                pred: allores::AFR_0002374.as_simple(),
+                target_iri: None,
+            },
+        )?;
         Ok(())
     }
 }
@@ -165,8 +165,6 @@ impl InsertIntoGraph for ChromatographyColumnDocument {
         Ok(())
     }
 }
-
-
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceSystemDocument {

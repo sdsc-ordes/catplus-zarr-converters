@@ -202,7 +202,8 @@ fn test_convert_liquid_chromatography() {
         }
     }
     "#;
-    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+    let result =
+        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
     println!("{:?}", result);
     let expected_ttl = r#"
 
@@ -368,7 +369,8 @@ fn test_convert_device_system_document() {
         }
     }
     "#;
-    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+    let result =
+        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
     let expected_ttl = r#"
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>

@@ -475,7 +475,6 @@ impl InsertIntoGraph for Peak {
             (allores::AFR_0000949, &self.relative_peak_height),
             (allores::AFR_0001179, &self.peak_value_at_start),
             (allores::AFR_0001181, &self.peak_value_at_end),
-
         ] {
             value.attach_into(
                 graph,

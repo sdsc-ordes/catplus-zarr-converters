@@ -17,7 +17,7 @@ namespace! {
     MilliM3,
     SEC,
     MIN,
-    PERCENT, 
+    PERCENT,
     NanoM,
     UNITLESS,
     CountsPerSec
