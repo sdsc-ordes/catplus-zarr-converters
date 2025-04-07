@@ -1,5 +1,6 @@
 use crate::{
     graph::{
+        graph_builder::GraphBuilder,
         insert_into::{InsertIntoGraph, Link},
         namespaces::{allocom, allohdf, allores, cat, obo, purl, schema},
     },
@@ -8,7 +9,7 @@ use crate::{
 
 use anyhow;
 use serde::{Deserialize, Serialize};
-use sophia::{api::ns::rdf, inmem::graph::LightGraph};
+use sophia::api::ns::rdf;
 use sophia_api::term::{SimpleTerm, Term};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -28,7 +29,7 @@ pub struct Campaign {
 }
 
 impl InsertIntoGraph for Campaign {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Campaign.as_simple() as &dyn InsertIntoGraph),
             (schema::name, &self.campaign_name.as_simple()),
@@ -42,7 +43,7 @@ impl InsertIntoGraph for Campaign {
             (cat::hasChemical, &self.has_chemical),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
@@ -60,7 +61,7 @@ pub struct Objective {
 }
 
 impl InsertIntoGraph for Objective {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &obo::IAO_0000005.as_simple()),
             (schema::name, &self.objective_name.as_simple()),
@@ -69,7 +70,7 @@ impl InsertIntoGraph for Objective {
             (allocom::AFC_0000090, &self.condition.as_simple()),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
@@ -83,8 +84,8 @@ pub struct CampaignWrapper {
     pub has_campaign: Campaign,
 }
 impl InsertIntoGraph for CampaignWrapper {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        self.has_campaign.insert_into(graph, iri)
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
+        self.has_campaign.insert_into(builder, iri)
     }
 }
 
@@ -102,7 +103,7 @@ pub struct HciBatch {
 }
 
 impl InsertIntoGraph for HciBatch {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
             (purl::identifier, &self.batch_id.as_simple()),
@@ -116,7 +117,7 @@ impl InsertIntoGraph for HciBatch {
             ),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }

@@ -1,4 +1,7 @@
-use catplus_common::{models::synth::SynthBatch, rdf::rdf_parser::parse_turtle_to_graph};
+use catplus_common::{
+    graph::graph_builder::OutputNodeStrategy, models::synth::SynthBatch,
+    rdf::rdf_parser::parse_turtle_to_graph,
+};
 use converter::convert::{json_to_rdf, RdfFormat};
 use sophia_isomorphism::isomorphic_graphs;
 
@@ -22,7 +25,8 @@ fn test_convert_filtrate_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -90,7 +94,8 @@ fn test_convert_pressure_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -180,7 +185,8 @@ fn test_convert_set_temperature_action() {
                 ]
             }
         "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -339,7 +345,8 @@ fn test_convert_add_action() {
         ]
     }
     "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -485,7 +492,8 @@ fn test_convert_shake_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -571,7 +579,8 @@ fn test_convert_set_vacuum_action() {
             ]
         }
     "#;
-    let result = json_to_rdf::<SynthBatch>(json_data, &output_format);
+    let output_node_strategy = OutputNodeStrategy::BNode;
+    let result = json_to_rdf::<SynthBatch>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
