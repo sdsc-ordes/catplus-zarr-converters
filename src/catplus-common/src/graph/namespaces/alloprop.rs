@@ -3,6 +3,7 @@ use sophia::api::ns::Namespace;
 use sophia_api::namespace;
 namespace! {
     "http://purl.allotrope.org/ontologies/property#",
+    AFX_0000060,
     AFX_0000211
 }
 lazy_static! {

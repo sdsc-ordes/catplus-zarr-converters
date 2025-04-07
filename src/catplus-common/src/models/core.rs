@@ -5,7 +5,7 @@
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema},
+        namespaces::{allores, cat, obo, purl, qudt, schema},
     },
     models::enums::Unit,
 };
@@ -93,77 +93,6 @@ impl InsertIntoGraph for ErrorMargin {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Sample {
-    #[serde(flatten)]
-    pub has_plate: Plate,
-    #[serde(rename = "vialID")]
-    pub vial_id: String,
-    pub vial_type: String,
-    pub role: String,
-    pub expected_datum: Observation,
-    pub has_sample: Vec<SampleItem>,
-}
-
-impl InsertIntoGraph for Sample {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
-            (cat::hasPlate, &self.has_plate),
-            (cat::role, &self.role.as_simple()),
-            (cat::vialType, &self.vial_type.as_simple()),
-            (allores::AFR_0002464, &self.vial_id.as_simple()),
-            (cat::expectedDatum, &self.expected_datum),
-            (cat::hasSample, &self.has_sample),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SampleItem {
-    #[serde(rename = "sampleID")]
-    pub sample_id: String,
-    pub role: String,
-    pub internal_bar_code: String,
-    pub expected_datum: Option<Observation>,
-    pub measured_quantity: Option<Observation>,
-    pub concentration: Option<Observation>,
-    pub physical_state: String,
-    pub has_chemical: Chemical,
-}
-
-impl InsertIntoGraph for SampleItem {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (prop, value) in [
-            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
-            (purl::identifier, &self.sample_id.as_simple()),
-            (cat::role, &self.role.as_simple()),
-            (cat::internalBarCode, &self.internal_bar_code.as_simple()),
-            (alloqual::AFQ_0000111, &self.physical_state.as_simple()),
-            (cat::expectedDatum, &self.expected_datum),
-            (cat::measuredQuantity, &self.measured_quantity),
-            (allores::AFR_0002036, &self.concentration),
-            (cat::hasChemical, &self.has_chemical),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Chemical {
     #[serde(rename = "chemicalID")]
     pub chemical_id: String,
@@ -198,32 +127,6 @@ impl InsertIntoGraph for Chemical {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Well {
-    #[serde(flatten)]
-    pub has_plate: Plate,
-    pub position: String,
-    pub quantity: Observation,
-}
-
-impl InsertIntoGraph for Well {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in [
-            (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
-            (cat::hasPlate, &self.has_plate),
-            (allores::AFR_0002240, &self.position.as_simple()),
-            (qudt::quantity, &self.quantity),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
 
@@ -346,6 +249,30 @@ mod tests {
         let i = IriRef::new_unchecked("http://test.com/my-obersvation");
         observation.insert_into(&mut b.graph, i.as_simple())?;
         println!("Graph\n{}", b.serialize_to_turtle().unwrap());
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Well {
+    #[serde(flatten)]
+    pub has_plate: Plate,
+    pub position: String,
+}
+
+impl InsertIntoGraph for Well {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
+            (cat::hasPlate, &self.has_plate),
+            (allores::AFR_0002240, &self.position.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
 
         Ok(())
     }

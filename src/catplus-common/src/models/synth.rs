@@ -1,10 +1,10 @@
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{alloproc, alloprop, alloqual, allores, cat, purl},
+        namespaces::{alloproc, alloprop, alloqual, allores, cat, purl, qudt},
     },
     models::{
-        core::{Observation, Plate, Sample, Well},
+        core::{Observation, Plate, Chemical},
         enums::ActionName,
     },
 };
@@ -67,10 +67,10 @@ pub struct SynthAction {
     #[serde(flatten)]
     pub has_plate: Option<Plate>,
     pub speed_shaker: Option<Observation>,
-    pub has_well: Option<Vec<Well>>,
+    pub has_well: Option<Vec<SynthWell>>,
     pub dispense_state: Option<String>,
     pub dispense_type: Option<String>,
-    pub has_sample: Option<Sample>,
+    pub has_sample: Option<SynthSample>,
     pub speed_tumble_stirrer: Option<Observation>,
     pub temperature_tumble_stirrer: Option<Observation>,
     pub temperature_shaker: Option<Observation>,
@@ -102,6 +102,103 @@ impl InsertIntoGraph for SynthAction {
             value.attach_into(
                 graph,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SynthWell {
+    #[serde(flatten)]
+    pub has_plate: Plate,
+    pub position: String,
+    pub quantity: Observation,
+}
+
+impl InsertIntoGraph for SynthWell {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
+            (cat::hasPlate, &self.has_plate),
+            (allores::AFR_0002240, &self.position.as_simple()),
+            (qudt::quantity, &self.quantity),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SynthSample {
+    #[serde(flatten)]
+    pub has_plate: Plate,
+    #[serde(rename = "vialID")]
+    pub vial_id: String,
+    pub vial_type: String,
+    pub role: String,
+    pub expected_datum: Observation,
+    pub has_sample: Vec<SampleItem>,
+}
+
+impl InsertIntoGraph for SynthSample {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
+            (cat::hasPlate, &self.has_plate),
+            (cat::role, &self.role.as_simple()),
+            (cat::vialType, &self.vial_type.as_simple()),
+            (allores::AFR_0002464, &self.vial_id.as_simple()),
+            (cat::expectedDatum, &self.expected_datum),
+            (cat::hasSample, &self.has_sample),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SampleItem {
+    #[serde(rename = "sampleID")]
+    pub sample_id: String,
+    pub role: String,
+    pub internal_bar_code: String,
+    pub expected_datum: Option<Observation>,
+    pub measured_quantity: Option<Observation>,
+    pub concentration: Option<Observation>,
+    pub physical_state: String,
+    pub has_chemical: Chemical,
+}
+
+impl InsertIntoGraph for SampleItem {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
+            (purl::identifier, &self.sample_id.as_simple()),
+            (cat::role, &self.role.as_simple()),
+            (cat::internalBarCode, &self.internal_bar_code.as_simple()),
+            (alloqual::AFQ_0000111, &self.physical_state.as_simple()),
+            (cat::expectedDatum, &self.expected_datum),
+            (cat::measuredQuantity, &self.measured_quantity),
+            (allores::AFR_0002036, &self.concentration),
+            (cat::hasChemical, &self.has_chemical),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
             )?;
         }
 

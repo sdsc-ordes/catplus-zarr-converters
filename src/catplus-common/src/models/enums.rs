@@ -21,6 +21,8 @@ pub enum Unit {
     MolPerL,
     #[serde(rename = "rpm")]
     RevPerMin,
+    #[serde(rename = "mL")]
+    MilliL,
     #[serde(rename = "mm^3")]
     MilliM3,
     #[serde(rename = "nM")]
@@ -51,6 +53,7 @@ impl Unit {
             Unit::GMPerMol => "GM-PER-MOL",
             Unit::MolPerL => "MOL-PER-L",
             Unit::RevPerMin => "REV-PER-MIN",
+            Unit::MilliL => "MilliL",
             Unit::MilliM3 => "MilliM3",
             Unit::SEC => "SEC",
             Unit::MIN => "MIN",
@@ -70,6 +73,7 @@ impl Unit {
             Unit::Bar
             | Unit::DegC
             | Unit::MilliGM
+            | Unit::MilliL
             | Unit::GMPerMilliL
             | Unit::GMPerMol
             | Unit::MolPerL
@@ -106,6 +110,8 @@ pub enum ActionName {
     shakeAction,
     setVacuumAction,
     setPressureAction,
+    solventChangeAction,
+    EvaporationAction,
 }
 
 impl fmt::Display for ActionName {
@@ -123,6 +129,8 @@ impl ActionName {
             Self::shakeAction => cat::ShakeAction,
             Self::setVacuumAction => cat::SetVacuumAction,
             Self::filtrateAction => cat::FiltrateAction,
+            Self::EvaporationAction => cat::EvaporationAction,
+            Self::solventChangeAction => cat::SolventChangeAction,
         }
     }
 }
