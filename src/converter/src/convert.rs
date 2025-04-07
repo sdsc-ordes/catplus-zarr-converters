@@ -1,5 +1,8 @@
 use anyhow::{Context, Result};
-use catplus_common::graph::{graph_builder::GraphBuilder, insert_into::InsertIntoGraph};
+use catplus_common::graph::{
+    graph_builder::{GraphBuilder, OutputNodeStrategy},
+    insert_into::InsertIntoGraph,
+};
 use serde::{de::DeserializeOwned, Deserialize};
 
 // Derive Deserialize and ValueEnum
@@ -19,13 +22,17 @@ pub enum RdfFormat {
 ///
 /// # Returns
 /// A `Result` containing the serialized graph as a string or an error.
-pub fn json_to_rdf<T>(input_content: &str, format: &RdfFormat) -> Result<String>
+pub fn json_to_rdf<T>(
+    input_content: &str,
+    format: &RdfFormat,
+    output_node_strategy: &OutputNodeStrategy,
+) -> Result<String>
 where
     T: DeserializeOwned + InsertIntoGraph, // Trait bounds
 {
     let data: T = parse_json(input_content).context("Failed to parse JSON input")?;
 
-    let mut graph_builder = GraphBuilder::new();
+    let mut graph_builder = GraphBuilder::new(output_node_strategy.clone());
     graph_builder.insert(&data).context("Failed to build RDF graph")?;
 
     let serialized_graph = match format {

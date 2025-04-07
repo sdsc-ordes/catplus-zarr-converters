@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use catplus_common::models::{
     agilent::LiquidChromatographyAggregateDocumentWrapper, hci::CampaignWrapper, synth::SynthBatch,
 };
+use catplus_common::graph::graph_builder::OutputNodeStrategy;
 use clap::Parser;
 use converter::convert::{json_to_rdf, RdfFormat};
 use serde::Deserialize;
@@ -17,6 +18,23 @@ enum InputType {
     Synth,
     HCI,
     Agilent,
+}
+
+// Define the CLI-specific enum
+#[derive(Debug, clap::ValueEnum, Clone, Copy)]
+enum CliOutputNodeStrategy {
+    Bnode,
+    Iri,
+}
+
+// Optional: Implement From trait for easy conversion
+impl From<CliOutputNodeStrategy> for OutputNodeStrategy {
+    fn from(cli_strategy: CliOutputNodeStrategy) -> Self {
+        match cli_strategy {
+            CliOutputNodeStrategy::Bnode => OutputNodeStrategy::BNode,
+            CliOutputNodeStrategy::Iri => OutputNodeStrategy::Iri,
+        }
+    }
 }
 
 /// Converts CAT+ JSON input into RDF formats.
@@ -39,6 +57,10 @@ struct Args {
     /// Type of input data: "Turtle" or "Jsonld".
     #[arg(value_enum)]
     format: RdfFormat,
+
+    /// Strategy for generating new nodes in the RDF graph: "BNode" (blank node) or "Iri".
+    #[arg(value_enum, default_value = "iri")]
+    node_strategy: CliOutputNodeStrategy, // Use the CLI enum here
 }
 
 fn main() -> Result<()> {
@@ -60,13 +82,21 @@ fn main() -> Result<()> {
         .read_to_string(&mut input_content)
         .with_context(|| format!("Failed to read input file '{}'", args.input_file))?;
 
+    // Map the CLI enum to the internal enum
+    let output_node_strategy: OutputNodeStrategy = args.node_strategy.into();
+
     // Unified conversion function with type selection
     let serialized_graph = match args.input_type {
-        InputType::Synth => json_to_rdf::<SynthBatch>(&input_content, &args.format),
-        InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
+        InputType::Synth => {
+            json_to_rdf::<SynthBatch>(&input_content, &args.format, &output_node_strategy)
+        }
+        InputType::HCI => {
+            json_to_rdf::<CampaignWrapper>(&input_content, &args.format, &output_node_strategy)
+        }
         InputType::Agilent => json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
             &input_content,
             &args.format,
+            &output_node_strategy
         ),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
