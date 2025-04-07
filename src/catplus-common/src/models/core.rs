@@ -110,7 +110,7 @@ impl InsertIntoGraph for Sample {
             (rdf::type_, &cat::Sample.as_simple() as &dyn InsertIntoGraph),
             (cat::hasPlate, &self.has_plate),
             (cat::role, &self.role.as_simple()),
-            (cat::vialShape, &self.vial_type.as_simple()),
+            (cat::vialType, &self.vial_type.as_simple()),
             (allores::AFR_0002464, &self.vial_id.as_simple()),
             (cat::expectedDatum, &self.expected_datum),
             (cat::hasSample, &self.has_sample),

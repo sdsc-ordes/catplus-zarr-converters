@@ -399,7 +399,7 @@ fn test_convert_add_action() {
                 purl:identifier "124";
                 alloqual:AFQ_0000111 "Liquid"];
             cat:role "reagent";
-            cat:vialShape "storage vial";
+            cat:vialType "storage vial";
             allores:AFR_0002464 "17"];
         cat:hasWell [ a cat:Well;
             cat:hasPlate [ a cat:Plate;

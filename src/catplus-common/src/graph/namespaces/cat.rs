@@ -68,7 +68,7 @@ namespace! {
     ThreeDimensionalMassSpectrumDataCube,
     ThreeDimensionalUltravioletSpectrumDataCube,
     vacuum,
-    vialShape,
+    vialType,
     Well
 }
 lazy_static! {
