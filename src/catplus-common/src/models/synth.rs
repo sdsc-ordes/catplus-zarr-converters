@@ -1,7 +1,7 @@
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{alloproc, alloqual, allores, cat, purl},
+        namespaces::{alloproc, alloprop, alloqual, allores, cat, purl},
     },
     models::{
         core::{Observation, Plate, Sample, Well},
@@ -88,10 +88,10 @@ impl InsertIntoGraph for SynthAction {
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
             (cat::subEquipmentName, &self.sub_equipment_name.as_simple()),
             (cat::speedInRPM, &self.speed_shaker),
-            (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
-            (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
+            (cat::temperatureTumbleStirrer, &self.temperature_tumble_stirrer),
+            (alloprop::AFX_0000211, &self.speed_tumble_stirrer),
             (cat::vacuum, &self.vacuum),
-            (cat::temperatureShakerShape, &self.temperature_shaker),
+            (cat::temperatureShaker, &self.temperature_shaker),
             (alloproc::AFP_0002677, &self.pressure_measurement),
             (cat::hasSample, &self.has_sample),
             (cat::hasWell, &self.has_well),
