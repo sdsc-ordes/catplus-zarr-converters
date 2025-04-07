@@ -1,4 +1,5 @@
 use catplus_common::{
+    graph::graph_builder::OutputNodeStrategy,
     models::agilent::LiquidChromatographyAggregateDocumentWrapper,
     rdf::rdf_parser::parse_turtle_to_graph,
 };
@@ -202,8 +203,9 @@ fn test_convert_liquid_chromatography() {
         }
     }
     "#;
+    let output_node_strategy = OutputNodeStrategy::BNode;
     let result =
-        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format, &output_node_strategy);
     println!("{:?}", result);
     let expected_ttl = r#"
 
@@ -369,8 +371,9 @@ fn test_convert_device_system_document() {
         }
     }
     "#;
+    let output_node_strategy = OutputNodeStrategy::BNode;
     let result =
-        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format, &output_node_strategy);
     let expected_ttl = r#"
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
