@@ -1,5 +1,6 @@
 use crate::{
     graph::{
+        graph_builder::{GraphBuilder, OutputNodeStrategy},
         insert_into::{InsertIntoGraph, Link},
         namespaces::{alloproc, alloqual, allores, cat, purl},
     },
@@ -10,10 +11,7 @@ use crate::{
 };
 use anyhow;
 use serde::{Deserialize, Serialize};
-use sophia::{
-    api::ns::{rdf, xsd},
-    inmem::graph::LightGraph,
-};
+use sophia::api::ns::{rdf, xsd};
 use sophia_api::{
     graph::MutableGraph,
     term::{SimpleTerm, Term},
@@ -30,13 +28,13 @@ pub struct SynthBatch {
 }
 
 impl InsertIntoGraph for SynthBatch {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
             (purl::identifier, &self.batch_id.as_simple()),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
@@ -44,9 +42,12 @@ impl InsertIntoGraph for SynthBatch {
         // NOTE: for actions, the direction is reversed (action hasbatch batch)
         if let Some(actions) = &self.actions {
             for action in actions {
-                let action_uri = action.get_uri();
-                graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
-                action.insert_into(graph, action_uri)?;
+                let action_uri = match builder.node_strategy {
+                    OutputNodeStrategy::Iri => action.get_uri(),
+                    OutputNodeStrategy::BNode => action.get_bnode(),
+                };
+                builder.graph.insert(&action_uri, &cat::hasBatch.as_simple(), &iri)?;
+                action.insert_into(builder, action_uri)?;
             }
         }
 
@@ -79,7 +80,7 @@ pub struct SynthAction {
 }
 
 impl InsertIntoGraph for SynthAction {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+    fn insert_into(&self, builder: &mut GraphBuilder, iri: SimpleTerm) -> anyhow::Result<()> {
         for (pred, value) in [
             (rdf::type_, &self.action_name.iri().as_simple() as &dyn InsertIntoGraph),
             (allores::AFX_0000622, &(self.start_time.as_str() * xsd::dateTime).as_simple()),
@@ -100,7 +101,7 @@ impl InsertIntoGraph for SynthAction {
             (cat::dispenseType, &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
         ] {
             value.attach_into(
-                graph,
+                builder,
                 Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
             )?;
         }
