@@ -46,8 +46,6 @@ pub struct BravoAction {
     pub method_name: Option<String>,
     pub equipment_name: String,
     pub sub_equipment_name: Option<String>,
-    #[serde(flatten)]
-    pub has_plate: Option<Plate>,
     pub speed_shaker: Option<Observation>,
     pub at_well: Option<BravoWell>,
     pub dispense_state: Option<String>,
@@ -72,6 +70,8 @@ impl InsertIntoGraph for BravoAction {
             (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
             (allores::AFR_0001606, &self.method_name.as_ref().clone().map(|s| s.as_simple())),
             (allores::AFR_0001723, &self.equipment_name.as_simple()),
+            (cat::startDuration, &self.start_duration),
+            (cat::endingDuration, &self.ending_duration),
             (
                 cat::subEquipmentName,
                 &self.sub_equipment_name.as_ref().clone().map(|s| s.as_simple()),
@@ -96,7 +96,6 @@ impl InsertIntoGraph for BravoAction {
             (cat::hasWell, &self.at_well),
             (cat::hasCartridge, &self.has_cartridge),
             (cat::order, &self.order.as_ref().clone().map(|s| s.as_simple())),
-            (cat::hasPlate, &self.has_plate),
             (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
             (cat::dispenseType, &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
         ] {
@@ -158,10 +157,12 @@ impl InsertIntoGraph for Solvent {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BravoWell {
     #[serde(flatten)]
     pub has_plate: Plate,
     pub position: String,
+    pub product_identification: ProductIdentification,
 }
 
 impl InsertIntoGraph for BravoWell {
@@ -170,6 +171,29 @@ impl InsertIntoGraph for BravoWell {
             (rdf::type_, &cat::Well.as_simple() as &dyn InsertIntoGraph),
             (cat::hasPlate, &self.has_plate),
             (allores::AFR_0002240, &self.position.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductIdentification {
+    #[serde(rename = "sampleID")]
+    pub sample_id: String,
+    pub peak_identifier: String,
+}
+
+impl InsertIntoGraph for ProductIdentification {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::Product.as_simple() as &dyn InsertIntoGraph),
         ] {
             value.attach_into(
                 graph,
