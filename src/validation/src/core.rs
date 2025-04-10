@@ -1,9 +1,7 @@
-use sophia::inmem::graph::LightGraph;
 /// Interface for validating an RDF graph.
+use sophia::inmem::graph::LightGraph;
 use sophia_api::prelude::*;
 use std::error::Error;
-
-pub mod shacl_api;
 
 /// A SHACL validation report for an RDF graph.
 #[derive(Clone, Debug)]
