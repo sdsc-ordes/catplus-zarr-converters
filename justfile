@@ -22,6 +22,14 @@ format *args:
     cargo fmt {{args}}
 
 # Run the converter.
+convert *args:
+  cargo run --bin converter -- {{args}}
+
+# Run the validation.
+validate *args:
+  cargo run --bin validation -- {{args}}
+
+# Run validation
 run input_type input_file output_file *args:
     cd "{{root_dir}}/src/converter" && \
     cargo run --bin converter "{{input_type}}" "{{root_dir}}/{{input_file}}" "{{root_dir}}/{{output_file}}" {{args}}
