@@ -3,7 +3,7 @@ set positional-arguments
 set shell := ["bash", "-cue"]
 
 root_dir := `git rev-parse --show-toplevel`
-shapes_url := "https://github.com/sdsc-ordes/catplus-ontology/releases/download/v0.1.0/catplus_ontology.ttl"
+shapes_url := "https://github.com/sdsc-ordes/catplus-ontology/releases/latest/download/catplus_ontology.ttl"
 
 # Default recipe to list all recipes.
 default:
