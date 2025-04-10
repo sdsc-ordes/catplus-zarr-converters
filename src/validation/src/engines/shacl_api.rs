@@ -37,7 +37,7 @@ impl ShaclEngine for ShaclApiEndpoint {
         let accept_header = "text/turtle";
 
         // Serialize data graph and add to multipart form
-        let data_bytes = serialize_graph_to_turtle(&data).unwrap().into_bytes();
+        let data_bytes = serialize_graph_to_turtle(data).unwrap().into_bytes();
         let data_part =
             multipart::Part::bytes(data_bytes).file_name("data.ttl").mime_str("text/turtle")?;
 

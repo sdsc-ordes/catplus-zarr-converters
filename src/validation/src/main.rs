@@ -7,7 +7,7 @@ use std::{
     fs,
     fs::File,
     io::{stdin, stdout, BufReader, BufWriter, Read, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 use validation::{core::*, engines::shacl_api::*};
 
@@ -44,7 +44,7 @@ fn main() -> Result<()> {
 }
 
 // Get a reader based on input path, either from stdin or a file.
-pub fn get_reader(path: &PathBuf) -> Result<Box<dyn Read>> {
+pub fn get_reader(path: &Path) -> Result<Box<dyn Read>> {
     return match path.to_str().unwrap() {
         "-" => Ok(Box::new(BufReader::new(stdin()))),
         path => Ok(Box::new(BufReader::new(File::open(path)?))),
@@ -52,7 +52,7 @@ pub fn get_reader(path: &PathBuf) -> Result<Box<dyn Read>> {
 }
 
 // Get a writer based on input path, either to stdout or a file.
-pub fn get_writer(path: &PathBuf) -> Result<Box<dyn Write>> {
+pub fn get_writer(path: &Path) -> Result<Box<dyn Write>> {
     return match path.to_str().unwrap() {
         "-" => Ok(Box::new(BufWriter::new(stdout()))),
         path => Ok(Box::new(BufWriter::new(File::create(path)?))),
