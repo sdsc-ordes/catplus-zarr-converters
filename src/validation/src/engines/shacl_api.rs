@@ -5,8 +5,8 @@ use sophia::{inmem::graph::LightGraph, turtle::parser::turtle};
 use sophia_api::prelude::*;
 use std::error::Error;
 
-use catplus_common::rdf::rdf_serializers::serialize_graph_to_turtle;
 use crate::core::{ShaclEngine, ValidationReport};
+use catplus_common::rdf::rdf_serializers::serialize_graph_to_turtle;
 
 pub struct ShaclApiEndpoint {
     url: String,
