@@ -215,6 +215,7 @@ fn test_convert_liquid_chromatography() {
     PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
     PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
     PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+    PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
     PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
     PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
     PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -380,6 +381,7 @@ fn test_convert_device_system_document() {
     PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
     PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
     PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+    PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
     PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
     PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
     PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
