@@ -3,7 +3,8 @@ resolver = "2"
 
 members = [
   "src/catplus-common",
-  "src/converter"
+  "src/converter",
+  "src/validation",
 ]
 
 
