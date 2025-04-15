@@ -8,6 +8,7 @@ pkgs.dockerTools.buildLayeredImage {
 
   contents = [ 
     catplus-converters
+    pkgs.just
     pkgs.bashInteractive
     ];
 
