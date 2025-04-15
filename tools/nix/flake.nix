@@ -77,21 +77,21 @@
 
           rootDir = ./../..;
 
-          catplus-converter = (import ./packages) {
+          catplus-converters = (import ./packages) {
             inherit rootDir;
             inherit pkgs;
             inherit lib;
             inherit rustToolchain;
           };
 
-          catplus-converter-image = (import ./images) {
+          catplus-converters-image = (import ./images) {
             inherit pkgs;
-            inherit catplus-converter;
+            inherit catplus-converters;
           };
         in
         {
           packages = {
-            inherit catplus-converter catplus-converter-image;
+            inherit catplus-converters catplus-converters-image;
           };
 
           devShells = {
