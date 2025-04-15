@@ -41,21 +41,23 @@ impl GraphBuilder {
             // If the subject or object is a blank node, replace it with a URI
             let new_subject = match subject {
                 SimpleTerm::BlankNode(s) => {
-                    format!("{}{}", prefix.unwrap_or_default(), s.as_str())
+                    let new_iri = format!("{}{}", prefix.unwrap_or_default(), s.as_str());
+                    let new_s = new_iri.as_simple();
+                    new_s.clone()
                 },
-                _ => subject
+                _ => subject.clone()
             };
 
             let new_object = match object {
                 SimpleTerm::BlankNode(o) => {
                     let new_iri = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
-                    let new_subject = SimpleTerm::Iri(new_iri.as_simple());
+                    let new_o = new_iri.as_simple();
                     new_o
                 },
-                _ => object
+                _ => *object
             };
             // Add the triple to the new graph
-            new_graph.insert(new_subject, predicate.clone(), new_object.clone())?
+            new_graph.insert(new_subject, predicate.clone(), new_object.clone())?;
         }
                     
 
