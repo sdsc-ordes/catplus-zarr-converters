@@ -1,6 +1,8 @@
 use crate::rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle};
 use anyhow::{Context, Result};
 use sophia::inmem::graph::LightGraph;
+use sophia_api::prelude::*;
+use sophia_api::term::SimpleTerm;
 
 use super::insert_into::InsertIntoGraph;
 
@@ -25,6 +27,39 @@ impl GraphBuilder {
     pub fn insert(&mut self, other: &dyn InsertIntoGraph) -> Result<()> {
         other.insert_into(&mut self.graph, other.get_uri())?;
 
+        Ok(())
+    }
+
+    /// Materializes blank nodes in the graph by replacing them with URIs.
+    /// If a prefix is given, it will be used for all materialized blank nodes.
+    /// Otherwise, the empty string is used as the prefix.
+    pub fn materialize_blank_nodes(&mut self, prefix: Option<&str>) -> Result<()> {
+        let mut new_graph = LightGraph::new();
+        for triple in self.graph.triples_matching(Any, Any, Any) {
+            let [subject, predicate, object] = triple?;
+
+            // If the subject or object is a blank node, replace it with a URI
+            let new_subject = match subject {
+                SimpleTerm::BlankNode(s) => {
+                    format!("{}{}", prefix.unwrap_or_default(), s.as_str())
+                },
+                _ => subject
+            };
+
+            let new_object = match object {
+                SimpleTerm::BlankNode(o) => {
+                    let new_iri = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
+                    let new_subject = SimpleTerm::Iri(new_iri.as_simple());
+                    new_o
+                },
+                _ => object
+            };
+            // Add the triple to the new graph
+            new_graph.insert(new_subject, predicate.clone(), new_object.clone())?
+        }
+                    
+
+        self.graph = new_graph;
         Ok(())
     }
 
