@@ -10,7 +10,6 @@ default:
 # Upload converter image.
 push-image:
    @echo "🐋 Uploading docker image"
-   skopeo login ghcr.io
    skopeo copy \
     "docker-archive:{{root_dir}}/tools/image/.output/package/catplus-converter-image" \
     "docker://ghcr.io/sdsc-ordes/catplus-converter:latest"
