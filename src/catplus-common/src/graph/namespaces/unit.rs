@@ -6,17 +6,25 @@ use sophia_api::namespace;
 // namespace uses rust adapted term names and then maps them on output
 // to the real ontology units
 namespace! {
-    "https://qudt.org/vocab/unit/",
+    "http://qudt.org/vocab/unit/",
     Bar,
     DegC,
     GMPerMilliL,
     GMPerMol,
     MilliGM,
     MolPerL,
-    RevPerMin
+    RevPerMin,
+    MilliM3,
+    SEC,
+    MIN,
+    PERCENT,
+    NanoM,
+    UNITLESS,
+    CountsPerSec
+
 }
 
 lazy_static! {
     pub static ref ns: Namespace<&'static str> =
-        Namespace::new("https://qudt.org/vocab/unit/").unwrap();
+        Namespace::new("http://qudt.org/vocab/unit/").unwrap();
 }

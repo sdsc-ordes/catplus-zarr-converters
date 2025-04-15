@@ -5,198 +5,14 @@
 use crate::{
     graph::{
         insert_into::{InsertIntoGraph, Link},
-        namespaces::{alloproc, allocom, allohdf, alloqual, allores, cat, obo, purl, qudt, schema},
+        namespaces::{alloqual, allores, cat, obo, purl, qudt, schema},
     },
-    models::enums::{ActionName, Unit},
+    models::enums::Unit,
 };
 use anyhow;
 use serde::{Deserialize, Serialize};
-use sophia::{
-    api::ns::{rdf, xsd},
-    inmem::graph::LightGraph,
-};
-use sophia_api::{
-    graph::MutableGraph,
-    term::{SimpleTerm, Term},
-};
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Campaign {
-    pub campaign_name: String,
-    pub description: String,
-    #[serde(rename = "objective")]
-    pub generic_objective: String,
-    pub campaign_class: String,
-    #[serde(rename = "type")]
-    pub campaign_type: String,
-    pub reference: String,
-    pub has_objective: Option<Objective>,
-    pub has_batch: Batch,
-    pub has_chemical: Option<Vec<Chemical>>,
-}
-
-impl InsertIntoGraph for Campaign {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in [
-            (rdf::type_, &cat::Campaign.as_simple() as &dyn InsertIntoGraph),
-            (schema::name, &self.campaign_name.as_simple()),
-            (schema::description, &self.description.as_simple()),
-            (cat::genericObjective, &self.generic_objective.as_simple()),
-            (cat::campaignClass, &self.campaign_class.as_simple()),
-            (cat::campaignType, &self.campaign_type.as_simple()),
-            (allores::AFR_0002764, &self.reference.as_simple()),
-            (cat::hasObjective, &self.has_objective),
-            (cat::hasBatch, &self.has_batch),
-            (cat::hasChemical, &self.has_chemical),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Objective {
-    pub criteria: String,
-    pub condition: String,
-    pub description: String,
-    pub objective_name: String,
-}
-
-impl InsertIntoGraph for Objective {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in [
-            (rdf::type_, &obo::IAO_0000005.as_simple()),
-            (schema::name, &self.objective_name.as_simple()),
-            (schema::description, &self.description.as_simple()),
-            (cat::criteria, &self.criteria.as_simple()),
-            (allocom::AFC_0000090, &self.condition.as_simple()),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Deserialize)]
-pub struct CampaignWrapper {
-    #[serde(rename = "hasCampaign")]
-    pub has_campaign: Campaign,
-}
-impl InsertIntoGraph for CampaignWrapper {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        self.has_campaign.insert_into(graph, iri)
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Batch {
-    #[serde(rename = "batchID")]
-    pub batch_id: String,
-    #[serde(rename = "Actions")]
-    pub actions: Option<Vec<Action>>,
-    pub batch_name: Option<String>,
-    pub reaction_type: Option<String>,
-    pub reaction_name: Option<String>,
-    pub optimization_type: Option<String>,
-    pub link: Option<String>,
-}
-
-impl InsertIntoGraph for Batch {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in [
-            (rdf::type_, &cat::Batch.as_simple() as &dyn InsertIntoGraph),
-            (purl::identifier, &self.batch_id.as_simple()),
-            (schema::name, &self.batch_name.as_ref().clone().map(|s| s.as_simple())),
-            (allohdf::HardLink, &self.link.as_ref().clone().map(|s| s.as_simple())),
-            (cat::reactionType, &self.reaction_type.as_ref().clone().map(|s| s.as_simple())),
-            (cat::reactionName, &self.reaction_name.as_ref().clone().map(|s| s.as_simple())),
-            (
-                cat::optimizationType,
-                &self.optimization_type.as_ref().clone().map(|s| s.as_simple()),
-            ),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-
-        // NOTE: for actions, the direction is reversed (action hasbatch batch)
-        if let Some(actions) = &self.actions {
-            for action in actions {
-                let action_uri = action.get_uri();
-                graph.insert(&action_uri, cat::hasBatch.as_simple(), iri.clone())?;
-                action.insert_into(graph, action_uri)?;
-            }
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Action {
-    pub action_name: ActionName,
-    pub start_time: String,
-    pub ending_time: String,
-    pub method_name: String,
-    pub equipment_name: String,
-    pub sub_equipment_name: String,
-    #[serde(flatten)]
-    pub has_plate: Option<Plate>,
-    pub speed_shaker: Option<Observation>,
-    pub has_well: Option<Vec<Well>>,
-    pub dispense_state: Option<String>,
-    pub dispense_type: Option<String>,
-    pub has_sample: Option<Sample>,
-    pub speed_tumble_stirrer: Option<Observation>,
-    pub temperature_tumble_stirrer: Option<Observation>,
-    pub temperature_shaker: Option<Observation>,
-    pub pressure_measurement: Option<Observation>,
-    pub vacuum: Option<Observation>,
-}
-
-impl InsertIntoGraph for Action {
-    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
-        for (pred, value) in [
-            (rdf::type_, &self.action_name.iri().as_simple() as &dyn InsertIntoGraph),
-            (allores::AFX_0000622, &(self.start_time.as_str() * xsd::dateTime).as_simple()),
-            (allores::AFR_0002423, &(self.ending_time.as_str() * xsd::dateTime).as_simple()),
-            (allores::AFR_0001606, &self.method_name.as_simple()),
-            (allores::AFR_0001723, &self.equipment_name.as_simple()),
-            (cat::subEquipmentName, &self.sub_equipment_name.as_simple()),
-            (cat::speedInRPM, &self.speed_shaker),
-            (cat::temperatureTumbleStirrerShape, &self.temperature_tumble_stirrer),
-            (cat::speedTumbleStirrerShape, &self.speed_tumble_stirrer),
-            (cat::vacuum, &self.vacuum),
-            (cat::temperatureShakerShape, &self.temperature_shaker),
-            (alloproc::AFP_0002677, &self.pressure_measurement),
-            (cat::hasSample, &self.has_sample),
-            (cat::hasWell, &self.has_well),
-            (cat::hasPlate, &self.has_plate),
-            (alloqual::AFQ_0000111, &self.dispense_state.as_ref().clone().map(|s| s.as_simple())),
-            (cat::dispenseType, &self.dispense_type.as_ref().clone().map(|s| s.as_simple())),
-        ] {
-            value.attach_into(
-                graph,
-                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
-            )?;
-        }
-
-        Ok(())
-    }
-}
+use sophia::{api::ns::rdf, inmem::graph::LightGraph};
+use sophia_api::term::{SimpleTerm, Term};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -258,7 +74,6 @@ pub struct ErrorMargin {
     pub unit: Unit,
 }
 
-/// Implementation for concrete [Observation].
 impl InsertIntoGraph for ErrorMargin {
     fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
         for (prop, value) in [
@@ -412,6 +227,98 @@ impl InsertIntoGraph for Well {
             )?;
         }
 
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PeakList {
+    pub peak: Vec<Peak>,
+}
+
+impl InsertIntoGraph for PeakList {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &cat::PeakList.as_simple() as &dyn InsertIntoGraph),
+            (cat::Peak, &self.peak),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Peak {
+    #[serde(rename = "@index")]
+    pub index: i64,
+    #[serde(rename = "peakIdentifier")]
+    pub peak_identifier: String,
+    #[serde(rename = "peak area")]
+    pub peak_area: Measurement,
+    #[serde(rename = "retention time")]
+    pub retention_time: Measurement,
+    #[serde(rename = "peak start")]
+    pub peak_start: Measurement,
+    #[serde(rename = "peak end")]
+    pub peak_end: Measurement,
+    #[serde(rename = "peak height")]
+    pub peak_height: Measurement,
+    #[serde(rename = "relative peak area")]
+    pub relative_peak_area: Measurement,
+    #[serde(rename = "relative peak height")]
+    pub relative_peak_height: Measurement,
+    #[serde(rename = "peak value at start")]
+    pub peak_value_at_start: Measurement,
+    #[serde(rename = "peak value at end")]
+    pub peak_value_at_end: Measurement,
+}
+
+impl InsertIntoGraph for Peak {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (pred, value) in [
+            (rdf::type_, &allores::AFR_0000413.as_simple() as &dyn InsertIntoGraph),
+            (allores::AFR_0001164, &self.peak_identifier.as_simple()),
+            (allores::AFR_0001073, &self.peak_area),
+            (allores::AFR_0001089, &self.retention_time),
+            (allores::AFR_0001178, &self.peak_start),
+            (allores::AFR_0001180, &self.peak_end),
+            (allores::AFR_0000948, &self.peak_height),
+            (allores::AFR_0001165, &self.relative_peak_area),
+            (allores::AFR_0000949, &self.relative_peak_height),
+            (allores::AFR_0001179, &self.peak_value_at_start),
+            (allores::AFR_0001181, &self.peak_value_at_end),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: pred.as_simple(), target_iri: None },
+            )?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Measurement {
+    pub value: f64,
+    pub unit: Unit,
+}
+
+impl InsertIntoGraph for Measurement {
+    fn insert_into(&self, graph: &mut LightGraph, iri: SimpleTerm) -> anyhow::Result<()> {
+        for (prop, value) in [
+            (rdf::type_, &cat::Measurement.as_simple() as &dyn InsertIntoGraph),
+            (qudt::unit, &self.unit.iri().as_simple() as &dyn InsertIntoGraph),
+            (qudt::value, &self.value.as_simple()),
+        ] {
+            value.attach_into(
+                graph,
+                Link { source_iri: iri.clone(), pred: prop.as_simple(), target_iri: None },
+            )?;
+        }
         Ok(())
     }
 }
