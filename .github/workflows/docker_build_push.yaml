@@ -28,7 +28,7 @@ jobs:
         run: |
           nix develop ./tools/nix#default --accept-flake-config --command bash -c '
             echo "$GITHUB_TOKEN" | skopeo login ghcr.io -u $GITHUB_ACTOR --password-stdin
-            just docker build-nix-package
-            just docker build-nix-image
-            just docker push-image
+            just --unstable docker build-nix-package
+            just --unstable docker build-nix-image
+            just --unstable docker push-image
           '
