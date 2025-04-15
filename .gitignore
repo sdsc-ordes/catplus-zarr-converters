@@ -1,7 +1,11 @@
+# Builds
+build/
+
 # Examples 
 examples/
 # Direnv
 .direnv
+.output
 
 # Rust Build
 target

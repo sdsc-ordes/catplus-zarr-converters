@@ -45,6 +45,8 @@
         let
           overlays = [ (import rust-overlay) ];
 
+          lib = nixpkgs.lib;
+
           # Import nixpkgs and load it into pkgs.
           # Overlay the rust toolchain
           pkgs = import nixpkgs {
@@ -70,9 +72,28 @@
             rustToolchain
             cargo-watch
             just
+            skopeo
           ];
+
+          rootDir = ./../..;
+
+          catplus-converters = (import ./packages) {
+            inherit rootDir;
+            inherit pkgs;
+            inherit lib;
+            inherit rustToolchain;
+          };
+
+          catplus-converters-image = (import ./images) {
+            inherit pkgs;
+            inherit catplus-converters;
+          };
         in
         {
+          packages = {
+            inherit catplus-converters catplus-converters-image;
+          };
+
           devShells = {
             default = pkgs.mkShell {
               packages = packagesBasic ++ packagesDev;
