@@ -6,13 +6,6 @@ root_dir := `git rev-parse --show-toplevel`
 [private]
 default:
   just --list docker --no-aliases
-  
-# Upload converters image.
-push-image:
-   @echo "🐋 Uploading docker image"
-   skopeo copy \
-    "docker-archive:{{root_dir}}/tools/image/.output/package/catplus-converters-image" \
-    "docker://ghcr.io/sdsc-ordes/catplus-converters:latest"
 
 # Build the catplus-converters Nix package.
 build-nix-package *args:
@@ -21,7 +14,14 @@ build-nix-package *args:
         --out-link {{root_dir}}/tools/package/.output/build/bin/catplus-converters
 
 # Build the catplus-converters-image Nix Docker image.
-build-nix-image *args:
+build-nix-image *args: build-nix-package
     @echo "Building image derivation"
     nix build {{root_dir}}/tools/nix#catplus-converters-image \
         --out-link {{root_dir}}/tools/image/.output/package/catplus-converters-image
+
+# Upload converters image.
+push-image: build-nix-image
+   @echo "🐋 Uploading docker image"
+   skopeo copy \
+    "docker-archive:{{root_dir}}/tools/image/.output/package/catplus-converters-image" \
+    "docker://ghcr.io/sdsc-ordes/catplus-converters:latest"
