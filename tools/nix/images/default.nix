@@ -8,8 +8,11 @@ pkgs.dockerTools.buildLayeredImage {
 
   contents = [ 
     catplus-converters
-    pkgs.just
     pkgs.bashInteractive
+    pkgs.just
+    pkgs.rustc
+    pkgs.cargo
+
     ];
 
   fakeRootCommands = ''
