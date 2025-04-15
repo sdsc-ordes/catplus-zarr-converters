@@ -29,23 +29,6 @@ run input_type input_file output_file *args:
         "{{root_dir}}/{{input_file}}" \
         "{{root_dir}}/{{output_file}}" {{args}}
 
-# Upload converter image.
-upload-image:
-   skopeo login ghcr.io
-   skopeo copy \
-    "docker-archive:.output/package/catplus-converter-image" \
-    "docker://ghcr.io/sdsc-ordes/catplus-converter:latest"
-
-# Build the catplus-converter Nix package.
-nix-package *args:
-    nix build ./tools/nix#catplus-converter \
-        --out-link .output/build/bin/catplus-converter
-
-# Build the catplus-converter-image Nix Docker image.
-nix-image *args:
-    nix build ./tools/nix#catplus-converter-image \
-        --out-link .output/package/catplus-converter-image
-
 # Enter a nix interpreter with loaded flake.
 nix-repl:
     nix repl ./tools/nix
@@ -57,3 +40,6 @@ nix-develop *args:
     cmd=("$@") && \
     { [ -n "${cmd:-}" ] || cmd=("zsh"); } && \
     nix develop ./tools/nix#default --accept-flake-config --command "${cmd[@]}"
+
+# Manage docker.
+mod docker './tools/just/docker.just'

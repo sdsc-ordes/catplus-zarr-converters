@@ -29,6 +29,17 @@ just run synth examples/1-Synth.json examples/1-Synth.ttl turtle
 just run hci examples/0-HCI.json examples/0-HCI.ttl jsonld
 ```
 
+#### Deployment
+
+The rust code can be packaged and built into a docker image through Nix derivations. 
+Execute the following commands: 
+
+```
+just --unstable docker build-nix-package
+just --unstable docker build-nix-image
+just --unstable docker push-image
+```
+
 ### Architecture
 
 The json input is read with `serde_json`: the transformation into rdf is done by the `src/catplus-common` library.
