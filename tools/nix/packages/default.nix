@@ -27,7 +27,7 @@ let
   lockFile = rootDir + "/Cargo.lock";
 in
 rustPlatform.buildRustPackage {
-  name = "catplus-converter";
+  name = "catplus-converters";
   inherit src;
 
   version = (lib.importTOML cargoFile).package.version;

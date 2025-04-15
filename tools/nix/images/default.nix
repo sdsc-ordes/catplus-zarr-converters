@@ -1,12 +1,12 @@
 {
   pkgs,
-  catplus-converter,
+  catplus-converters,
 }:
 pkgs.dockerTools.buildLayeredImage {
   name = "ghcr.io/sdsc-ordes/catplus-converters";
-  tag = catplus-converter.version;
+  tag = catplus-converters.version;
 
-  contents = [ catplus-converter ];
+  contents = [ catplus-converters ];
 
   fakeRootCommands = ''
     ${pkgs.dockerTools.shadowSetup}
@@ -21,9 +21,9 @@ pkgs.dockerTools.buildLayeredImage {
     Entrypoint = [ "converter" ];
     WorkingDir = "/workspace";
     Labels = {
-      "org.opencontainers.image.source" = "https://github.com/catplus-converter";
-      "org.opencontainers.image.description" = catplus-converter.meta.description;
-      "org.opencontainers.image.license" = catplus-converter.meta.license.spdxId;
+      "org.opencontainers.image.source" = "https://github.com/catplus-converters";
+      "org.opencontainers.image.description" = catplus-converters.meta.description;
+      "org.opencontainers.image.license" = catplus-converters.meta.license.spdxId;
     };
     User = "non-root";
   };
