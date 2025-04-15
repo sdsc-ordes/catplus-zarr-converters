@@ -6,7 +6,10 @@ pkgs.dockerTools.buildLayeredImage {
   name = "ghcr.io/sdsc-ordes/catplus-converters";
   tag = catplus-converters.version;
 
-  contents = [ catplus-converters ];
+  contents = [ 
+    catplus-converters
+    pkgs.bashInteractive
+    ];
 
   fakeRootCommands = ''
     ${pkgs.dockerTools.shadowSetup}
