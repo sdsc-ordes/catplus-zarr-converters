@@ -17,7 +17,7 @@
 
     # You can access packages and modules from different nixpkgs revs
     # at the same time. Here's an working example:
-    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-23.11";
+    nixpkgsStable.url = "github:nixos/nixpkgs/nixos-24.11";
     # Also see the 'stable-packages' overlay at 'overlays/default.nix'.
 
     flake-utils.url = "github:numtide/flake-utils";
@@ -33,6 +33,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       flake-utils,
       rust-overlay,
