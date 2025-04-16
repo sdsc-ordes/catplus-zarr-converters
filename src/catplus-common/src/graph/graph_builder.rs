@@ -35,29 +35,39 @@ impl GraphBuilder {
     /// Otherwise, the empty string is used as the prefix.
     pub fn materialize_blank_nodes(&mut self, prefix: Option<&str>) -> Result<()> {
         let mut new_graph = LightGraph::new();
+
         for triple in self.graph.triples_matching(Any, Any, Any) {
             let [subject, predicate, object] = triple?;
 
-            // If the subject or object is a blank node, replace it with a URI
+            // If the subject is a blank node, replace it with a URI
             let new_subject = match subject {
                 SimpleTerm::BlankNode(s) => {
                     let new_iri = format!("{}{}", prefix.unwrap_or_default(), s.as_str());
-                    let new_s = new_iri.as_simple();
-                    new_s.clone()
+                    new_iri.to_owned()
                 },
-                _ => subject.clone()
+                SimpleTerm::Iri(s) => s.as_str().to_owned(),
+                _ => panic!("Unexpected subject type")
             };
 
-            let new_object = match object {
+            // If the object is a blank node, replace it with a URI
+            // In any other case, we just clone it
+            match object {
                 SimpleTerm::BlankNode(o) => {
-                    let new_iri = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
-                    let new_o = new_iri.as_simple();
-                    new_o
+                    let new_o = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
+                    new_graph.insert(
+                        new_subject.as_simple(),
+                        predicate.clone(),
+                        new_o.as_simple()
+                    )?;
                 },
-                _ => *object
+                _ => {
+                    new_graph.insert(
+                        new_subject.as_simple(),
+                        predicate.clone(),
+                        object.clone()
+                    )?;
+                },
             };
-            // Add the triple to the new graph
-            new_graph.insert(new_subject, predicate.clone(), new_object.clone())?;
         }
                     
 
