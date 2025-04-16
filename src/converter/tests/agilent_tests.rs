@@ -6,6 +6,31 @@ use converter::convert::{json_to_rdf, RdfFormat};
 use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
+fn test_materialize_blank_nodes() {
+    let output_format = RdfFormat::Turtle;
+    let json_data = r#"
+    {
+        "liquid chromatography aggregate document": {
+            "liquid chromatography document": [
+                {
+                    "analyst": "Swisscat (swisscat)",
+                    "measurement aggregate document": {
+                        "measurement document": []
+                    }
+                }
+            ]
+        }
+    }
+    "#;
+    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
+        json_data,
+        &output_format,
+        true,
+    );
+    println!("{}", result.unwrap());
+}
+
+#[test]
 fn test_convert_liquid_chromatography() {
     let output_format = RdfFormat::Turtle;
     let json_data = r#"
