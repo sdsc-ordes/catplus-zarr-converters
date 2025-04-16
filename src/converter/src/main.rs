@@ -39,6 +39,10 @@ struct Args {
     /// Type of input data: "Turtle" or "Jsonld".
     #[arg(value_enum)]
     format: RdfFormat,
+
+    /// Materialize blank nodes
+    #[arg(long, default_value_t = false)]
+    materialize: bool,
 }
 
 fn main() -> Result<()> {
@@ -62,11 +66,16 @@ fn main() -> Result<()> {
 
     // Unified conversion function with type selection
     let serialized_graph = match args.input_type {
-        InputType::Synth => json_to_rdf::<SynthBatch>(&input_content, &args.format),
-        InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format),
+        InputType::Synth => {
+            json_to_rdf::<SynthBatch>(&input_content, &args.format, args.materialize)
+        }
+        InputType::HCI => {
+            json_to_rdf::<CampaignWrapper>(&input_content, &args.format, args.materialize)
+        }
         InputType::Agilent => json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
             &input_content,
             &args.format,
+            args.materialize,
         ),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;

@@ -105,7 +105,7 @@ fn test_convert_campaign() {
             }
         }
     "#;
-    let result = json_to_rdf::<CampaignWrapper>(json_data, &output_format);
+    let result = json_to_rdf::<CampaignWrapper>(json_data, &output_format, false);
     let expected_ttl = r#"
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>

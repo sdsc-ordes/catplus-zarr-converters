@@ -1,6 +1,7 @@
 use crate::rdf::rdf_serializers::{serialize_graph_to_jsonld, serialize_graph_to_turtle};
 use anyhow::{Context, Result};
 use sophia::inmem::graph::LightGraph;
+use sophia_api::{prelude::*, term::SimpleTerm};
 
 use super::insert_into::InsertIntoGraph;
 
@@ -25,6 +26,46 @@ impl GraphBuilder {
     pub fn insert(&mut self, other: &dyn InsertIntoGraph) -> Result<()> {
         other.insert_into(&mut self.graph, other.get_uri())?;
 
+        Ok(())
+    }
+
+    /// Materializes blank nodes in the graph by replacing them with URIs.
+    /// If a prefix is given, it will be used for all materialized blank nodes.
+    /// Otherwise, the empty string is used as the prefix.
+    pub fn materialize_blank_nodes(&mut self, prefix: Option<&str>) -> Result<()> {
+        let mut materialized_graph = LightGraph::new();
+
+        for triple in self.graph.triples_matching(Any, Any, Any) {
+            let [subject, predicate, object] = triple?;
+
+            // If the subject is a blank node, replace it with a URI
+            let new_subject = match subject {
+                SimpleTerm::BlankNode(s) => {
+                    let new_iri = format!("{}{}", prefix.unwrap_or_default(), s.as_str());
+                    IriRef::new(new_iri.to_owned())
+                }
+                SimpleTerm::Iri(s) => IriRef::new(s.as_str().to_owned()),
+                _ => panic!("Unexpected subject type"),
+            }?;
+
+            // If the object is a blank node, replace it with a URI
+            // In any other case, we just clone it.
+            match object {
+                SimpleTerm::BlankNode(o) => {
+                    let new_o = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
+                    materialized_graph.insert(
+                        new_subject,
+                        predicate.clone(),
+                        IriRef::new(new_o.as_str().to_owned()).unwrap(),
+                    )?;
+                }
+                _ => {
+                    materialized_graph.insert(new_subject, predicate.clone(), object.clone())?;
+                }
+            };
+        }
+
+        self.graph = materialized_graph;
         Ok(())
     }
 

@@ -6,6 +6,31 @@ use converter::convert::{json_to_rdf, RdfFormat};
 use sophia_isomorphism::isomorphic_graphs;
 
 #[test]
+fn test_materialize_blank_nodes() {
+    let output_format = RdfFormat::Turtle;
+    let json_data = r#"
+    {
+        "liquid chromatography aggregate document": {
+            "liquid chromatography document": [
+                {
+                    "analyst": "Swisscat (swisscat)",
+                    "measurement aggregate document": {
+                        "measurement document": []
+                    }
+                }
+            ]
+        }
+    }
+    "#;
+    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
+        json_data,
+        &output_format,
+        true,
+    );
+    println!("{}", result.unwrap());
+}
+
+#[test]
 fn test_convert_liquid_chromatography() {
     let output_format = RdfFormat::Turtle;
     let json_data = r#"
@@ -202,8 +227,11 @@ fn test_convert_liquid_chromatography() {
         }
     }
     "#;
-    let result =
-        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
+        json_data,
+        &output_format,
+        false,
+    );
     println!("{:?}", result);
     let expected_ttl = r#"
 
@@ -369,8 +397,11 @@ fn test_convert_device_system_document() {
         }
     }
     "#;
-    let result =
-        json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(json_data, &output_format);
+    let result = json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
+        json_data,
+        &output_format,
+        false,
+    );
     let expected_ttl = r#"
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
