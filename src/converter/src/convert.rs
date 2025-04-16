@@ -19,7 +19,7 @@ pub enum RdfFormat {
 ///
 /// # Returns
 /// A `Result` containing the serialized graph as a string or an error.
-pub fn json_to_rdf<T>(input_content: &str, format: &RdfFormat) -> Result<String>
+pub fn json_to_rdf<T>(input_content: &str, format: &RdfFormat, materialize: bool) -> Result<String>
 where
     T: DeserializeOwned + InsertIntoGraph, // Trait bounds
 {
@@ -27,6 +27,12 @@ where
 
     let mut graph_builder = GraphBuilder::new();
     graph_builder.insert(&data).context("Failed to build RDF graph")?;
+
+    if materialize {
+        graph_builder
+            .materialize_blank_nodes(Some("http://example.org/"))
+            .context("Failed to materialize blank nodes")?;
+    }
 
     let serialized_graph = match format {
         RdfFormat::Jsonld => {
