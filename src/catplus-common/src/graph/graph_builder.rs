@@ -52,14 +52,14 @@ impl GraphBuilder {
             }?;
 
             // If the object is a blank node, replace it with a URI
-            // In any other case, we just clone it
+            // In any other case, we just clone it.
             match object {
                 SimpleTerm::BlankNode(o) => {
                     let new_o = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
                     materialized_graph.insert(
                         new_subject,
                         predicate.clone(),
-                        new_o.as_simple(),
+                        IriRef::new(new_o.as_str().to_owned()).unwrap(),
                     )?;
                 }
                 _ => {
