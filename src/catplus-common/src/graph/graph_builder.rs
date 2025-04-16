@@ -42,11 +42,14 @@ impl GraphBuilder {
             let new_subject = match subject {
                 SimpleTerm::BlankNode(s) => {
                     let new_iri = format!("{}{}", prefix.unwrap_or_default(), s.as_str());
-                    new_iri.to_owned()
+                    IriRef::new(new_iri.to_owned())
                 }
-                SimpleTerm::Iri(s) => s.as_str().to_owned(),
+                SimpleTerm::Iri(s) => {
+                    IriRef::new(s.as_str().to_owned())
+                }
+                ,
                 _ => panic!("Unexpected subject type"),
-            };
+            }?;
 
             // If the object is a blank node, replace it with a URI
             // In any other case, we just clone it
@@ -54,14 +57,14 @@ impl GraphBuilder {
                 SimpleTerm::BlankNode(o) => {
                     let new_o = format!("{}{}", prefix.unwrap_or_default(), o.as_str());
                     materialized_graph.insert(
-                        new_subject.as_simple(),
+                        new_subject,
                         predicate.clone(),
                         new_o.as_simple(),
                     )?;
                 }
                 _ => {
                     materialized_graph.insert(
-                        new_subject.as_simple(),
+                        new_subject,
                         predicate.clone(),
                         object.clone(),
                     )?;
