@@ -343,7 +343,7 @@ mod tests {
         };
 
         let mut b = GraphBuilder::new();
-        let i = IriRef::new_unchecked("http://test.com/my-obersvation");
+        let i = IriRef::new_unchecked("http://test.com/my-observation");
         observation.insert_into(&mut b.graph, i.as_simple())?;
         println!("Graph\n{}", b.serialize_to_turtle().unwrap());
 
