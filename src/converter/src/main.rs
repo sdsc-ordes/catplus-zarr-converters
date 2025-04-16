@@ -66,8 +66,12 @@ fn main() -> Result<()> {
 
     // Unified conversion function with type selection
     let serialized_graph = match args.input_type {
-        InputType::Synth => json_to_rdf::<SynthBatch>(&input_content, &args.format, args.materialize),
-        InputType::HCI => json_to_rdf::<CampaignWrapper>(&input_content, &args.format, args.materialize),
+        InputType::Synth => {
+            json_to_rdf::<SynthBatch>(&input_content, &args.format, args.materialize)
+        }
+        InputType::HCI => {
+            json_to_rdf::<CampaignWrapper>(&input_content, &args.format, args.materialize)
+        }
         InputType::Agilent => json_to_rdf::<LiquidChromatographyAggregateDocumentWrapper>(
             &input_content,
             &args.format,
