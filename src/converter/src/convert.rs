@@ -30,7 +30,7 @@ where
 
     if materialize {
         graph_builder
-            .materialize_blank_nodes(Some("http://example.org/"))
+            .materialize_blank_nodes(Some("http://example.org/cat"))
             .context("Failed to materialize blank nodes")?;
     }
 
