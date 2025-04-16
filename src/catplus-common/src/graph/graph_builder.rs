@@ -44,10 +44,7 @@ impl GraphBuilder {
                     let new_iri = format!("{}{}", prefix.unwrap_or_default(), s.as_str());
                     IriRef::new(new_iri.to_owned())
                 }
-                SimpleTerm::Iri(s) => {
-                    IriRef::new(s.as_str().to_owned())
-                }
-                ,
+                SimpleTerm::Iri(s) => IriRef::new(s.as_str().to_owned()),
                 _ => panic!("Unexpected subject type"),
             }?;
 
@@ -63,11 +60,7 @@ impl GraphBuilder {
                     )?;
                 }
                 _ => {
-                    materialized_graph.insert(
-                        new_subject,
-                        predicate.clone(),
-                        object.clone(),
-                    )?;
+                    materialized_graph.insert(new_subject, predicate.clone(), object.clone())?;
                 }
             };
         }
