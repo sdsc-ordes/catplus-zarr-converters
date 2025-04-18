@@ -3,6 +3,13 @@ name = "converter"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+# panic = "abort" # I dont think you want that. Check again.
+lto = true
+codegen-units = 1
+incremental = false
+opt-level = "z"
+
 [lib]
 path = "src/lib.rs"
 

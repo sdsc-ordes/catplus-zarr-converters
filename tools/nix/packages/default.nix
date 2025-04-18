@@ -36,6 +36,10 @@ rustPlatform.buildRustPackage {
     inherit lockFile;
   };
 
+  dontInstallDocs = true;
+  dontInstallManpages = true;
+  doInstallCargoArtifacts = false;
+
   meta = {
     description = "File converters for the cat+ system.";
     homepage = "https://github.com/sdsc-ordes/catplus-converters";
