@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use catplus_common::models::{
-    agilent::LiquidChromatographyAggregateDocumentWrapper, hci::CampaignWrapper, synth::SynthBatch,
+    agilent::LiquidChromatographyAggregateDocumentWrapper, bravo::BravoBatch, hci::CampaignWrapper,
+    synth::SynthBatch,
 };
 use clap::Parser;
 use converter::convert::{json_to_rdf, RdfFormat};
@@ -17,6 +18,7 @@ enum InputType {
     Synth,
     HCI,
     Agilent,
+    Bravo,
 }
 
 /// Converts CAT+ JSON input into RDF formats.
@@ -26,7 +28,7 @@ enum InputType {
 /// serialized as Turtle (ttl) or JSON-LD (jsonld).
 #[derive(Parser, Debug)]
 struct Args {
-    /// Type of input data: "Synth", "HCI" or "Agilent".
+    /// Type of input data: "Synth", "HCI" or "Agilent" or "Bravo".
     #[arg(value_enum)]
     input_type: InputType,
 
@@ -77,6 +79,7 @@ fn main() -> Result<()> {
             &args.format,
             args.materialize,
         ),
+        InputType::Bravo => json_to_rdf::<BravoBatch>(&input_content, &args.format),
     }
     .with_context(|| format!("Failed to convert JSON to RDF format '{:?}'", &args.format))?;
 

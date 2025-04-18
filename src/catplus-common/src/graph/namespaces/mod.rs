@@ -3,6 +3,7 @@ pub mod allodc;
 pub mod allohdf;
 pub mod allohdfcube;
 pub mod alloproc;
+pub mod alloprop;
 pub mod alloqual;
 pub mod allores;
 pub mod allorole;

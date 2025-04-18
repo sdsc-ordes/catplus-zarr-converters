@@ -32,6 +32,7 @@ fn test_convert_filtrate_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -100,6 +101,7 @@ fn test_convert_pressure_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -190,6 +192,7 @@ fn test_convert_set_temperature_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -214,13 +217,13 @@ fn test_convert_set_temperature_action() {
             qudt:unit unit:REV-PER-MIN;
             qudt:value "152"^^xsd:double];
         cat:subEquipmentName "heater";
-        cat:temperatureShakerShape [ a cat:Observation;
+        cat:temperatureShaker [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "1"^^xsd:double];
             qudt:unit unit:DEG-C;
             qudt:value "25"^^xsd:double];
-        cat:temperatureTumbleStirrerShape [ a cat:Observation;
+        cat:temperatureTumbleStirrer [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "2"^^xsd:double];
@@ -349,6 +352,7 @@ fn test_convert_add_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -399,7 +403,7 @@ fn test_convert_add_action() {
                 purl:identifier "124";
                 alloqual:AFQ_0000111 "Liquid"];
             cat:role "reagent";
-            cat:vialShape "storage vial";
+            cat:vialType "storage vial";
             allores:AFR_0002464 "17"];
         cat:hasWell [ a cat:Well;
             cat:hasPlate [ a cat:Plate;
@@ -495,6 +499,7 @@ fn test_convert_shake_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
@@ -512,20 +517,20 @@ fn test_convert_shake_action() {
         cat:hasPlate [ a cat:Plate;
             cat:containerBarcode "1";
             cat:containerID "1"];
-        cat:speedTumbleStirrerShape [ a cat:Observation;
+        alloprop:AFX_0000211 [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:REV-PER-MIN;
                 qudt:value "1"^^xsd:double];
             qudt:unit unit:REV-PER-MIN;
             qudt:value "600"^^xsd:double];
         cat:subEquipmentName "Tumble Stirrer";
-        cat:temperatureShakerShape [ a cat:Observation;
+        cat:temperatureShaker [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "2"^^xsd:double];
             qudt:unit unit:DEG-C;
             qudt:value "25"^^xsd:double];
-        cat:temperatureTumbleStirrerShape [ a cat:Observation;
+        cat:temperatureTumbleStirrer [ a cat:Observation;
             cat:errorMargin [ a cat:errorMargin;
                 qudt:unit unit:DEG-C;
                 qudt:value "1"^^xsd:double];
@@ -581,6 +586,7 @@ fn test_convert_set_vacuum_action() {
         PREFIX allores: <http://purl.allotrope.org/ontologies/result#>
         PREFIX allorole: <http://purl.allotrope.org/ontologies/role#>
         PREFIX alloproc: <http://purl.allotrope.org/ontologies/process#>
+        PREFIX alloprop: <http://purl.allotrope.org/ontologies/property#>
         PREFIX allocom: <http://purl.allotrope.org/ontologies/common#>
         PREFIX allohdf: <http://purl.allotrope.org/ontologies/hdf5/1.8#>
         PREFIX allohdfcube: <http://purl.allotrope.org/ontologies/datacube-hdf-map#>
