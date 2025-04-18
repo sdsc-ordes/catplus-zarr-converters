@@ -55,7 +55,7 @@
           };
 
           # Set the rust toolchain from the `rust-toolchain.toml`.
-          rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ../../rust-toolchain.toml;
+          rustToolchain = pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ../../rust-toolchain-release.toml;
 
           # Things needed only at compile-time.
           packagesBasic = with pkgs; [
